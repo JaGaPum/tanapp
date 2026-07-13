@@ -1,0 +1,300 @@
+{
+  "@@locale": "es",
+  "appTitle": "TanApp",
+
+  "errorInesperado": "Ha ocurrido un error inesperado",
+  "cuentaDesactivada": "Tu cuenta está desactivada. Contacta con el administrador.",
+
+  "validatorRequiredField": "{field} es obligatorio",
+  "@validatorRequiredField": {
+    "placeholders": { "field": { "type": "String" } }
+  },
+  "validatorEmailRequired": "El email es obligatorio",
+  "validatorEmailInvalid": "Introduce un email válido",
+  "validatorPasswordRequired": "La contraseña es obligatoria",
+  "validatorPasswordTooShort": "Debe tener al menos 8 caracteres",
+  "validatorPasswordMismatch": "Las contraseñas no coinciden",
+  "validatorOtpLength": "Introduce el código de 6 dígitos",
+  "validatorOtpDigitsOnly": "El código solo contiene números",
+  "validatorProvinciaRequired": "La provincia es obligatoria",
+  "validatorConcelloRequired": "El concello es obligatorio",
+
+  "confirmDialogConfirm": "Confirmar",
+  "confirmDialogCancel": "Cancelar",
+
+  "passwordFieldLabel": "Contraseña",
+  "fieldNombre": "Nombre",
+  "fieldPrimerApellido": "Primer apellido",
+  "fieldSegundoApellidoOpcional": "Segundo apellido (opcional)",
+  "fieldSegundoApellido": "Segundo apellido",
+  "fieldTelefonoOpcional": "Teléfono (opcional)",
+  "fieldTelefono": "Teléfono",
+  "fieldEmail": "Email",
+  "fieldContrasena": "La contraseña",
+  "fieldProvincia": "Provincia",
+  "fieldConcello": "Concello",
+  "fieldConfirmarContrasena": "Confirmar contraseña",
+
+  "errorCargarProvincias": "No se pudieron cargar las provincias: {error}",
+  "@errorCargarProvincias": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "errorCargarConcellos": "No se pudieron cargar los concellos: {error}",
+  "@errorCargarConcellos": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+
+  "googleContinuar": "Continuar con Google",
+  "googleConectando": "Conectando…",
+  "googleRegistrarse": "Regístrate con Google",
+  "o": "o",
+
+  "drawerMiCuenta": "Mi cuenta",
+  "drawerSistema": "Sistema",
+  "drawerConfiguracion": "Configuración",
+  "drawerCerrarSesion": "Cerrar sesión",
+  "drawerCerrarSesionMensaje": "¿Seguro que quieres cerrar sesión?",
+
+  "loginTagline": "Información funeraria",
+  "loginRecordarme": "Recordarme",
+  "loginOlvidasteContrasena": "¿Olvidaste tu contraseña?",
+  "loginIniciarSesion": "Iniciar sesión",
+  "loginNoTienesCuenta": "¿No tienes cuenta?",
+  "loginRegistrate": "Regístrate",
+  "loginEresFuneraria": "¿Eres una funeraria o tanatorio? Solicita el alta",
+
+  "registerTitle": "Crear cuenta",
+  "registerYaTengoCuenta": "Ya tengo cuenta, iniciar sesión",
+
+  "forgotPasswordTitle": "Recuperar contraseña",
+  "forgotPasswordIntro": "Introduce tu email y te enviaremos un código para restablecer tu contraseña.",
+  "forgotPasswordEnviarCodigo": "Enviar código",
+
+  "resetPasswordTitle": "Nueva contraseña",
+  "resetPasswordNuevaContrasena": "Nueva contraseña",
+  "resetPasswordGuardar": "Guardar contraseña",
+  "resetPasswordActualizada": "Contraseña actualizada, inicia sesión de nuevo",
+
+  "verifyOtpTitle": "Verificar código",
+  "verifyOtpSentTo": "Hemos enviado un código de 6 dígitos a {email}",
+  "@verifyOtpSentTo": {
+    "placeholders": { "email": { "type": "String" } }
+  },
+  "verifyOtpVerificar": "Verificar",
+  "verifyOtpReenviar": "Reenviar código",
+  "verifyOtpReenviarCooldown": "Reenviar código ({segundos}s)",
+  "@verifyOtpReenviarCooldown": {
+    "placeholders": { "segundos": { "type": "int" } }
+  },
+  "verifyOtpCodigoReenviado": "Código reenviado",
+  "verifyOtpNoSePudoReenviar": "No se pudo reenviar el código",
+  "verifyOtpCodigoIncorrecto": "Código incorrecto",
+
+  "errorGenerico": "Error: {error}",
+  "@errorGenerico": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+
+  "accountTitle": "Mi cuenta",
+  "accountNoSePudoCargarPerfil": "No se pudo cargar tu perfil",
+  "accountFotoPerfil": "Foto de perfil",
+  "accountDatosPersonales": "Datos personales",
+  "accountFotoActualizada": "Foto actualizada",
+  "accountNoSePudoSubirFoto": "No se pudo subir la foto",
+  "accountDatosActualizados": "Datos actualizados",
+  "accountCambiarContrasena": "Cambiar contraseña",
+  "accountContrasenaActual": "Contraseña actual",
+  "accountContrasenaActualIncorrecta": "La contraseña actual no es correcta",
+  "accountNoSePudoVerificarIdentidad": "No se pudo verificar tu identidad",
+  "accountContrasenaActualizada": "Contraseña actualizada",
+  "accountActualizarContrasena": "Actualizar contraseña",
+  "accountGuardarCambios": "Guardar cambios",
+
+  "usuarioFichaTitulo": "Ficha de usuario",
+  "usuarioCambiosGuardados": "Cambios guardados",
+  "usuarioNoSePudoAsignarRol": "No se pudo asignar el rol",
+  "usuarioQuitarRolTitulo": "Quitar rol",
+  "usuarioQuitarRolMensaje": "¿Quitar el rol \"{rol}\" a este usuario?",
+  "@usuarioQuitarRolMensaje": {
+    "placeholders": { "rol": { "type": "String" } }
+  },
+  "usuarioQuitar": "Quitar",
+  "usuarioNoSePudoQuitarRol": "No se pudo quitar el rol",
+  "usuarioYaTieneTodosLosRoles": "Ya tiene todos los roles asignados",
+  "usuarioEmailValidado": "Email validado",
+  "usuarioNoSePudoValidarEmail": "No se pudo validar el email",
+  "usuarioEliminarTitulo": "Eliminar usuario",
+  "usuarioEliminarMensaje": "¿Seguro que quieres eliminar a \"{nombre}\"? Esta acción no se puede deshacer.",
+  "@usuarioEliminarMensaje": {
+    "placeholders": { "nombre": { "type": "String" } }
+  },
+  "usuarioEliminar": "Eliminar",
+  "usuarioNoSePudoEliminar": "No se pudo eliminar el usuario",
+  "usuarioIdiomaPreferido": "Idioma preferido",
+  "errorCargarIdiomas": "No se pudieron cargar los idiomas: {error}",
+  "@errorCargarIdiomas": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "usuarioActivo": "Usuario activo",
+  "validacionEmail": "Validación de email",
+  "marcarComoValidado": "Marcar como validado",
+  "validado": "Validado",
+  "roles": "Roles",
+  "anadirRol": "Añadir rol",
+  "sesiones": "Sesiones",
+  "ocultarSesiones": "Ocultar sesiones",
+  "verSesiones": "Ver sesiones",
+  "sinSesionesRegistradas": "Sin sesiones registradas",
+  "sesionColInicio": "Inicio",
+  "sesionColFin": "Fin",
+  "sesionColEstado": "Estado",
+  "sesionColRecordar": "Recordar",
+  "sesionEnCurso": "En curso",
+  "sesionAbierta": "Abierta",
+  "sesionCerrada": "Cerrada",
+  "si": "Sí",
+  "no": "No",
+  "errorCargarSesiones": "No se pudieron cargar las sesiones: {error}",
+  "@errorCargarSesiones": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+
+  "solicitudTitulo": "Solicitud de alta de cliente",
+  "solicitudEnviadaTitulo": "Solicitud enviada",
+  "solicitudEnviadaMensaje": "Hemos recibido tu solicitud. Un administrador la revisará y te contactaremos en breve.",
+  "volverAlInicio": "Volver al inicio",
+  "solicitudIntro": "Solicita el alta de tu funeraria, tanatorio o parroquia en TanApp. Un administrador revisará tu solicitud antes de darte acceso.",
+  "fieldRazonSocial": "Razón social",
+  "fieldNifCif": "NIF / CIF",
+  "fieldNombreContacto": "Nombre de la persona de contacto",
+  "fieldEmailContacto": "Email de contacto",
+  "fieldTelefonoContacto": "Teléfono de contacto",
+  "fieldObservacionesOpcional": "Observaciones (opcional)",
+  "enviarSolicitud": "Enviar solicitud",
+  "volver": "Volver",
+
+  "guardar": "Guardar",
+  "editar": "Editar",
+  "eliminar": "Eliminar",
+  "cambiosGuardados": "Cambios guardados",
+
+  "comunicacionNueva": "Nueva comunicación",
+  "comunicacionEditar": "Editar comunicación",
+  "comunicacionTipo": "Tipo de comunicación",
+  "comunicacionCodigo": "Código",
+  "comunicacionRemitente": "Remitente",
+  "comunicacionActiva": "Activa",
+  "comunicacionTextosPorIdioma": "Textos por idioma",
+  "comunicacionTextoGuardadoEnIdioma": "Texto en {idioma} guardado",
+  "@comunicacionTextoGuardadoEnIdioma": {
+    "placeholders": { "idioma": { "type": "String" } }
+  },
+  "comunicacionNoSePudoGuardar": "No se pudo guardar",
+  "comunicacionAsunto": "Asunto",
+  "comunicacionCuerpo": "Cuerpo",
+  "comunicacionGuardarTexto": "Guardar texto",
+  "comunicacionEliminarTitulo": "Eliminar comunicación",
+  "comunicacionEliminarMensaje": "¿Eliminar \"{nombre}\"?",
+  "@comunicacionEliminarMensaje": {
+    "placeholders": { "nombre": { "type": "String" } }
+  },
+  "configuracionComunicacionesTitulo": "Configuración > Comunicaciones",
+  "noHayComunicacionesDadasDeAlta": "No hay comunicaciones dadas de alta",
+  "inactiva": "Inactiva",
+
+  "gestionUsuariosTitulo": "Gestión de usuarios",
+  "buscarPorNombreEmail": "Buscar por nombre o email",
+  "soloActivos": "Solo activos",
+  "todosLosRoles": "Todos los roles",
+  "noSeHanEncontradoUsuarios": "No se han encontrado usuarios",
+  "pendiente": "Pendiente",
+
+  "solicitudesClientesTitulo": "Solicitudes de clientes",
+  "estadoTodas": "Todas",
+  "estadoPendientes": "Pendientes",
+  "estadoAprobadas": "Aprobadas",
+  "estadoRechazadas": "Rechazadas",
+  "noHaySolicitudesEnEsteEstado": "No hay solicitudes en este estado",
+
+  "solicitudEliminarTitulo": "Eliminar solicitud",
+  "solicitudEliminarMensaje": "¿Seguro que quieres eliminar esta solicitud? Esta acción no se puede deshacer.",
+  "solicitudNoSePudoEliminar": "No se pudo eliminar la solicitud",
+  "solicitudAprobarTitulo": "Aprobar solicitud",
+  "solicitudRechazarTitulo": "Rechazar solicitud",
+  "solicitudConfirmarAprobar": "¿Confirmas que quieres aprobar esta solicitud de alta?",
+  "solicitudConfirmarRechazar": "¿Confirmas que quieres rechazar esta solicitud de alta?",
+  "aprobar": "Aprobar",
+  "rechazar": "Rechazar",
+  "solicitudNoIdentificado": "No se pudo identificar al usuario actual",
+  "solicitudAprobadaSinCuenta": "Solicitud aprobada, pero no se pudo crear la cuenta del cliente: {error}",
+  "@solicitudAprobadaSinCuenta": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "solicitudCuentaCreada": "Cuenta de cliente creada",
+  "solicitudNoSePudoCrearCuenta": "No se pudo crear la cuenta del cliente: {error}",
+  "@solicitudNoSePudoCrearCuenta": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "solicitudDetalleTitulo": "Solicitud de cliente",
+  "solicitudAprobarBoton": "Aprobar solicitud",
+  "campoPersonaContacto": "Persona de contacto",
+  "campoLocalidad": "Localidad",
+  "campoObservaciones": "Observaciones",
+  "campoObservacionesResolucion": "Observaciones de resolución",
+  "fieldObservacionesResolucionOpcional": "Observaciones de resolución (opcional)",
+
+  "provincias": "Provincias",
+  "comunicaciones": "Comunicaciones",
+
+  "configuracionProvinciasTitulo": "Configuración > Provincias",
+  "noHayProvinciasDadasDeAlta": "No hay provincias dadas de alta",
+  "prefijoPostalLabel": "Prefijo postal: {prefijo}",
+  "@prefijoPostalLabel": {
+    "placeholders": { "prefijo": { "type": "String" } }
+  },
+  "provinciaEliminarTitulo": "Eliminar provincia",
+  "provinciaEliminarMensaje": "¿Eliminar \"{nombre}\"? También se eliminarán sus concellos.",
+  "@provinciaEliminarMensaje": {
+    "placeholders": { "nombre": { "type": "String" } }
+  },
+  "provinciaNueva": "Nueva provincia",
+  "provinciaEditar": "Editar provincia",
+  "fieldPrefijoPostal": "Prefijo postal",
+  "errorPrefijoRequerido": "El prefijo es obligatorio",
+  "errorNombreRequerido": "El nombre es obligatorio",
+
+  "concellosDeProvincia": "Concellos de {provincia}",
+  "@concellosDeProvincia": {
+    "placeholders": { "provincia": { "type": "String" } }
+  },
+  "concellosTitulo": "Concellos",
+  "noHayConcellosDadosDeAlta": "No hay concellos dados de alta",
+  "concelloEliminarTitulo": "Eliminar concello",
+  "concelloEliminarMensaje": "¿Eliminar \"{nombre}\"?",
+  "@concelloEliminarMensaje": {
+    "placeholders": { "nombre": { "type": "String" } }
+  },
+  "concelloNuevo": "Nuevo concello",
+  "concelloEditar": "Editar concello",
+
+  "gestionDeUsuarios": "Gestión de Usuarios",
+  "solicitudesDeClientes": "Solicitudes de Clientes",
+
+  "holaNombre": "Hola, {nombre}",
+  "@holaNombre": {
+    "placeholders": { "nombre": { "type": "String" } }
+  },
+  "tablon": "Tablón",
+  "seguidos": "Seguidos",
+  "avisos": "Avisos",
+
+  "proximamente": "Próximamente",
+  "avisoSolicitudesPendientes": "{count, plural, one{Tienes 1 solicitud de cliente pendiente de aprobar} other{Tienes {count} solicitudes de clientes pendientes de aprobar}}",
+  "@avisoSolicitudesPendientes": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "estadoAprobadaSingular": "Aprobada",
+  "estadoRechazadaSingular": "Rechazada",
+  "solicitudCrearCuentaBoton": "Crear cuenta de cliente"
+}
