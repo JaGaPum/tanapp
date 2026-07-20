@@ -31,3 +31,8 @@ final esUsuarioOrdinarioProvider = Provider.autoDispose<bool>((ref) {
     orElse: () => false,
   );
 });
+
+final isClienteProvider = Provider.autoDispose<bool>((ref) {
+  final perfilAsync = ref.watch(currentUserProfileProvider);
+  return perfilAsync.maybeWhen(data: (p) => p?.roles.contains('CLIENTE') ?? false, orElse: () => false);
+});

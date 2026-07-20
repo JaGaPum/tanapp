@@ -25,6 +25,7 @@ class _SolicitudClienteFormScreenState extends ConsumerState<SolicitudClienteFor
   final _nombreContactoController = TextEditingController();
   final _emailContactoController = TextEditingController();
   final _telefonoContactoController = TextEditingController();
+  final _direccionController = TextEditingController();
   final _observacionesController = TextEditingController();
   String? _provinciaSeleccionada;
   String? _concelloSeleccionado;
@@ -39,6 +40,7 @@ class _SolicitudClienteFormScreenState extends ConsumerState<SolicitudClienteFor
     _nombreContactoController.dispose();
     _emailContactoController.dispose();
     _telefonoContactoController.dispose();
+    _direccionController.dispose();
     _observacionesController.dispose();
     super.dispose();
   }
@@ -58,6 +60,7 @@ class _SolicitudClienteFormScreenState extends ConsumerState<SolicitudClienteFor
             telefonoContacto: _telefonoContactoController.text,
             localidad: _concelloSeleccionado,
             provincia: _provinciaSeleccionada,
+            direccion: _direccionController.text,
             observaciones: _observacionesController.text,
           );
       if (mounted) setState(() => _enviado = true);
@@ -153,6 +156,12 @@ class _SolicitudClienteFormScreenState extends ConsumerState<SolicitudClienteFor
             concelloInicial: _concelloSeleccionado,
             onProvinciaChanged: (value) => setState(() => _provinciaSeleccionada = value),
             onConcelloChanged: (value) => setState(() => _concelloSeleccionado = value),
+          ),
+          const SizedBox(height: 16),
+          AppTextField(
+            controller: _direccionController,
+            label: context.l10n.fieldDireccion,
+            validator: Validators.required(context, context.l10n.fieldDireccion),
           ),
           const SizedBox(height: 16),
           AppTextField(

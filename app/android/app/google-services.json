@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "879317306758",
+    "project_id": "tanapp-36ec1",
+    "storage_bucket": "tanapp-36ec1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:879317306758:android:e864c96de47a0f140cf007",
+        "android_client_info": {
+          "package_name": "com.tanapp.tanapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUCvq2G9Kld7updU_G9D9ebPoBGwBuJtI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

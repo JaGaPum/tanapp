@@ -1,14 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/utils/galician_sort.dart';
 import 'concello.dart';
 import 'provincia.dart';
-
-final _articuloInicial = RegExp(r'^(A|O|As|Os)\s+', caseSensitive: false);
-
-/// Clave de orden que ignora el artículo gallego inicial (A/O/As/Os), para que
-/// "A Coruña" se ordene junto a las C y no se amontone al principio bajo la "A".
-String _claveOrdenGalego(String nombre) => nombre.replaceFirst(_articuloInicial, '').toLowerCase();
 
 class ConfiguracionRepository {
   final SupabaseClient _client;
@@ -17,7 +12,7 @@ class ConfiguracionRepository {
   Future<List<Provincia>> listProvincias() async {
     final data = await _client.from('TConfiguracionProvincias').select();
     final provincias = (data as List).map((e) => Provincia.fromMap(e as Map<String, dynamic>)).toList();
-    provincias.sort((a, b) => _claveOrdenGalego(a.nombre).compareTo(_claveOrdenGalego(b.nombre)));
+    provincias.sort((a, b) => claveOrdenGalego(a.nombre).compareTo(claveOrdenGalego(b.nombre)));
     return provincias;
   }
 
@@ -27,7 +22,7 @@ class ConfiguracionRepository {
         .select()
         .eq('IdConfiguracionProvincia', idConfiguracionProvincia);
     final concellos = (data as List).map((e) => Concello.fromMap(e as Map<String, dynamic>)).toList();
-    concellos.sort((a, b) => _claveOrdenGalego(a.nombre).compareTo(_claveOrdenGalego(b.nombre)));
+    concellos.sort((a, b) => claveOrdenGalego(a.nombre).compareTo(claveOrdenGalego(b.nombre)));
     return concellos;
   }
 

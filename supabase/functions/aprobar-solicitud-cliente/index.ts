@@ -121,6 +121,7 @@ async function handle(req: Request): Promise<Response> {
       telefono: solicitud.TelefonoContacto,
       concello: solicitud.Localidad,
       provincia: solicitud.Provincia,
+      direccion: solicitud.Direccion,
     },
   });
   if (createError || !created.user) {
@@ -153,6 +154,29 @@ async function handle(req: Request): Promise<Response> {
       .from('TClienteSolicitudes')
       .update({ IdSistemaUsuarioCliente: nuevoPerfil.IdSistemaUsuario })
       .eq('IdClientesSolicitud', idClientesSolicitud);
+
+    // Traslada al usuario el tipo de cliente que el ADMIN eligió al aprobar la solicitud.
+    if (solicitud.IdConfiguracionClienteTipo) {
+      await adminClient
+        .from('TSistemaUsuarios')
+        .update({ IdConfiguracionClienteTipo: solicitud.IdConfiguracionClienteTipo })
+        .eq('IdSistemaUsuario', nuevoPerfil.IdSistemaUsuario);
+    }
+
+    // Da de alta la primera sede del cliente (la de la propia solicitud). Buscar/Seguindo/
+    // "Cómo llegar" operan sobre sedes, no sobre el cliente directamente, así que sin esto
+    // el cliente recién aprobado no aparecería en ningún resultado hasta que él mismo diera
+    // de alta una sede a mano.
+    if (solicitud.Direccion && solicitud.Provincia && solicitud.Localidad) {
+      await adminClient.from('TClienteSedes').insert({
+        IdSistemaUsuario: nuevoPerfil.IdSistemaUsuario,
+        Codigo: 'Sede001',
+        Nombre: 'Sede principal',
+        Provincia: solicitud.Provincia,
+        Concello: solicitud.Localidad,
+        Direccion: solicitud.Direccion,
+      });
+    }
   }
 
   return jsonResponse({ idAuthSupabase: created.user.id });

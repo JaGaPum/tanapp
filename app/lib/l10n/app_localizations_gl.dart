@@ -90,6 +90,24 @@ class AppLocalizationsGl extends AppLocalizations {
   String get fieldConcello => 'Concello';
 
   @override
+  String get fieldDireccion => 'Enderezo completo';
+
+  @override
+  String get fieldNombreEmpresa => 'Nome da empresa';
+
+  @override
+  String get comoLlegar => 'Como chegar';
+
+  @override
+  String get mapa => 'Mapa';
+
+  @override
+  String get filtroTodasProvincias => 'Todas';
+
+  @override
+  String get filtroTodosConcellos => 'Todos';
+
+  @override
   String get fieldConfirmarContrasena => 'Confirmar contrasinal';
 
   @override
@@ -258,6 +276,10 @@ class AppLocalizationsGl extends AppLocalizations {
   String get accountGuardarCambios => 'Gardar cambios';
 
   @override
+  String get accountNotificacionesPush =>
+      'Desexo recibir notificacións das publicacións no meu móbil.';
+
+  @override
   String get usuarioFichaTitulo => 'Ficha de usuario';
 
   @override
@@ -309,6 +331,14 @@ class AppLocalizationsGl extends AppLocalizations {
   @override
   String errorCargarIdiomas(String error) {
     return 'Non se puideron cargar os idiomas: $error';
+  }
+
+  @override
+  String get usuarioTipoCliente => 'Tipo de cliente';
+
+  @override
+  String errorCargarTiposCliente(String error) {
+    return 'Non se puideron cargar os tipos de cliente: $error';
   }
 
   @override
@@ -482,6 +512,55 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get inactiva => 'Inactiva';
+
+  @override
+  String get tiposCliente => 'Tipos de Clientes';
+
+  @override
+  String get configuracionTiposClienteTitulo =>
+      'Configuración > Tipos de Clientes';
+
+  @override
+  String get noHayTiposClienteDadosDeAlta =>
+      'Non hai tipos de cliente dados de alta';
+
+  @override
+  String get clienteTipoNuevo => 'Novo tipo de cliente';
+
+  @override
+  String get clienteTipoEditar => 'Editar tipo de cliente';
+
+  @override
+  String get clienteTipoActivo => 'Activo';
+
+  @override
+  String get clienteTipoEliminarTitulo => 'Eliminar tipo de cliente';
+
+  @override
+  String clienteTipoEliminarMensaje(String nombre) {
+    return 'Eliminar \"$nombre\"?';
+  }
+
+  @override
+  String get clienteTipoTraduccionesPorIdioma => 'Traducións por idioma';
+
+  @override
+  String get clienteTipoGuardarTraduccion => 'Gardar tradución';
+
+  @override
+  String clienteTipoTraduccionGuardadaEnIdioma(String idioma) {
+    return 'Tradución en $idioma gardada';
+  }
+
+  @override
+  String get clienteTipoNoSePudoGuardar => 'Non se puido gardar';
+
+  @override
+  String get solicitudSeleccionarTipoCliente => 'Selecciona o tipo de cliente';
+
+  @override
+  String get solicitudTipoClienteObligatorio =>
+      'O tipo de cliente é obrigatorio para aprobar a solicitude';
 
   @override
   String get gestionUsuariosTitulo => 'Xestión de usuarios';
@@ -668,10 +747,237 @@ class AppLocalizationsGl extends AppLocalizations {
   String get tablon => 'Taboleiro';
 
   @override
-  String get seguidos => 'Seguidos';
+  String get seguidos => 'Buscar';
 
   @override
   String get avisos => 'Avisos';
+
+  @override
+  String get seguidosSeleccionaTipo => '¿A quen quero seguir?';
+
+  @override
+  String get seguidosSeleccionaProvincia => 'Escolle a provincia';
+
+  @override
+  String get seguidosSeleccionaConcello => 'Escolle o concello';
+
+  @override
+  String get seguidosBuscarConcello => 'Buscar concello';
+
+  @override
+  String seguidosNoHayActivosNesteConcello(String tipoNombre) {
+    String _temp0 = intl.Intl.selectLogic(tipoNombre, {
+      'Tanatorio': 'Aínda non hai ningún tanatorio activo neste concello',
+      'Funeraria': 'Aínda non hai ningunha funeraria activa neste concello',
+      'Parroquia': 'Aínda non hai ningunha parroquia activa neste concello',
+      'other': 'Aínda non hai ningún cliente activo neste concello',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get seguidosSeguir => 'Seguir';
+
+  @override
+  String get seguidosDejarDeSeguir => 'Deixar de seguir';
+
+  @override
+  String get siguiendoTab => 'Seguindo';
+
+  @override
+  String get misSeguidosBuscarNombre => 'Buscar por nome';
+
+  @override
+  String get misSeguidosVacio => 'Aínda non segues a ningún cliente';
+
+  @override
+  String get drawerMisSedes => 'As miñas sedes';
+
+  @override
+  String get misSedesTitulo => 'As miñas sedes';
+
+  @override
+  String get misSedesVacio => 'Aínda non deches de alta ningunha sede';
+
+  @override
+  String get misSedesNueva => 'Nova sede';
+
+  @override
+  String get misSedesEditar => 'Editar sede';
+
+  @override
+  String get misSedesNombreSede => 'Nome da sede';
+
+  @override
+  String get misSedesEliminarTitulo => 'Eliminar sede';
+
+  @override
+  String misSedesEliminarMensaje(String nombre) {
+    return 'Eliminar \"$nombre\"?';
+  }
+
+  @override
+  String get misSedesUltimaSedeAviso =>
+      'Debe quedar polo menos unha sede. Para eliminar esta, primeiro dá de alta outra.';
+
+  @override
+  String get misSedesCodigo => 'Código';
+
+  @override
+  String get tabPublicar => 'Publicar';
+
+  @override
+  String get tabPanelDatos => 'Panel de Datos';
+
+  @override
+  String get publicarEscanear => 'Escanear';
+
+  @override
+  String get publicarManual => 'Manual';
+
+  @override
+  String get publicarNuevaPublicacion => 'Nova publicación';
+
+  @override
+  String get publicarSeleccionaSede => 'Escolle a sede';
+
+  @override
+  String get publicarSinSedes =>
+      'Aínda non tes ningunha sede. Dá de alta unha sede en \"Miñas sedes\" antes de publicar.';
+
+  @override
+  String get publicarAvisoDatosPersonales =>
+      'Por protección de datos, non inclúas datos persoais de familiares (nomes, teléfonos, enderezos). Só o nome do falecido e a información relevante para o público.';
+
+  @override
+  String get publicarNombreFallecido => 'Nome do falecido';
+
+  @override
+  String get publicarAvisoRevisar =>
+      'Revisa ben todos os campos antes de publicar: se veñen dun escaneo, corrixe ou completa o que faga falta.';
+
+  @override
+  String get publicarFechaFallecimiento => 'Data de falecemento';
+
+  @override
+  String get publicarEdad => 'Idade';
+
+  @override
+  String get publicarFechaFuneral => 'Data do funeral';
+
+  @override
+  String get publicarHoraFuneral => 'Hora do funeral';
+
+  @override
+  String get publicarIglesia => 'Igrexa';
+
+  @override
+  String get publicarLugar => 'Lugar';
+
+  @override
+  String get publicarCapillaArdiente => 'Capela ardente / velorio';
+
+  @override
+  String get publicarSala => 'Sala';
+
+  @override
+  String get publicarObservaciones => 'Observacións';
+
+  @override
+  String get publicarEdadInvalida => 'Introduce un número enteiro válido';
+
+  @override
+  String get publicarVistaPreviaTitulo => 'É correcto?';
+
+  @override
+  String publicarFallecioEl(String fecha) {
+    return 'Faleceu o $fecha';
+  }
+
+  @override
+  String publicarAnosDeEdad(int edad) {
+    String _temp0 = intl.Intl.pluralLogic(
+      edad,
+      locale: localeName,
+      other: '$edad anos',
+      one: '1 ano',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get publicarPublicar => 'Publicar';
+
+  @override
+  String get publicarPublicadoOk => 'Publicación creada';
+
+  @override
+  String get publicarLeyendoEsquela => 'Lendo esquela…';
+
+  @override
+  String get publicarOcrSinTexto =>
+      'Non se puido ler texto na foto. Cobre o formulario a man.';
+
+  @override
+  String publicarOcrError(String detalle) {
+    return 'Non se puido ler a foto (detalle técnico: $detalle). Cobre o formulario a man; se podes, fai unha captura desta mensaxe para reportalo.';
+  }
+
+  @override
+  String get publicarSinPublicaciones => 'Aínda non hai ningunha publicación';
+
+  @override
+  String get publicarCambiosGuardados => 'Cambios gardados';
+
+  @override
+  String get publicarEditarPublicacion => 'Editar publicación';
+
+  @override
+  String get publicarEliminarTitulo => 'Eliminar publicación';
+
+  @override
+  String publicarEliminarMensaje(String nombre) {
+    return 'Seguro que queres eliminar a publicación de $nombre?';
+  }
+
+  @override
+  String get tabPublicaciones => 'Publicacións';
+
+  @override
+  String get arquivo => 'Arquivo';
+
+  @override
+  String get arquivoVacio => 'Aínda non gardaches ningunha publicación';
+
+  @override
+  String get arquivoGardado => 'Gardado no meu arquivo';
+
+  @override
+  String get arquivoEliminado => 'Eliminado do meu arquivo';
+
+  @override
+  String get arquivoTooltipGardar => 'Gardar no meu arquivo';
+
+  @override
+  String get arquivoTooltipQuitar => 'Quitar do meu arquivo';
+
+  @override
+  String get panelDatosPublicaciones => 'Publicacións';
+
+  @override
+  String get panelDatosSeguidores => 'Seguidores';
+
+  @override
+  String get panelDatosSinSeguidores => 'Aínda non ten seguidores';
+
+  @override
+  String get panelDatosConcelloDesconocido => 'Sen concello indicado';
+
+  @override
+  String get tablonBuscar => 'Buscar por texto, cliente ou concello';
+
+  @override
+  String get misSeguidosBuscarYFiltrar => 'Buscar e filtrar';
 
   @override
   String get proximamente => 'Proximamente';

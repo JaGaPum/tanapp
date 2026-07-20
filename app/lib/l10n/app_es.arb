@@ -33,6 +33,12 @@
   "fieldContrasena": "La contraseña",
   "fieldProvincia": "Provincia",
   "fieldConcello": "Concello",
+  "fieldDireccion": "Dirección completa",
+  "fieldNombreEmpresa": "Nombre de la empresa",
+  "comoLlegar": "Cómo llegar",
+  "mapa": "Mapa",
+  "filtroTodasProvincias": "Todas",
+  "filtroTodosConcellos": "Todos",
   "fieldConfirmarContrasena": "Confirmar contraseña",
 
   "errorCargarProvincias": "No se pudieron cargar las provincias: {error}",
@@ -109,6 +115,7 @@
   "accountContrasenaActualizada": "Contraseña actualizada",
   "accountActualizarContrasena": "Actualizar contraseña",
   "accountGuardarCambios": "Guardar cambios",
+  "accountNotificacionesPush": "Deseo recibir notificaciones de las publicaciones en mi móvil.",
 
   "usuarioFichaTitulo": "Ficha de usuario",
   "usuarioCambiosGuardados": "Cambios guardados",
@@ -133,6 +140,11 @@
   "usuarioIdiomaPreferido": "Idioma preferido",
   "errorCargarIdiomas": "No se pudieron cargar los idiomas: {error}",
   "@errorCargarIdiomas": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "usuarioTipoCliente": "Tipo de cliente",
+  "errorCargarTiposCliente": "No se pudieron cargar los tipos de cliente: {error}",
+  "@errorCargarTiposCliente": {
     "placeholders": { "error": { "type": "String" } }
   },
   "usuarioActivo": "Usuario activo",
@@ -201,6 +213,27 @@
   "configuracionComunicacionesTitulo": "Configuración > Comunicaciones",
   "noHayComunicacionesDadasDeAlta": "No hay comunicaciones dadas de alta",
   "inactiva": "Inactiva",
+
+  "tiposCliente": "Tipos de Clientes",
+  "configuracionTiposClienteTitulo": "Configuración > Tipos de Clientes",
+  "noHayTiposClienteDadosDeAlta": "No hay tipos de cliente dados de alta",
+  "clienteTipoNuevo": "Nuevo tipo de cliente",
+  "clienteTipoEditar": "Editar tipo de cliente",
+  "clienteTipoActivo": "Activo",
+  "clienteTipoEliminarTitulo": "Eliminar tipo de cliente",
+  "clienteTipoEliminarMensaje": "¿Eliminar \"{nombre}\"?",
+  "@clienteTipoEliminarMensaje": {
+    "placeholders": { "nombre": { "type": "String" } }
+  },
+  "clienteTipoTraduccionesPorIdioma": "Traducciones por idioma",
+  "clienteTipoGuardarTraduccion": "Guardar traducción",
+  "clienteTipoTraduccionGuardadaEnIdioma": "Traducción en {idioma} guardada",
+  "@clienteTipoTraduccionGuardadaEnIdioma": {
+    "placeholders": { "idioma": { "type": "String" } }
+  },
+  "clienteTipoNoSePudoGuardar": "No se pudo guardar",
+  "solicitudSeleccionarTipoCliente": "Selecciona el tipo de cliente",
+  "solicitudTipoClienteObligatorio": "El tipo de cliente es obligatorio para aprobar la solicitud",
 
   "gestionUsuariosTitulo": "Gestión de usuarios",
   "buscarPorNombreEmail": "Buscar por nombre o email",
@@ -285,8 +318,101 @@
     "placeholders": { "nombre": { "type": "String" } }
   },
   "tablon": "Tablón",
-  "seguidos": "Seguidos",
+  "seguidos": "Buscar",
   "avisos": "Avisos",
+
+  "seguidosSeleccionaTipo": "¿A quién quiero seguir?",
+  "seguidosSeleccionaProvincia": "Elige la provincia",
+  "seguidosSeleccionaConcello": "Elige el concello",
+  "seguidosBuscarConcello": "Buscar concello",
+  "seguidosNoHayActivosNesteConcello": "{tipoNombre, select, Tanatorio{Todavía no hay ningún tanatorio activo en este concello} Funeraria{Todavía no hay ninguna funeraria activa en este concello} Parroquia{Todavía no hay ninguna parroquia activa en este concello} other{Todavía no hay ningún cliente activo en este concello}}",
+  "@seguidosNoHayActivosNesteConcello": {
+    "placeholders": { "tipoNombre": { "type": "String" } }
+  },
+  "seguidosSeguir": "Seguir",
+  "seguidosDejarDeSeguir": "Dejar de seguir",
+  "siguiendoTab": "Siguiendo",
+  "misSeguidosBuscarNombre": "Buscar por nombre",
+  "misSeguidosVacio": "Todavía no sigues a ningún cliente",
+
+  "drawerMisSedes": "Mis sedes",
+  "misSedesTitulo": "Mis sedes",
+  "misSedesVacio": "Todavía no has dado de alta ninguna sede",
+  "misSedesNueva": "Nueva sede",
+  "misSedesEditar": "Editar sede",
+  "misSedesNombreSede": "Nombre de la sede",
+  "misSedesEliminarTitulo": "Eliminar sede",
+  "misSedesEliminarMensaje": "¿Eliminar \"{nombre}\"?",
+  "@misSedesEliminarMensaje": {
+    "placeholders": { "nombre": { "type": "String" } }
+  },
+  "misSedesUltimaSedeAviso": "Debe quedar al menos una sede. Para eliminar esta, primero da de alta otra.",
+  "misSedesCodigo": "Código",
+
+  "tabPublicar": "Publicar",
+  "tabPanelDatos": "Panel de Datos",
+
+  "publicarEscanear": "Escanear",
+  "publicarManual": "Manual",
+  "publicarNuevaPublicacion": "Nueva publicación",
+  "publicarSeleccionaSede": "Selecciona la sede",
+  "publicarSinSedes": "Todavía no tienes ninguna sede. Da de alta una sede en \"Miñas sedes\" antes de publicar.",
+  "publicarAvisoDatosPersonales": "Por protección de datos, no incluyas datos personales de familiares (nombres, teléfonos, direcciones). Solo el nombre del fallecido y la información relevante para el público.",
+  "publicarNombreFallecido": "Nombre del fallecido",
+  "publicarAvisoRevisar": "Revisa bien todos los campos antes de publicar: si vienen de un escaneo, corrige o completa lo que haga falta.",
+  "publicarFechaFallecimiento": "Fecha de fallecimiento",
+  "publicarEdad": "Edad",
+  "publicarFechaFuneral": "Fecha del funeral",
+  "publicarHoraFuneral": "Hora del funeral",
+  "publicarIglesia": "Iglesia",
+  "publicarLugar": "Lugar",
+  "publicarCapillaArdiente": "Capilla ardiente / velatorio",
+  "publicarSala": "Sala",
+  "publicarObservaciones": "Observaciones",
+  "publicarEdadInvalida": "Introduce un número entero válido",
+  "publicarVistaPreviaTitulo": "¿Es correcto?",
+  "publicarFallecioEl": "Falleció el {fecha}",
+  "@publicarFallecioEl": {
+    "placeholders": { "fecha": { "type": "String" } }
+  },
+  "publicarAnosDeEdad": "{edad, plural, =1{1 año} other{{edad} años}}",
+  "@publicarAnosDeEdad": {
+    "placeholders": { "edad": { "type": "int" } }
+  },
+  "publicarPublicar": "Publicar",
+  "publicarPublicadoOk": "Publicación creada",
+  "publicarLeyendoEsquela": "Leyendo esquela…",
+  "publicarOcrSinTexto": "No se ha podido leer texto en la foto. Rellena el formulario a mano.",
+  "publicarOcrError": "No se ha podido leer la foto (detalle técnico: {detalle}). Rellena el formulario a mano; si puedes, haz una captura de este mensaje para reportarlo.",
+  "@publicarOcrError": {
+    "placeholders": { "detalle": { "type": "String" } }
+  },
+  "publicarSinPublicaciones": "Todavía no hay ninguna publicación",
+  "publicarCambiosGuardados": "Cambios guardados",
+  "publicarEditarPublicacion": "Editar publicación",
+  "publicarEliminarTitulo": "Eliminar publicación",
+  "publicarEliminarMensaje": "¿Seguro que quieres eliminar la publicación de {nombre}?",
+  "@publicarEliminarMensaje": {
+    "placeholders": { "nombre": { "type": "String" } }
+  },
+
+  "tabPublicaciones": "Publicaciones",
+
+  "arquivo": "Archivo",
+  "arquivoVacio": "Todavía no has guardado ninguna publicación",
+  "arquivoGardado": "Guardado en mi archivo",
+  "arquivoEliminado": "Eliminado de mi archivo",
+  "arquivoTooltipGardar": "Guardar en mi archivo",
+  "arquivoTooltipQuitar": "Quitar de mi archivo",
+
+  "panelDatosPublicaciones": "Publicaciones",
+  "panelDatosSeguidores": "Seguidores",
+  "panelDatosSinSeguidores": "Todavía no tiene seguidores",
+  "panelDatosConcelloDesconocido": "Sin concello indicado",
+
+  "tablonBuscar": "Buscar por texto, cliente o concello",
+
+  "misSeguidosBuscarYFiltrar": "Buscar y filtrar",
 
   "proximamente": "Próximamente",
   "avisoSolicitudesPendientes": "{count, plural, one{Tienes 1 solicitud de cliente pendiente de aprobar} other{Tienes {count} solicitudes de clientes pendientes de aprobar}}",

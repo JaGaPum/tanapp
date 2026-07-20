@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Wordmark de Xaga Labs reconstruido con widgets (placeholder hasta disponer
-/// del archivo de imagen real del logo).
+/// Wordmark de Xaga Labs reconstruido con widgets.
 class XagaLabsLogo extends StatelessWidget {
   final bool dark;
   const XagaLabsLogo({super.key, this.dark = false});
@@ -10,6 +9,7 @@ class XagaLabsLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisSize: MainAxisSize.min,

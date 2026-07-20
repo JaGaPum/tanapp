@@ -47,7 +47,7 @@ class _AccountBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + MediaQuery.of(context).padding.bottom + 24),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 560),
@@ -195,6 +195,7 @@ class _DatosPersonalesFormState extends ConsumerState<_DatosPersonalesForm> {
   String? _provinciaSeleccionada;
   String? _concelloSeleccionado;
   String? _idiomaSeleccionado;
+  late bool _notificacionesPushActivas;
   bool _loading = false;
   String? _error;
 
@@ -209,6 +210,7 @@ class _DatosPersonalesFormState extends ConsumerState<_DatosPersonalesForm> {
     _provinciaSeleccionada = widget.perfil.provincia;
     _concelloSeleccionado = widget.perfil.concello;
     _idiomaSeleccionado = widget.perfil.idSistemaIdiomaPreferido;
+    _notificacionesPushActivas = widget.perfil.notificacionesPushActivas;
   }
 
   @override
@@ -238,6 +240,7 @@ class _DatosPersonalesFormState extends ConsumerState<_DatosPersonalesForm> {
             provincia: _provinciaSeleccionada,
             idSistemaIdiomaPreferido: _idiomaSeleccionado,
             activo: widget.perfil.activo,
+            notificacionesPushActivas: _notificacionesPushActivas,
           );
       ref.invalidate(currentUserProfileProvider);
       if (mounted) {
@@ -252,6 +255,9 @@ class _DatosPersonalesFormState extends ConsumerState<_DatosPersonalesForm> {
 
   @override
   Widget build(BuildContext context) {
+    final esCliente = widget.perfil.roles.contains('CLIENTE');
+    final labelNombre = esCliente ? context.l10n.fieldNombreEmpresa : context.l10n.fieldNombre;
+    final labelApellido1 = esCliente ? context.l10n.campoPersonaContacto : context.l10n.fieldPrimerApellido;
     return Form(
       key: _formKey,
       child: Column(
@@ -262,17 +268,19 @@ class _DatosPersonalesFormState extends ConsumerState<_DatosPersonalesForm> {
           const SizedBox(height: 16),
           AppTextField(
             controller: _nombreController,
-            label: context.l10n.fieldNombre,
-            validator: Validators.required(context, context.l10n.fieldNombre),
+            label: labelNombre,
+            validator: Validators.required(context, labelNombre),
           ),
           const SizedBox(height: 16),
           AppTextField(
             controller: _apellido1Controller,
-            label: context.l10n.fieldPrimerApellido,
-            validator: Validators.required(context, context.l10n.fieldPrimerApellido),
+            label: labelApellido1,
+            validator: Validators.required(context, labelApellido1),
           ),
-          const SizedBox(height: 16),
-          AppTextField(controller: _apellido2Controller, label: context.l10n.fieldSegundoApellido),
+          if (!esCliente) ...[
+            const SizedBox(height: 16),
+            AppTextField(controller: _apellido2Controller, label: context.l10n.fieldSegundoApellido),
+          ],
           const SizedBox(height: 16),
           AppTextField(
             controller: _telefonoController,
@@ -299,6 +307,13 @@ class _DatosPersonalesFormState extends ConsumerState<_DatosPersonalesForm> {
                 loading: () => const LinearProgressIndicator(),
                 error: (e, _) => Text(context.l10n.errorCargarIdiomas(e.toString())),
               ),
+          const SizedBox(height: 16),
+          SwitchListTile(
+            title: Text(context.l10n.accountNotificacionesPush),
+            value: _notificacionesPushActivas,
+            onChanged: (value) => setState(() => _notificacionesPushActivas = value),
+            contentPadding: EdgeInsets.zero,
+          ),
           const SizedBox(height: 16),
           AppButton(label: context.l10n.accountGuardarCambios, loading: _loading, onPressed: _guardar),
         ],
@@ -345,17 +360,33 @@ class _CambiarPasswordForm extends ConsumerStatefulWidget {
 
 class _CambiarPasswordFormState extends ConsumerState<_CambiarPasswordForm> {
   final _formKey = GlobalKey<FormState>();
+  final _formFieldKey = GlobalKey();
   final _actualController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
+  final _actualFocusNode = FocusNode();
   bool _loading = false;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final fieldContext = _formFieldKey.currentContext;
+      if (fieldContext != null) {
+        Scrollable.ensureVisible(fieldContext, duration: const Duration(milliseconds: 250));
+      }
+      _actualFocusNode.requestFocus();
+    });
+  }
 
   @override
   void dispose() {
     _actualController.dispose();
     _passwordController.dispose();
     _confirmController.dispose();
+    _actualFocusNode.dispose();
     super.dispose();
   }
 
@@ -403,7 +434,9 @@ class _CambiarPasswordFormState extends ConsumerState<_CambiarPasswordForm> {
         children: [
           if (_error != null) ErrorBanner(message: _error!),
           PasswordField(
+            key: _formFieldKey,
             controller: _actualController,
+            focusNode: _actualFocusNode,
             label: context.l10n.accountContrasenaActual,
             validator: Validators.required(context, context.l10n.accountContrasenaActual),
           ),

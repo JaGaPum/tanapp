@@ -254,6 +254,42 @@ abstract class AppLocalizations {
   /// **'Concello'**
   String get fieldConcello;
 
+  /// No description provided for @fieldDireccion.
+  ///
+  /// In es, this message translates to:
+  /// **'Dirección completa'**
+  String get fieldDireccion;
+
+  /// No description provided for @fieldNombreEmpresa.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre de la empresa'**
+  String get fieldNombreEmpresa;
+
+  /// No description provided for @comoLlegar.
+  ///
+  /// In es, this message translates to:
+  /// **'Cómo llegar'**
+  String get comoLlegar;
+
+  /// No description provided for @mapa.
+  ///
+  /// In es, this message translates to:
+  /// **'Mapa'**
+  String get mapa;
+
+  /// No description provided for @filtroTodasProvincias.
+  ///
+  /// In es, this message translates to:
+  /// **'Todas'**
+  String get filtroTodasProvincias;
+
+  /// No description provided for @filtroTodosConcellos.
+  ///
+  /// In es, this message translates to:
+  /// **'Todos'**
+  String get filtroTodosConcellos;
+
   /// No description provided for @fieldConfirmarContrasena.
   ///
   /// In es, this message translates to:
@@ -560,6 +596,12 @@ abstract class AppLocalizations {
   /// **'Guardar cambios'**
   String get accountGuardarCambios;
 
+  /// No description provided for @accountNotificacionesPush.
+  ///
+  /// In es, this message translates to:
+  /// **'Deseo recibir notificaciones de las publicaciones en mi móvil.'**
+  String get accountNotificacionesPush;
+
   /// No description provided for @usuarioFichaTitulo.
   ///
   /// In es, this message translates to:
@@ -655,6 +697,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'No se pudieron cargar los idiomas: {error}'**
   String errorCargarIdiomas(String error);
+
+  /// No description provided for @usuarioTipoCliente.
+  ///
+  /// In es, this message translates to:
+  /// **'Tipo de cliente'**
+  String get usuarioTipoCliente;
+
+  /// No description provided for @errorCargarTiposCliente.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudieron cargar los tipos de cliente: {error}'**
+  String errorCargarTiposCliente(String error);
 
   /// No description provided for @usuarioActivo.
   ///
@@ -979,6 +1033,90 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Inactiva'**
   String get inactiva;
+
+  /// No description provided for @tiposCliente.
+  ///
+  /// In es, this message translates to:
+  /// **'Tipos de Clientes'**
+  String get tiposCliente;
+
+  /// No description provided for @configuracionTiposClienteTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Configuración > Tipos de Clientes'**
+  String get configuracionTiposClienteTitulo;
+
+  /// No description provided for @noHayTiposClienteDadosDeAlta.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay tipos de cliente dados de alta'**
+  String get noHayTiposClienteDadosDeAlta;
+
+  /// No description provided for @clienteTipoNuevo.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo tipo de cliente'**
+  String get clienteTipoNuevo;
+
+  /// No description provided for @clienteTipoEditar.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar tipo de cliente'**
+  String get clienteTipoEditar;
+
+  /// No description provided for @clienteTipoActivo.
+  ///
+  /// In es, this message translates to:
+  /// **'Activo'**
+  String get clienteTipoActivo;
+
+  /// No description provided for @clienteTipoEliminarTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar tipo de cliente'**
+  String get clienteTipoEliminarTitulo;
+
+  /// No description provided for @clienteTipoEliminarMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Eliminar \"{nombre}\"?'**
+  String clienteTipoEliminarMensaje(String nombre);
+
+  /// No description provided for @clienteTipoTraduccionesPorIdioma.
+  ///
+  /// In es, this message translates to:
+  /// **'Traducciones por idioma'**
+  String get clienteTipoTraduccionesPorIdioma;
+
+  /// No description provided for @clienteTipoGuardarTraduccion.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar traducción'**
+  String get clienteTipoGuardarTraduccion;
+
+  /// No description provided for @clienteTipoTraduccionGuardadaEnIdioma.
+  ///
+  /// In es, this message translates to:
+  /// **'Traducción en {idioma} guardada'**
+  String clienteTipoTraduccionGuardadaEnIdioma(String idioma);
+
+  /// No description provided for @clienteTipoNoSePudoGuardar.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo guardar'**
+  String get clienteTipoNoSePudoGuardar;
+
+  /// No description provided for @solicitudSeleccionarTipoCliente.
+  ///
+  /// In es, this message translates to:
+  /// **'Selecciona el tipo de cliente'**
+  String get solicitudSeleccionarTipoCliente;
+
+  /// No description provided for @solicitudTipoClienteObligatorio.
+  ///
+  /// In es, this message translates to:
+  /// **'El tipo de cliente es obligatorio para aprobar la solicitud'**
+  String get solicitudTipoClienteObligatorio;
 
   /// No description provided for @gestionUsuariosTitulo.
   ///
@@ -1313,7 +1451,7 @@ abstract class AppLocalizations {
   /// No description provided for @seguidos.
   ///
   /// In es, this message translates to:
-  /// **'Seguidos'**
+  /// **'Buscar'**
   String get seguidos;
 
   /// No description provided for @avisos.
@@ -1321,6 +1459,402 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Avisos'**
   String get avisos;
+
+  /// No description provided for @seguidosSeleccionaTipo.
+  ///
+  /// In es, this message translates to:
+  /// **'¿A quién quiero seguir?'**
+  String get seguidosSeleccionaTipo;
+
+  /// No description provided for @seguidosSeleccionaProvincia.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige la provincia'**
+  String get seguidosSeleccionaProvincia;
+
+  /// No description provided for @seguidosSeleccionaConcello.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige el concello'**
+  String get seguidosSeleccionaConcello;
+
+  /// No description provided for @seguidosBuscarConcello.
+  ///
+  /// In es, this message translates to:
+  /// **'Buscar concello'**
+  String get seguidosBuscarConcello;
+
+  /// No description provided for @seguidosNoHayActivosNesteConcello.
+  ///
+  /// In es, this message translates to:
+  /// **'{tipoNombre, select, Tanatorio{Todavía no hay ningún tanatorio activo en este concello} Funeraria{Todavía no hay ninguna funeraria activa en este concello} Parroquia{Todavía no hay ninguna parroquia activa en este concello} other{Todavía no hay ningún cliente activo en este concello}}'**
+  String seguidosNoHayActivosNesteConcello(String tipoNombre);
+
+  /// No description provided for @seguidosSeguir.
+  ///
+  /// In es, this message translates to:
+  /// **'Seguir'**
+  String get seguidosSeguir;
+
+  /// No description provided for @seguidosDejarDeSeguir.
+  ///
+  /// In es, this message translates to:
+  /// **'Dejar de seguir'**
+  String get seguidosDejarDeSeguir;
+
+  /// No description provided for @siguiendoTab.
+  ///
+  /// In es, this message translates to:
+  /// **'Siguiendo'**
+  String get siguiendoTab;
+
+  /// No description provided for @misSeguidosBuscarNombre.
+  ///
+  /// In es, this message translates to:
+  /// **'Buscar por nombre'**
+  String get misSeguidosBuscarNombre;
+
+  /// No description provided for @misSeguidosVacio.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no sigues a ningún cliente'**
+  String get misSeguidosVacio;
+
+  /// No description provided for @drawerMisSedes.
+  ///
+  /// In es, this message translates to:
+  /// **'Mis sedes'**
+  String get drawerMisSedes;
+
+  /// No description provided for @misSedesTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Mis sedes'**
+  String get misSedesTitulo;
+
+  /// No description provided for @misSedesVacio.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no has dado de alta ninguna sede'**
+  String get misSedesVacio;
+
+  /// No description provided for @misSedesNueva.
+  ///
+  /// In es, this message translates to:
+  /// **'Nueva sede'**
+  String get misSedesNueva;
+
+  /// No description provided for @misSedesEditar.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar sede'**
+  String get misSedesEditar;
+
+  /// No description provided for @misSedesNombreSede.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre de la sede'**
+  String get misSedesNombreSede;
+
+  /// No description provided for @misSedesEliminarTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar sede'**
+  String get misSedesEliminarTitulo;
+
+  /// No description provided for @misSedesEliminarMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Eliminar \"{nombre}\"?'**
+  String misSedesEliminarMensaje(String nombre);
+
+  /// No description provided for @misSedesUltimaSedeAviso.
+  ///
+  /// In es, this message translates to:
+  /// **'Debe quedar al menos una sede. Para eliminar esta, primero da de alta otra.'**
+  String get misSedesUltimaSedeAviso;
+
+  /// No description provided for @misSedesCodigo.
+  ///
+  /// In es, this message translates to:
+  /// **'Código'**
+  String get misSedesCodigo;
+
+  /// No description provided for @tabPublicar.
+  ///
+  /// In es, this message translates to:
+  /// **'Publicar'**
+  String get tabPublicar;
+
+  /// No description provided for @tabPanelDatos.
+  ///
+  /// In es, this message translates to:
+  /// **'Panel de Datos'**
+  String get tabPanelDatos;
+
+  /// No description provided for @publicarEscanear.
+  ///
+  /// In es, this message translates to:
+  /// **'Escanear'**
+  String get publicarEscanear;
+
+  /// No description provided for @publicarManual.
+  ///
+  /// In es, this message translates to:
+  /// **'Manual'**
+  String get publicarManual;
+
+  /// No description provided for @publicarNuevaPublicacion.
+  ///
+  /// In es, this message translates to:
+  /// **'Nueva publicación'**
+  String get publicarNuevaPublicacion;
+
+  /// No description provided for @publicarSeleccionaSede.
+  ///
+  /// In es, this message translates to:
+  /// **'Selecciona la sede'**
+  String get publicarSeleccionaSede;
+
+  /// No description provided for @publicarSinSedes.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no tienes ninguna sede. Da de alta una sede en \"Miñas sedes\" antes de publicar.'**
+  String get publicarSinSedes;
+
+  /// No description provided for @publicarAvisoDatosPersonales.
+  ///
+  /// In es, this message translates to:
+  /// **'Por protección de datos, no incluyas datos personales de familiares (nombres, teléfonos, direcciones). Solo el nombre del fallecido y la información relevante para el público.'**
+  String get publicarAvisoDatosPersonales;
+
+  /// No description provided for @publicarNombreFallecido.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre del fallecido'**
+  String get publicarNombreFallecido;
+
+  /// No description provided for @publicarAvisoRevisar.
+  ///
+  /// In es, this message translates to:
+  /// **'Revisa bien todos los campos antes de publicar: si vienen de un escaneo, corrige o completa lo que haga falta.'**
+  String get publicarAvisoRevisar;
+
+  /// No description provided for @publicarFechaFallecimiento.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha de fallecimiento'**
+  String get publicarFechaFallecimiento;
+
+  /// No description provided for @publicarEdad.
+  ///
+  /// In es, this message translates to:
+  /// **'Edad'**
+  String get publicarEdad;
+
+  /// No description provided for @publicarFechaFuneral.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha del funeral'**
+  String get publicarFechaFuneral;
+
+  /// No description provided for @publicarHoraFuneral.
+  ///
+  /// In es, this message translates to:
+  /// **'Hora del funeral'**
+  String get publicarHoraFuneral;
+
+  /// No description provided for @publicarIglesia.
+  ///
+  /// In es, this message translates to:
+  /// **'Iglesia'**
+  String get publicarIglesia;
+
+  /// No description provided for @publicarLugar.
+  ///
+  /// In es, this message translates to:
+  /// **'Lugar'**
+  String get publicarLugar;
+
+  /// No description provided for @publicarCapillaArdiente.
+  ///
+  /// In es, this message translates to:
+  /// **'Capilla ardiente / velatorio'**
+  String get publicarCapillaArdiente;
+
+  /// No description provided for @publicarSala.
+  ///
+  /// In es, this message translates to:
+  /// **'Sala'**
+  String get publicarSala;
+
+  /// No description provided for @publicarObservaciones.
+  ///
+  /// In es, this message translates to:
+  /// **'Observaciones'**
+  String get publicarObservaciones;
+
+  /// No description provided for @publicarEdadInvalida.
+  ///
+  /// In es, this message translates to:
+  /// **'Introduce un número entero válido'**
+  String get publicarEdadInvalida;
+
+  /// No description provided for @publicarVistaPreviaTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Es correcto?'**
+  String get publicarVistaPreviaTitulo;
+
+  /// No description provided for @publicarFallecioEl.
+  ///
+  /// In es, this message translates to:
+  /// **'Falleció el {fecha}'**
+  String publicarFallecioEl(String fecha);
+
+  /// No description provided for @publicarAnosDeEdad.
+  ///
+  /// In es, this message translates to:
+  /// **'{edad, plural, =1{1 año} other{{edad} años}}'**
+  String publicarAnosDeEdad(int edad);
+
+  /// No description provided for @publicarPublicar.
+  ///
+  /// In es, this message translates to:
+  /// **'Publicar'**
+  String get publicarPublicar;
+
+  /// No description provided for @publicarPublicadoOk.
+  ///
+  /// In es, this message translates to:
+  /// **'Publicación creada'**
+  String get publicarPublicadoOk;
+
+  /// No description provided for @publicarLeyendoEsquela.
+  ///
+  /// In es, this message translates to:
+  /// **'Leyendo esquela…'**
+  String get publicarLeyendoEsquela;
+
+  /// No description provided for @publicarOcrSinTexto.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha podido leer texto en la foto. Rellena el formulario a mano.'**
+  String get publicarOcrSinTexto;
+
+  /// No description provided for @publicarOcrError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha podido leer la foto (detalle técnico: {detalle}). Rellena el formulario a mano; si puedes, haz una captura de este mensaje para reportarlo.'**
+  String publicarOcrError(String detalle);
+
+  /// No description provided for @publicarSinPublicaciones.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no hay ninguna publicación'**
+  String get publicarSinPublicaciones;
+
+  /// No description provided for @publicarCambiosGuardados.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambios guardados'**
+  String get publicarCambiosGuardados;
+
+  /// No description provided for @publicarEditarPublicacion.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar publicación'**
+  String get publicarEditarPublicacion;
+
+  /// No description provided for @publicarEliminarTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar publicación'**
+  String get publicarEliminarTitulo;
+
+  /// No description provided for @publicarEliminarMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Seguro que quieres eliminar la publicación de {nombre}?'**
+  String publicarEliminarMensaje(String nombre);
+
+  /// No description provided for @tabPublicaciones.
+  ///
+  /// In es, this message translates to:
+  /// **'Publicaciones'**
+  String get tabPublicaciones;
+
+  /// No description provided for @arquivo.
+  ///
+  /// In es, this message translates to:
+  /// **'Archivo'**
+  String get arquivo;
+
+  /// No description provided for @arquivoVacio.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no has guardado ninguna publicación'**
+  String get arquivoVacio;
+
+  /// No description provided for @arquivoGardado.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardado en mi archivo'**
+  String get arquivoGardado;
+
+  /// No description provided for @arquivoEliminado.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminado de mi archivo'**
+  String get arquivoEliminado;
+
+  /// No description provided for @arquivoTooltipGardar.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar en mi archivo'**
+  String get arquivoTooltipGardar;
+
+  /// No description provided for @arquivoTooltipQuitar.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar de mi archivo'**
+  String get arquivoTooltipQuitar;
+
+  /// No description provided for @panelDatosPublicaciones.
+  ///
+  /// In es, this message translates to:
+  /// **'Publicaciones'**
+  String get panelDatosPublicaciones;
+
+  /// No description provided for @panelDatosSeguidores.
+  ///
+  /// In es, this message translates to:
+  /// **'Seguidores'**
+  String get panelDatosSeguidores;
+
+  /// No description provided for @panelDatosSinSeguidores.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no tiene seguidores'**
+  String get panelDatosSinSeguidores;
+
+  /// No description provided for @panelDatosConcelloDesconocido.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin concello indicado'**
+  String get panelDatosConcelloDesconocido;
+
+  /// No description provided for @tablonBuscar.
+  ///
+  /// In es, this message translates to:
+  /// **'Buscar por texto, cliente o concello'**
+  String get tablonBuscar;
+
+  /// No description provided for @misSeguidosBuscarYFiltrar.
+  ///
+  /// In es, this message translates to:
+  /// **'Buscar y filtrar'**
+  String get misSeguidosBuscarYFiltrar;
 
   /// No description provided for @proximamente.
   ///

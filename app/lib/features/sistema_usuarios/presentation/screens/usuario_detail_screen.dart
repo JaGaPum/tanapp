@@ -11,6 +11,11 @@ import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/error_banner.dart';
 import '../../../../core/widgets/provincia_concello_fields.dart';
+import '../../../cliente_sedes/application/cliente_sedes_providers.dart';
+import '../../../cliente_sedes/data/cliente_sede.dart';
+import '../../../cliente_sedes/data/cliente_sedes_repository.dart';
+import '../../../cliente_sedes/presentation/widgets/sede_form_dialog.dart';
+import '../../../cliente_tipos/application/cliente_tipos_providers.dart';
 import '../../../sesiones/application/sesiones_providers.dart';
 import '../../application/usuarios_providers.dart';
 import '../../data/catalogos_repository.dart';
@@ -60,10 +65,12 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
   late final TextEditingController _apellido1Controller;
   late final TextEditingController _apellido2Controller;
   late final TextEditingController _telefonoController;
+  late final TextEditingController _direccionController;
   late final TextEditingController _emailController;
   String? _idiomaSeleccionado;
   String? _provinciaSeleccionada;
   String? _concelloSeleccionado;
+  String? _tipoClienteSeleccionado;
   late bool _activo;
   bool _loading = false;
   bool _mostrarSesiones = false;
@@ -76,10 +83,12 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
     _apellido1Controller = TextEditingController(text: widget.perfil.apellido1 ?? '');
     _apellido2Controller = TextEditingController(text: widget.perfil.apellido2 ?? '');
     _telefonoController = TextEditingController(text: widget.perfil.telefono ?? '');
+    _direccionController = TextEditingController(text: widget.perfil.direccion ?? '');
     _emailController = TextEditingController(text: widget.perfil.email);
     _idiomaSeleccionado = widget.perfil.idSistemaIdiomaPreferido;
     _provinciaSeleccionada = widget.perfil.provincia;
     _concelloSeleccionado = widget.perfil.concello;
+    _tipoClienteSeleccionado = widget.perfil.idConfiguracionClienteTipo;
     _activo = widget.perfil.activo;
   }
 
@@ -89,6 +98,7 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
     _apellido1Controller.dispose();
     _apellido2Controller.dispose();
     _telefonoController.dispose();
+    _direccionController.dispose();
     _emailController.dispose();
     super.dispose();
   }
@@ -113,7 +123,9 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
             telefono: _telefonoController.text,
             concello: _concelloSeleccionado,
             provincia: _provinciaSeleccionada,
+            direccion: _direccionController.text,
             idSistemaIdiomaPreferido: _idiomaSeleccionado,
+            idConfiguracionClienteTipo: _tipoClienteSeleccionado,
             activo: _activo,
           );
       _invalidateUsuario();
@@ -153,6 +165,30 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
     } catch (e) {
       setState(() => _error = e is AppException ? e.message : context.l10n.usuarioNoSePudoQuitarRol);
     }
+  }
+
+  Future<void> _mostrarFormularioSede({ClienteSede? sede}) async {
+    await showDialog<void>(
+      context: context,
+      builder: (context) => SedeFormDialog(idSistemaUsuario: widget.perfil.idSistemaUsuario, sede: sede),
+    );
+    ref.invalidate(sedesDeUsuarioProvider(widget.perfil.idSistemaUsuario));
+  }
+
+  Future<void> _eliminarSede(ClienteSede sede, int totalSedes) async {
+    if (totalSedes <= 1) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.misSedesUltimaSedeAviso)));
+      return;
+    }
+    final confirmado = await showConfirmDialog(
+      context,
+      title: context.l10n.misSedesEliminarTitulo,
+      message: context.l10n.misSedesEliminarMensaje(sede.nombre),
+      confirmLabel: context.l10n.eliminar,
+    );
+    if (!confirmado) return;
+    await ref.read(clienteSedesRepositoryProvider).eliminarSede(sede.idClienteSede);
+    ref.invalidate(sedesDeUsuarioProvider(widget.perfil.idSistemaUsuario));
   }
 
   Future<void> _mostrarSelectorRoles() async {
@@ -212,6 +248,9 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
   @override
   Widget build(BuildContext context) {
     final idiomasAsync = ref.watch(idiomasCatalogoProvider);
+    final esCliente = widget.perfil.roles.contains('CLIENTE');
+    final labelNombre = esCliente ? context.l10n.fieldNombreEmpresa : context.l10n.fieldNombre;
+    final labelApellido1 = esCliente ? context.l10n.campoPersonaContacto : context.l10n.fieldPrimerApellido;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -227,17 +266,19 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
               const SizedBox(height: 16),
               AppTextField(
                 controller: _nombreController,
-                label: context.l10n.fieldNombre,
-                validator: Validators.required(context, context.l10n.fieldNombre),
+                label: labelNombre,
+                validator: Validators.required(context, labelNombre),
               ),
               const SizedBox(height: 16),
               AppTextField(
                 controller: _apellido1Controller,
-                label: context.l10n.fieldPrimerApellido,
-                validator: Validators.required(context, context.l10n.fieldPrimerApellido),
+                label: labelApellido1,
+                validator: Validators.required(context, labelApellido1),
               ),
-              const SizedBox(height: 16),
-              AppTextField(controller: _apellido2Controller, label: context.l10n.fieldSegundoApellido),
+              if (!esCliente) ...[
+                const SizedBox(height: 16),
+                AppTextField(controller: _apellido2Controller, label: context.l10n.fieldSegundoApellido),
+              ],
               const SizedBox(height: 16),
               AppTextField(
                 controller: _telefonoController,
@@ -252,6 +293,8 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                 onConcelloChanged: (value) => setState(() => _concelloSeleccionado = value),
               ),
               const SizedBox(height: 16),
+              AppTextField(controller: _direccionController, label: context.l10n.fieldDireccion),
+              const SizedBox(height: 16),
               idiomasAsync.when(
                 data: (idiomas) => DropdownButtonFormField<String>(
                   initialValue: _idiomaSeleccionado,
@@ -264,6 +307,24 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                 loading: () => const LinearProgressIndicator(),
                 error: (e, _) => Text(context.l10n.errorCargarIdiomas(e.toString())),
               ),
+              if (widget.perfil.roles.contains('CLIENTE')) ...[
+                const SizedBox(height: 16),
+                ref.watch(clienteTiposListProvider).when(
+                      data: (clienteTipos) => DropdownButtonFormField<String>(
+                        initialValue: _tipoClienteSeleccionado,
+                        decoration: InputDecoration(labelText: context.l10n.usuarioTipoCliente),
+                        items: clienteTipos
+                            .where((t) => t.activo || t.idConfiguracionClienteTipo == _tipoClienteSeleccionado)
+                            .map(
+                              (t) => DropdownMenuItem(value: t.idConfiguracionClienteTipo, child: Text(t.nombre)),
+                            )
+                            .toList(),
+                        onChanged: (value) => setState(() => _tipoClienteSeleccionado = value),
+                      ),
+                      loading: () => const LinearProgressIndicator(),
+                      error: (e, _) => Text(context.l10n.errorCargarTiposCliente(e.toString())),
+                    ),
+              ],
               const SizedBox(height: 8),
               SwitchListTile(
                 title: Text(context.l10n.usuarioActivo),
@@ -306,6 +367,62 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                     .map((rol) => InputChip(label: Text(rol.nombre), onDeleted: () => _quitarRol(rol)))
                     .toList(),
               ),
+              if (esCliente) ...[
+                const SizedBox(height: 32),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(context.l10n.misSedesTitulo, style: _sectionTitleStyle(context)),
+                    IconButton(
+                      icon: const Icon(Icons.add_circle_outline),
+                      tooltip: context.l10n.misSedesNueva,
+                      onPressed: () => _mostrarFormularioSede(),
+                    ),
+                  ],
+                ),
+                ref.watch(sedesDeUsuarioProvider(widget.perfil.idSistemaUsuario)).when(
+                      data: (sedes) {
+                        if (sedes.isEmpty) {
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Text(context.l10n.misSedesVacio),
+                          );
+                        }
+                        return Column(
+                          children: sedes
+                              .map(
+                                (sede) => Card(
+                                  child: ListTile(
+                                    title: Text('${sede.codigo} · ${sede.nombre}'),
+                                    subtitle: Text('${sede.direccion}, ${sede.concello}'),
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(Icons.edit_outlined),
+                                          tooltip: context.l10n.editar,
+                                          onPressed: () => _mostrarFormularioSede(sede: sede),
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.delete_outline),
+                                          tooltip: context.l10n.eliminar,
+                                          onPressed: () => _eliminarSede(sede, sedes.length),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                        );
+                      },
+                      loading: () => const Padding(
+                        padding: EdgeInsets.only(top: 8),
+                        child: LinearProgressIndicator(),
+                      ),
+                      error: (e, _) => Text(context.l10n.errorGenerico(e.toString())),
+                    ),
+              ],
               const SizedBox(height: 32),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

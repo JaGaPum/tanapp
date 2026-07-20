@@ -33,6 +33,7 @@ class AppDrawer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final perfilAsync = ref.watch(currentUserProfileProvider);
     final isAdmin = ref.watch(isAdminProvider);
+    final isCliente = ref.watch(isClienteProvider);
 
     return Drawer(
       backgroundColor: AppColors.black,
@@ -95,6 +96,12 @@ class AppDrawer extends ConsumerWidget {
                   leading: const Icon(Icons.tune_outlined),
                   title: Text(context.l10n.drawerConfiguracion),
                   onTap: () => _navigate(context, '/admin/configuracion'),
+                ),
+              if (isCliente)
+                ListTile(
+                  leading: const Icon(Icons.storefront_outlined),
+                  title: Text(context.l10n.drawerMisSedes),
+                  onTap: () => _navigate(context, '/mis-sedes'),
                 ),
               const Spacer(),
               Padding(

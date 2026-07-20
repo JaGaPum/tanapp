@@ -67,8 +67,11 @@ class UsuariosRepository {
     String? telefono,
     String? concello,
     String? provincia,
+    String? direccion,
     String? idSistemaIdiomaPreferido,
+    String? idConfiguracionClienteTipo,
     required bool activo,
+    bool? notificacionesPushActivas,
   }) async {
     String? normalizado(String? valor) => (valor == null || valor.trim().isEmpty) ? null : valor.trim();
 
@@ -79,8 +82,11 @@ class UsuariosRepository {
       'Telefono': normalizado(telefono),
       'Concello': normalizado(concello),
       'Provincia': normalizado(provincia),
+      'Direccion': normalizado(direccion),
       'IdSistemaIdiomaPreferido': idSistemaIdiomaPreferido,
+      'IdConfiguracionClienteTipo': idConfiguracionClienteTipo,
       'Activo': activo,
+      if (notificacionesPushActivas != null) 'NotificacionesPushActivas': notificacionesPushActivas,
     }).eq('IdSistemaUsuario', idSistemaUsuario);
   }
 

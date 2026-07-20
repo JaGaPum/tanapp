@@ -15,6 +15,7 @@ class SolicitudesRepository {
     required String telefonoContacto,
     String? localidad,
     String? provincia,
+    required String direccion,
     String? observaciones,
   }) async {
     await _client.from('TClienteSolicitudes').insert({
@@ -25,6 +26,7 @@ class SolicitudesRepository {
       'TelefonoContacto': telefonoContacto.trim(),
       'Localidad': _blankToNull(localidad),
       'Provincia': _blankToNull(provincia),
+      'Direccion': direccion.trim(),
       'Observaciones': _blankToNull(observaciones),
     });
   }
@@ -49,13 +51,18 @@ class SolicitudesRepository {
     required bool aprobar,
     String? observacionesResolucion,
     required String idSistemaUsuarioResolucion,
+    String? idConfiguracionClienteTipo,
   }) async {
-    await _client.from('TClienteSolicitudes').update({
+    final update = <String, dynamic>{
       'Estado': aprobar ? 'APROBADA' : 'RECHAZADA',
       'ObservacionesResolucion': _blankToNull(observacionesResolucion),
       'FechaResolucion': DateTime.now().toIso8601String(),
       'IdSistemaUsuarioResolucion': idSistemaUsuarioResolucion,
-    }).eq('IdClientesSolicitud', id);
+    };
+    if (aprobar && idConfiguracionClienteTipo != null) {
+      update['IdConfiguracionClienteTipo'] = idConfiguracionClienteTipo;
+    }
+    await _client.from('TClienteSolicitudes').update(update).eq('IdClientesSolicitud', id);
   }
 
   Future<void> eliminarSolicitud(String id) async {

@@ -22,10 +22,13 @@ class UsuarioPerfil {
   final String? telefono;
   final String? concello;
   final String? provincia;
+  final String? direccion;
   final String? fotoUrl;
   final String? idSistemaIdiomaPreferido;
+  final String? idConfiguracionClienteTipo;
   final bool activo;
   final bool emailConfirmado;
+  final bool notificacionesPushActivas;
   final List<RolAsignado> rolesAsignados;
 
   const UsuarioPerfil({
@@ -38,10 +41,13 @@ class UsuarioPerfil {
     this.telefono,
     this.concello,
     this.provincia,
+    this.direccion,
     this.fotoUrl,
     this.idSistemaIdiomaPreferido,
+    this.idConfiguracionClienteTipo,
     required this.activo,
     required this.emailConfirmado,
+    required this.notificacionesPushActivas,
     required this.rolesAsignados,
   });
 
@@ -76,10 +82,13 @@ class UsuarioPerfil {
       telefono: map['Telefono'] as String?,
       concello: map['Concello'] as String?,
       provincia: map['Provincia'] as String?,
+      direccion: map['Direccion'] as String?,
       fotoUrl: map['FotoUrl'] as String?,
       idSistemaIdiomaPreferido: map['IdSistemaIdiomaPreferido'] as String?,
+      idConfiguracionClienteTipo: map['IdConfiguracionClienteTipo'] as String?,
       activo: map['Activo'] as bool? ?? true,
       emailConfirmado: map['EmailConfirmado'] as bool? ?? false,
+      notificacionesPushActivas: map['NotificacionesPushActivas'] as bool? ?? true,
       rolesAsignados: roles,
     );
   }

@@ -10,6 +10,7 @@ import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/error_banner.dart';
 import '../../../auth/application/auth_providers.dart';
+import '../../../cliente_tipos/application/cliente_tipos_providers.dart';
 import '../../../comunicaciones/data/comunicaciones_repository.dart';
 import '../../application/solicitudes_providers.dart';
 import '../../data/solicitud_cliente.dart';
@@ -52,7 +53,17 @@ class _SolicitudDetailScreenState extends ConsumerState<SolicitudDetailScreen> {
     }
   }
 
-  Future<void> _resolver(bool aprobar) async {
+  Future<void> _iniciarAprobacion(SolicitudCliente solicitud) async {
+    final idTipoCliente = await showDialog<String>(
+      context: context,
+      builder: (context) => _ClienteTipoDialog(idInicial: solicitud.idConfiguracionClienteTipo),
+    );
+    if (idTipoCliente == null) return;
+    if (!mounted) return;
+    await _resolver(true, idConfiguracionClienteTipo: idTipoCliente);
+  }
+
+  Future<void> _resolver(bool aprobar, {String? idConfiguracionClienteTipo}) async {
     final noIdentificadoMensaje = context.l10n.solicitudNoIdentificado;
     final confirmado = await showConfirmDialog(
       context,
@@ -75,10 +86,16 @@ class _SolicitudDetailScreenState extends ConsumerState<SolicitudDetailScreen> {
         aprobar: aprobar,
         observacionesResolucion: _observacionesController.text,
         idSistemaUsuarioResolucion: perfil.idSistemaUsuario,
+        idConfiguracionClienteTipo: idConfiguracionClienteTipo,
       );
       ref.invalidate(solicitudDetailProvider(widget.idClientesSolicitud));
       ref.invalidate(solicitudesListProvider);
+      // invalidate() sólo marca el provider como obsoleto; si en ese momento no queda ningún
+      // widget "escuchándolo" (p. ej. la pestaña Avisos no está montada), el recálculo se
+      // queda pendiente hasta que alguien vuelva a observarlo, y el badge se queda con el
+      // valor antiguo hasta recargar la página. Forzamos aquí el recálculo ya mismo.
       ref.invalidate(solicitudesPendientesCountProvider);
+      await ref.read(solicitudesPendientesCountProvider.future);
 
       final solicitud = await ref.read(solicitudDetailProvider(widget.idClientesSolicitud).future);
       await _notificarResolucion(aprobar: aprobar, solicitud: solicitud);
@@ -86,6 +103,10 @@ class _SolicitudDetailScreenState extends ConsumerState<SolicitudDetailScreen> {
       if (aprobar) {
         try {
           await solicitudesRepo.crearUsuarioCliente(widget.idClientesSolicitud);
+          // La cuenta ya se ha creado (IdSistemaUsuarioCliente ya no es null en BD): sin
+          // este refresco, la pantalla se queda con el snapshot de antes de crear la cuenta
+          // y sigue ofreciendo el botón "Crear cuenta de cliente" aunque ya no haga falta.
+          ref.invalidate(solicitudDetailProvider(widget.idClientesSolicitud));
         } catch (e) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -111,6 +132,7 @@ class _SolicitudDetailScreenState extends ConsumerState<SolicitudDetailScreen> {
     });
     try {
       await ref.read(solicitudesRepositoryProvider).crearUsuarioCliente(widget.idClientesSolicitud);
+      ref.invalidate(solicitudDetailProvider(widget.idClientesSolicitud));
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(cuentaCreadaMensaje)));
       }
@@ -189,6 +211,8 @@ class _SolicitudDetailScreenState extends ConsumerState<SolicitudDetailScreen> {
                           _Campo(label: context.l10n.campoLocalidad, valor: solicitud.localidad!),
                         if (solicitud.provincia != null)
                           _Campo(label: context.l10n.fieldProvincia, valor: solicitud.provincia!),
+                        if (solicitud.direccion != null)
+                          _Campo(label: context.l10n.fieldDireccion, valor: solicitud.direccion!),
                         if (solicitud.observaciones != null)
                           _Campo(label: context.l10n.campoObservaciones, valor: solicitud.observaciones!),
                       ],
@@ -218,7 +242,7 @@ class _SolicitudDetailScreenState extends ConsumerState<SolicitudDetailScreen> {
                         child: AppButton(
                           label: context.l10n.aprobar,
                           loading: _loading,
-                          onPressed: () => _resolver(true),
+                          onPressed: () => _iniciarAprobacion(solicitud),
                         ),
                       ),
                     ],
@@ -247,7 +271,7 @@ class _SolicitudDetailScreenState extends ConsumerState<SolicitudDetailScreen> {
                     AppButton(
                       label: context.l10n.solicitudAprobarBoton,
                       loading: _loading,
-                      onPressed: () => _resolver(true),
+                      onPressed: () => _iniciarAprobacion(solicitud),
                     ),
                 ],
               ],
@@ -266,6 +290,67 @@ class _SolicitudDetailScreenState extends ConsumerState<SolicitudDetailScreen> {
         'RECHAZADA' => context.l10n.estadoRechazadaSingular,
         _ => estado,
       };
+}
+
+class _ClienteTipoDialog extends ConsumerStatefulWidget {
+  final String? idInicial;
+  const _ClienteTipoDialog({this.idInicial});
+
+  @override
+  ConsumerState<_ClienteTipoDialog> createState() => _ClienteTipoDialogState();
+}
+
+class _ClienteTipoDialogState extends ConsumerState<_ClienteTipoDialog> {
+  final _formKey = GlobalKey<FormState>();
+  String? _seleccionado;
+
+  @override
+  void initState() {
+    super.initState();
+    _seleccionado = widget.idInicial;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final clienteTiposAsync = ref.watch(clienteTiposListProvider);
+    return AlertDialog(
+      title: Text(context.l10n.solicitudSeleccionarTipoCliente),
+      content: Form(
+        key: _formKey,
+        child: clienteTiposAsync.when(
+          data: (clienteTipos) {
+            final activos = clienteTipos
+                .where((t) => t.activo || t.idConfiguracionClienteTipo == _seleccionado)
+                .toList();
+            return DropdownButtonFormField<String>(
+              initialValue: _seleccionado,
+              decoration: InputDecoration(labelText: context.l10n.usuarioTipoCliente),
+              items: activos
+                  .map((t) => DropdownMenuItem(value: t.idConfiguracionClienteTipo, child: Text(t.nombre)))
+                  .toList(),
+              onChanged: (value) => setState(() => _seleccionado = value),
+              validator: (value) => value == null ? context.l10n.solicitudTipoClienteObligatorio : null,
+            );
+          },
+          loading: () => const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: LinearProgressIndicator(),
+          ),
+          error: (e, _) => Text(context.l10n.errorCargarTiposCliente(e.toString())),
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(context.l10n.confirmDialogCancel)),
+        FilledButton(
+          onPressed: () {
+            if (!_formKey.currentState!.validate()) return;
+            Navigator.of(context).pop(_seleccionado);
+          },
+          child: Text(context.l10n.confirmDialogConfirm),
+        ),
+      ],
+    );
+  }
 }
 
 class _Campo extends StatelessWidget {

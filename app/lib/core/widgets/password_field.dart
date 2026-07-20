@@ -6,12 +6,16 @@ class PasswordField extends StatefulWidget {
   final TextEditingController controller;
   final String? label;
   final String? Function(String?)? validator;
+  final FocusNode? focusNode;
+  final bool autofocus;
 
   const PasswordField({
     super.key,
     required this.controller,
     this.label,
     this.validator,
+    this.focusNode,
+    this.autofocus = false,
   });
 
   @override
@@ -25,6 +29,8 @@ class _PasswordFieldState extends State<PasswordField> {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: widget.controller,
+      focusNode: widget.focusNode,
+      autofocus: widget.autofocus,
       obscureText: _obscure,
       validator: widget.validator,
       autovalidateMode: AutovalidateMode.onUserInteraction,

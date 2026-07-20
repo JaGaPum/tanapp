@@ -115,38 +115,65 @@ class _UsuarioTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final nombreCompleto = usuario.nombreCompleto;
     return Card(
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: usuario.activo
-              ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).colorScheme.outline,
-          foregroundColor: Colors.white,
-          backgroundImage: usuario.fotoUrl != null ? NetworkImage(usuario.fotoUrl!) : null,
-          child: usuario.fotoUrl == null
-              ? Text(usuario.nombre.isNotEmpty ? usuario.nombre[0].toUpperCase() : '?')
-              : null,
-        ),
-        title: Text(usuario.email, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: Row(
-          children: [
-            if (nombreCompleto.isNotEmpty) Expanded(child: Text(nombreCompleto)),
-            Icon(
-              usuario.emailConfirmado ? Icons.verified_outlined : Icons.hourglass_empty,
-              size: 16,
-              color: usuario.emailConfirmado ? AppColors.green : AppColors.gray,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              usuario.emailConfirmado ? context.l10n.validado : context.l10n.pendiente,
-              style: TextStyle(fontSize: 12, color: usuario.emailConfirmado ? AppColors.green : AppColors.gray),
-            ),
-          ],
-        ),
-        trailing: Wrap(
-          spacing: 4,
-          children: usuario.roles.take(2).map((codigo) => Chip(label: Text(codigo))).toList(),
-        ),
+      child: InkWell(
         onTap: () => context.push('/admin/usuarios/${usuario.idSistemaUsuario}'),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                backgroundColor: usuario.activo
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.outline,
+                foregroundColor: Colors.white,
+                backgroundImage: usuario.fotoUrl != null ? NetworkImage(usuario.fotoUrl!) : null,
+                child: usuario.fotoUrl == null
+                    ? Text(usuario.nombre.isNotEmpty ? usuario.nombre[0].toUpperCase() : '?')
+                    : null,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      usuario.email,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        if (nombreCompleto.isNotEmpty)
+                          Expanded(child: Text(nombreCompleto, overflow: TextOverflow.ellipsis)),
+                        Icon(
+                          usuario.emailConfirmado ? Icons.verified_outlined : Icons.hourglass_empty,
+                          size: 16,
+                          color: usuario.emailConfirmado ? AppColors.green : AppColors.gray,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          usuario.emailConfirmado ? context.l10n.validado : context.l10n.pendiente,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: usuario.emailConfirmado ? AppColors.green : AppColors.gray,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 4,
+                      runSpacing: 4,
+                      children: usuario.roles.take(2).map((codigo) => Chip(label: Text(codigo))).toList(),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
