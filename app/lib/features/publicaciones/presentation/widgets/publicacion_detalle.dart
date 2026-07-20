@@ -10,10 +10,10 @@ class PublicacionDetalle extends StatelessWidget {
   final PublicacionConSede publicacion;
   const PublicacionDetalle({super.key, required this.publicacion});
 
-  @override
-  Widget build(BuildContext context) {
-    final p = publicacion;
-    final filas = <Widget>[];
+  /// Icono + texto de cada dato cubierto, en el mismo orden en que se pintan. Se expone aparte
+  /// del build() para poder reutilizarlo al construir el texto que se lee en voz alta.
+  static List<(IconData, String)> items(BuildContext context, PublicacionConSede p) {
+    final items = <(IconData, String)>[];
 
     if (p.fechaFallecimiento != null || p.edad != null) {
       final partes = [
@@ -21,27 +21,36 @@ class PublicacionDetalle extends StatelessWidget {
           context.l10n.publicarFallecioEl(DateFormat('dd/MM/yyyy').format(p.fechaFallecimiento!)),
         if (p.edad != null) context.l10n.publicarAnosDeEdad(p.edad!),
       ];
-      filas.add(_Fila(icon: Icons.event_outlined, texto: partes.join(' · ')));
+      items.add((Icons.event_outlined, partes.join(' · ')));
     }
     if (p.fechaFuneral != null || p.horaFuneral != null) {
       final partesFuneral = [
         if (p.fechaFuneral != null) DateFormat('dd/MM/yyyy').format(p.fechaFuneral!),
         if (p.horaFuneral != null) p.horaFuneral!,
       ];
-      filas.add(_Fila(icon: Icons.schedule, texto: partesFuneral.join(' · ')));
+      items.add((Icons.schedule, partesFuneral.join(' · ')));
     }
     if (p.iglesia != null) {
-      filas.add(_Fila(icon: Icons.church_outlined, texto: p.iglesia!));
+      items.add((Icons.church_outlined, p.iglesia!));
     }
     if (p.lugar != null) {
-      filas.add(_Fila(icon: Icons.place_outlined, texto: p.lugar!));
+      items.add((Icons.place_outlined, p.lugar!));
     }
     if (p.capillaArdiente != null) {
-      filas.add(_Fila(icon: Icons.local_florist_outlined, texto: p.capillaArdiente!));
+      items.add((Icons.local_florist_outlined, p.capillaArdiente!));
     }
     if (p.sala != null) {
-      filas.add(_Fila(icon: Icons.meeting_room_outlined, texto: '${context.l10n.publicarSala} ${p.sala}'));
+      items.add((Icons.meeting_room_outlined, '${context.l10n.publicarSala} ${p.sala}'));
     }
+    return items;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final p = publicacion;
+    final filas = [
+      for (final (icon, texto) in items(context, p)) _Fila(icon: icon, texto: texto),
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

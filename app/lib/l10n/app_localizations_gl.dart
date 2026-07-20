@@ -884,6 +884,23 @@ class AppLocalizationsGl extends AppLocalizations {
   String get publicarObservaciones => 'Observacións';
 
   @override
+  String get publicarEscoitarEsquela => 'Escoitar esquela';
+
+  @override
+  String get publicarPararEscoita => 'Deter a lectura';
+
+  @override
+  String publicarFuneralVoz(String fecha, String hora) {
+    return 'O funeral será o $fecha ás $hora';
+  }
+
+  @override
+  String get tablonAumentarLetra => 'Aumentar tamaño de letra';
+
+  @override
+  String get tablonDisminuirLetra => 'Diminuír tamaño de letra';
+
+  @override
   String get publicarEdadInvalida => 'Introduce un número enteiro válido';
 
   @override

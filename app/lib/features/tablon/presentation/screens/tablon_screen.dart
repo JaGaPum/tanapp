@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/l10n_extensions.dart';
+import '../../../../core/preferences/escala_texto_provider.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../publicaciones/application/publicaciones_providers.dart';
 import '../../../publicaciones/data/publicacion_con_sede.dart';
@@ -62,19 +63,37 @@ class _TablonScreenState extends ConsumerState<TablonScreen> with WidgetsBinding
   @override
   Widget build(BuildContext context) {
     final publicacionesAsync = ref.watch(publicacionesTablonProvider);
+    final escala = ref.watch(escalaTextoProvider);
+    final notifierEscala = ref.read(escalaTextoProvider.notifier);
 
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          TextField(
-            controller: _busquedaController,
-            decoration: InputDecoration(
-              labelText: context.l10n.tablonBuscar,
-              prefixIcon: const Icon(Icons.search),
-            ),
-            onChanged: (_) => setState(() {}),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _busquedaController,
+                  decoration: InputDecoration(
+                    labelText: context.l10n.tablonBuscar,
+                    prefixIcon: const Icon(Icons.search),
+                  ),
+                  onChanged: (_) => setState(() {}),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.text_decrease),
+                tooltip: context.l10n.tablonDisminuirLetra,
+                onPressed: escala == EscalaTextoNotifier.valores.first ? null : notifierEscala.disminuir,
+              ),
+              IconButton(
+                icon: const Icon(Icons.text_increase),
+                tooltip: context.l10n.tablonAumentarLetra,
+                onPressed: escala == EscalaTextoNotifier.valores.last ? null : notifierEscala.aumentar,
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           Expanded(

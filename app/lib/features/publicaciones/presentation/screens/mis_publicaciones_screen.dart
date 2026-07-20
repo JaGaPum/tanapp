@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/l10n/l10n_extensions.dart';
+import '../../../../core/preferences/escala_texto_provider.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../application/publicaciones_providers.dart';
@@ -90,17 +91,26 @@ class _MiPublicacionCardState extends ConsumerState<_MiPublicacionCard> {
   @override
   Widget build(BuildContext context) {
     final publicacion = widget.publicacion;
+    final escala = ref.watch(escalaTextoProvider);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(publicacion.nombreFallecido, style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 4),
-            Text(publicacion.concello, style: Theme.of(context).textTheme.titleSmall),
-            const SizedBox(height: 8),
-            PublicacionDetalle(publicacion: publicacion),
+            MediaQuery(
+              data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(escala)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(publicacion.nombreFallecido, style: Theme.of(context).textTheme.titleLarge),
+                  const SizedBox(height: 4),
+                  Text(publicacion.concello, style: Theme.of(context).textTheme.titleSmall),
+                  const SizedBox(height: 8),
+                  PublicacionDetalle(publicacion: publicacion),
+                ],
+              ),
+            ),
             const SizedBox(height: 8),
             Text(
               DateFormat('dd/MM/yyyy HH:mm').format(publicacion.fechaAlta.toLocal()),

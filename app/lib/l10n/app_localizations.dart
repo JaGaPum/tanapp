@@ -1694,6 +1694,36 @@ abstract class AppLocalizations {
   /// **'Observaciones'**
   String get publicarObservaciones;
 
+  /// No description provided for @publicarEscoitarEsquela.
+  ///
+  /// In es, this message translates to:
+  /// **'Escuchar esquela'**
+  String get publicarEscoitarEsquela;
+
+  /// No description provided for @publicarPararEscoita.
+  ///
+  /// In es, this message translates to:
+  /// **'Detener lectura'**
+  String get publicarPararEscoita;
+
+  /// No description provided for @publicarFuneralVoz.
+  ///
+  /// In es, this message translates to:
+  /// **'El funeral será el {fecha} a las {hora}'**
+  String publicarFuneralVoz(String fecha, String hora);
+
+  /// No description provided for @tablonAumentarLetra.
+  ///
+  /// In es, this message translates to:
+  /// **'Aumentar tamaño de letra'**
+  String get tablonAumentarLetra;
+
+  /// No description provided for @tablonDisminuirLetra.
+  ///
+  /// In es, this message translates to:
+  /// **'Disminuir tamaño de letra'**
+  String get tablonDisminuirLetra;
+
   /// No description provided for @publicarEdadInvalida.
   ///
   /// In es, this message translates to:

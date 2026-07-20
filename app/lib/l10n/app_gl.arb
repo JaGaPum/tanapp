@@ -300,6 +300,14 @@
   "publicarCapillaArdiente": "Capela ardente / velorio",
   "publicarSala": "Sala",
   "publicarObservaciones": "Observacións",
+  "publicarEscoitarEsquela": "Escoitar esquela",
+  "publicarPararEscoita": "Deter a lectura",
+  "publicarFuneralVoz": "O funeral será o {fecha} ás {hora}",
+  "@publicarFuneralVoz": {
+    "placeholders": { "fecha": { "type": "String" }, "hora": { "type": "String" } }
+  },
+  "tablonAumentarLetra": "Aumentar tamaño de letra",
+  "tablonDisminuirLetra": "Diminuír tamaño de letra",
   "publicarEdadInvalida": "Introduce un número enteiro válido",
   "publicarVistaPreviaTitulo": "É correcto?",
   "publicarFallecioEl": "Faleceu o {fecha}",

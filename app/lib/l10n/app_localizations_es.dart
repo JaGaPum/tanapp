@@ -886,6 +886,23 @@ class AppLocalizationsEs extends AppLocalizations {
   String get publicarObservaciones => 'Observaciones';
 
   @override
+  String get publicarEscoitarEsquela => 'Escuchar esquela';
+
+  @override
+  String get publicarPararEscoita => 'Detener lectura';
+
+  @override
+  String publicarFuneralVoz(String fecha, String hora) {
+    return 'El funeral será el $fecha a las $hora';
+  }
+
+  @override
+  String get tablonAumentarLetra => 'Aumentar tamaño de letra';
+
+  @override
+  String get tablonDisminuirLetra => 'Disminuir tamaño de letra';
+
+  @override
   String get publicarEdadInvalida => 'Introduce un número entero válido';
 
   @override
