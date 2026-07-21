@@ -51,5 +51,11 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
+        <!-- Necesario desde Android 11 para que TextToSpeech pueda encontrar el motor de voz
+             instalado en el dispositivo (flutter_tts, botón "Escoitar esquela"); sin esto
+             speak() no da error pero tampoco suena nada. -->
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
     </queries>
 </manifest>
