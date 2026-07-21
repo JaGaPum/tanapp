@@ -103,7 +103,7 @@ class _MiPublicacionCardState extends ConsumerState<_MiPublicacionCard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(publicacion.nombreFallecido, style: Theme.of(context).textTheme.titleLarge),
+                  Text('✝ ${publicacion.nombreFallecido}', style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 4),
                   Text(publicacion.concello, style: Theme.of(context).textTheme.titleSmall),
                   const SizedBox(height: 8),

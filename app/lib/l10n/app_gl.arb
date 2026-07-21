@@ -99,6 +99,14 @@
   "accountGuardarCambios": "Gardar cambios",
   "accountNotificacionesPush": "Desexo recibir notificacións das publicacións no meu móbil.",
 
+  "terminosTitulo": "Antes de continuar",
+  "terminosHeAceptado": "Lin e acepto: {titulo}",
+  "@terminosHeAceptado": {
+    "placeholders": { "titulo": { "type": "String" } }
+  },
+  "terminosContinuar": "Continuar",
+  "terminosVerEnCuenta": "Termos e privacidade",
+
   "usuarioFichaTitulo": "Ficha de usuario",
   "usuarioCambiosGuardados": "Cambios gardados",
   "usuarioNoSePudoAsignarRol": "Non se puido asignar o rol",

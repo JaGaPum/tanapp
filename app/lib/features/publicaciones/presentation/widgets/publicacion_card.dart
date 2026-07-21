@@ -28,7 +28,7 @@ class PublicacionCard extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: Text(publicacion.nombreFallecido, style: Theme.of(context).textTheme.titleLarge),
+                    child: Text('✝ ${publicacion.nombreFallecido}', style: Theme.of(context).textTheme.titleLarge),
                   ),
                   EscucharEsquelaButton(publicacion: publicacion),
                   ArchivarPublicacionButton(idClientePublicacion: publicacion.idClientePublicacion),

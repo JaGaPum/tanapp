@@ -59,6 +59,11 @@ final sesionPolicyServiceProvider = Provider<SesionPolicyService>((ref) {
 /// Guard para que el bootstrap de sesión se ejecute una sola vez por carga de app.
 class SesionBootstrapGuard {
   bool completado = false;
+
+  /// Si el usuario tiene documentos legales pendientes de aceptar (null = aún sin calcular).
+  /// Se calcula aparte de [completado] porque un login explícito salta el bootstrap
+  /// (ver `login_screen.dart`) y aun así hay que comprobar los términos.
+  bool? necesitaAceptarTerminos;
 }
 
 final sesionBootstrapGuardProvider = Provider<SesionBootstrapGuard>((ref) => SesionBootstrapGuard());

@@ -280,6 +280,20 @@ class AppLocalizationsGl extends AppLocalizations {
       'Desexo recibir notificacións das publicacións no meu móbil.';
 
   @override
+  String get terminosTitulo => 'Antes de continuar';
+
+  @override
+  String terminosHeAceptado(String titulo) {
+    return 'Lin e acepto: $titulo';
+  }
+
+  @override
+  String get terminosContinuar => 'Continuar';
+
+  @override
+  String get terminosVerEnCuenta => 'Termos e privacidade';
+
+  @override
   String get usuarioFichaTitulo => 'Ficha de usuario';
 
   @override

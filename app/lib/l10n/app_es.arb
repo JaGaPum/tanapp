@@ -117,6 +117,14 @@
   "accountGuardarCambios": "Guardar cambios",
   "accountNotificacionesPush": "Deseo recibir notificaciones de las publicaciones en mi móvil.",
 
+  "terminosTitulo": "Antes de continuar",
+  "terminosHeAceptado": "He leído y acepto: {titulo}",
+  "@terminosHeAceptado": {
+    "placeholders": { "titulo": { "type": "String" } }
+  },
+  "terminosContinuar": "Continuar",
+  "terminosVerEnCuenta": "Términos y privacidad",
+
   "usuarioFichaTitulo": "Ficha de usuario",
   "usuarioCambiosGuardados": "Cambios guardados",
   "usuarioNoSePudoAsignarRol": "No se pudo asignar el rol",

@@ -602,6 +602,30 @@ abstract class AppLocalizations {
   /// **'Deseo recibir notificaciones de las publicaciones en mi móvil.'**
   String get accountNotificacionesPush;
 
+  /// No description provided for @terminosTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Antes de continuar'**
+  String get terminosTitulo;
+
+  /// No description provided for @terminosHeAceptado.
+  ///
+  /// In es, this message translates to:
+  /// **'He leído y acepto: {titulo}'**
+  String terminosHeAceptado(String titulo);
+
+  /// No description provided for @terminosContinuar.
+  ///
+  /// In es, this message translates to:
+  /// **'Continuar'**
+  String get terminosContinuar;
+
+  /// No description provided for @terminosVerEnCuenta.
+  ///
+  /// In es, this message translates to:
+  /// **'Términos y privacidad'**
+  String get terminosVerEnCuenta;
+
   /// No description provided for @usuarioFichaTitulo.
   ///
   /// In es, this message translates to:

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/l10n/l10n_extensions.dart';
@@ -313,6 +314,12 @@ class _DatosPersonalesFormState extends ConsumerState<_DatosPersonalesForm> {
             value: _notificacionesPushActivas,
             onChanged: (value) => setState(() => _notificacionesPushActivas = value),
             contentPadding: EdgeInsets.zero,
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(context.l10n.terminosVerEnCuenta),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/terminos'),
           ),
           const SizedBox(height: 16),
           AppButton(label: context.l10n.accountGuardarCambios, loading: _loading, onPressed: _guardar),

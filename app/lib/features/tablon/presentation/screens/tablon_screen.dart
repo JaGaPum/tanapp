@@ -84,12 +84,12 @@ class _TablonScreenState extends ConsumerState<TablonScreen> with WidgetsBinding
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.text_decrease),
+                icon: const Icon(Icons.text_decrease, size: 20),
                 tooltip: context.l10n.tablonDisminuirLetra,
                 onPressed: escala == EscalaTextoNotifier.valores.first ? null : notifierEscala.disminuir,
               ),
               IconButton(
-                icon: const Icon(Icons.text_increase),
+                icon: const Icon(Icons.text_increase, size: 30),
                 tooltip: context.l10n.tablonAumentarLetra,
                 onPressed: escala == EscalaTextoNotifier.valores.last ? null : notifierEscala.aumentar,
               ),

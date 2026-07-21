@@ -256,7 +256,7 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(nombre, style: Theme.of(context).textTheme.titleLarge),
+              Text('✝ $nombre', style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 8),
               for (final fila in filas) ...[fila, const SizedBox(height: 4)],
               if (observaciones.isNotEmpty) ...[

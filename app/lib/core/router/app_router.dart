@@ -34,7 +34,11 @@ import '../../features/sistema/presentation/screens/sistema_screen.dart';
 import '../../features/sistema_usuarios/data/usuarios_repository.dart';
 import '../../features/sistema_usuarios/presentation/screens/usuario_detail_screen.dart';
 import '../../features/sistema_usuarios/presentation/screens/usuarios_list_screen.dart';
+import '../../features/terminos/data/terminos_repository.dart';
+import '../../features/terminos/presentation/screens/aceptar_terminos_screen.dart';
+import '../../features/terminos/presentation/screens/ver_terminos_screen.dart';
 import '../l10n/l10n_extensions.dart';
+import '../l10n/locale_provider.dart';
 
 const _publicLocations = {
   '/login',
@@ -72,6 +76,37 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return '/home';
       }
 
+      // Se calcula aparte del bootstrap de arriba: un login explícito lo salta (ver
+      // login_screen.dart), así que hay que comprobarlo también aquí, una sola vez por carga
+      // de la app (el resultado queda cacheado en el guard).
+      if (guard.necesitaAceptarTerminos == null) {
+        try {
+          final perfil = await ref.read(usuariosRepositoryProvider).fetchPerfilByAuthId(session.user.id);
+          if (perfil == null) {
+            guard.necesitaAceptarTerminos = false;
+          } else {
+            final idiomaCodigo = ref.read(appLocaleProvider).languageCode == 'gl' ? 'GL' : 'ES';
+            final pendientes = await ref
+                .read(terminosRepositoryProvider)
+                .fetchPendientes(perfil.idSistemaUsuario, perfil.roles, idiomaCodigo);
+            guard.necesitaAceptarTerminos = pendientes.isNotEmpty;
+          }
+        } catch (e) {
+          // Si la migración de TSistemaTerminos aún no está aplicada (u otro fallo puntual),
+          // no se debe bloquear el acceso a toda la app por esto: se reintenta en la próxima
+          // navegación (necesitaAceptarTerminos sigue en null).
+          debugPrint('No se pudo comprobar los términos pendientes: $e');
+        }
+      }
+
+      final necesitaAceptarTerminos = guard.necesitaAceptarTerminos ?? false;
+      if (necesitaAceptarTerminos && location != '/aceptar-terminos') {
+        return '/aceptar-terminos';
+      }
+      if (!necesitaAceptarTerminos && location == '/aceptar-terminos') {
+        return '/home';
+      }
+
       if (location.startsWith('/admin')) {
         final repo = ref.read(usuariosRepositoryProvider);
         final perfil = await repo.fetchPerfilByAuthId(session.user.id);
@@ -103,6 +138,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/solicitud-cliente', builder: (context, state) => const SolicitudClienteFormScreen()),
       GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
       GoRoute(path: '/account', builder: (context, state) => const AccountScreen()),
+      GoRoute(path: '/aceptar-terminos', builder: (context, state) => const AceptarTerminosScreen()),
+      GoRoute(path: '/terminos', builder: (context, state) => const VerTerminosScreen()),
       GoRoute(path: '/mis-sedes', builder: (context, state) => const MisSedesScreen()),
       GoRoute(
         path: '/publicar/manual',
