@@ -6,6 +6,7 @@ import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../auth/application/auth_providers.dart';
 import '../../../cliente_tipos/application/cliente_tipos_providers.dart';
+import '../../../propuestas_publicaciones/application/propuestas_providers.dart';
 import '../../../seguidos/presentation/widgets/big_choice_card.dart';
 
 const _tiposHabilitados = {'Funeraria', 'Tanatorio'};
@@ -17,6 +18,7 @@ class PublicarScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final perfilAsync = ref.watch(currentUserProfileProvider);
     final tiposAsync = ref.watch(clienteTiposListProvider);
+    final propuestasPendientes = ref.watch(propuestasPendientesCountProvider);
 
     return perfilAsync.when(
       data: (perfil) => tiposAsync.when(
@@ -56,6 +58,29 @@ class PublicarScreen extends ConsumerWidget {
                           icon: const Icon(Icons.edit_note_outlined, size: 48),
                           label: context.l10n.publicarManual,
                           onTap: () => context.push('/publicar/manual'),
+                        ),
+                      ),
+                      SizedBox(
+                        width: anchoTarjeta,
+                        height: anchoTarjeta,
+                        child: BigChoiceCard(
+                          icon: const Icon(Icons.travel_explore, size: 48),
+                          label: context.l10n.publicarImportarWeb,
+                          onTap: () => context.push('/publicar/importar-web'),
+                        ),
+                      ),
+                      SizedBox(
+                        width: anchoTarjeta,
+                        height: anchoTarjeta,
+                        child: BigChoiceCard(
+                          icon: Badge(
+                            isLabelVisible: propuestasPendientes > 0,
+                            label: Text('$propuestasPendientes'),
+                            backgroundColor: const Color(0xFFD50000),
+                            child: const Icon(Icons.fact_check_outlined, size: 48),
+                          ),
+                          label: context.l10n.publicarPropuestas,
+                          onTap: () => context.push('/publicar/propuestas'),
                         ),
                       ),
                     ],

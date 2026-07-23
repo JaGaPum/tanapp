@@ -294,6 +294,41 @@ class AppLocalizationsGl extends AppLocalizations {
   String get terminosVerEnCuenta => 'Termos e privacidade';
 
   @override
+  String get importacionWebTitulo => 'Importar datos automaticamente';
+
+  @override
+  String get importacionWebConsentimiento =>
+      'Autorizo a TanApp a rastrexar a web indicada máis abaixo para propor esquelas automaticamente a partir do seu contido público. Cada proposta seguireina revisando e publicando eu mesmo/a antes de que sexa visible para o público; TanApp non publica nada sen a miña revisión.';
+
+  @override
+  String get importacionWebAceptoCheckbox =>
+      'Acepto e autorizo o rastrexo da miña web';
+
+  @override
+  String get importacionWebUrlLabel => 'URL da miña web';
+
+  @override
+  String get importacionWebUrlInvalida =>
+      'Introduce unha URL válida (debe comezar por http:// ou https://)';
+
+  @override
+  String get importacionWebGuardar => 'Gardar e autorizar';
+
+  @override
+  String get importacionWebActualizar => 'Actualizar URL';
+
+  @override
+  String get importacionWebDesactivar => 'Desactivar';
+
+  @override
+  String importacionWebActiva(String fecha) {
+    return 'Activa dende $fecha';
+  }
+
+  @override
+  String get importacionWebDesactivada => 'Desactivada';
+
+  @override
   String get usuarioFichaTitulo => 'Ficha de usuario';
 
   @override
@@ -848,6 +883,41 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get publicarManual => 'Manual';
+
+  @override
+  String get publicarImportarWeb => 'Importación automática';
+
+  @override
+  String get publicarPropuestas => 'Propostas';
+
+  @override
+  String get publicarAvisoImportadoWeb =>
+      'Datos importados automaticamente desde a túa web. Revisa todos os campos antes de publicar.';
+
+  @override
+  String get propuestasTitulo => 'Propostas de publicación';
+
+  @override
+  String get propuestasVacio => 'Non hai propostas pendentes de revisar.';
+
+  @override
+  String propuestasDetectadaEl(String fecha) {
+    return 'Detectada o $fecha';
+  }
+
+  @override
+  String get propuestasRevisar => 'Revisar';
+
+  @override
+  String get propuestasDescartar => 'Descartar';
+
+  @override
+  String get propuestasConfirmarDescartarTitulo => 'Descartar proposta';
+
+  @override
+  String propuestasConfirmarDescartarMensaje(String nombre) {
+    return 'Descartar a proposta de \"$nombre\"? Non se publicará e non se volverá propor.';
+  }
 
   @override
   String get publicarNuevaPublicacion => 'Nova publicación';

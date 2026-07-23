@@ -9,9 +9,12 @@ import '../../../../core/utils/text_format.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../../core/widgets/cruz_icon.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_banner.dart';
 import '../../../cliente_sedes/application/cliente_sedes_providers.dart';
+import '../../../propuestas_publicaciones/application/propuestas_providers.dart';
+import '../../../propuestas_publicaciones/data/propuestas_repository.dart';
 import '../../application/publicaciones_providers.dart';
 import '../../data/publicaciones_repository.dart';
 
@@ -46,6 +49,7 @@ class PublicacionFormScreen extends ConsumerStatefulWidget {
   final String? salaInicial;
   final String? observacionesInicial;
   final String? avisoInicial;
+  final String? idClientePublicacionPropuestaInicial;
 
   const PublicacionFormScreen({
     super.key,
@@ -62,6 +66,7 @@ class PublicacionFormScreen extends ConsumerStatefulWidget {
     this.salaInicial,
     this.observacionesInicial,
     this.avisoInicial,
+    this.idClientePublicacionPropuestaInicial,
   });
 
   @override
@@ -201,6 +206,11 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
           sala: sala,
           observaciones: observaciones,
         );
+        final idPropuesta = widget.idClientePublicacionPropuestaInicial;
+        if (idPropuesta != null) {
+          await ref.read(propuestasRepositoryProvider).marcarPublicada(idPropuesta);
+          ref.invalidate(propuestasPendientesProvider);
+        }
       }
       ref.invalidate(misPublicacionesProvider);
       ref.invalidate(publicacionesTablonProvider);
@@ -256,7 +266,14 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('✝ $nombre', style: Theme.of(context).textTheme.titleLarge),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const CruzIcon(size: 20),
+                  const SizedBox(width: 6),
+                  Expanded(child: Text(nombre, style: Theme.of(context).textTheme.titleLarge)),
+                ],
+              ),
               const SizedBox(height: 8),
               for (final fila in filas) ...[fila, const SizedBox(height: 4)],
               if (observaciones.isNotEmpty) ...[

@@ -23,6 +23,8 @@ import '../../features/configuracion/presentation/screens/configuracion_concello
 import '../../features/configuracion/presentation/screens/configuracion_provincias_screen.dart';
 import '../../features/configuracion/presentation/screens/configuracion_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/importacion_web/presentation/screens/configurar_importacion_web_screen.dart';
+import '../../features/propuestas_publicaciones/presentation/screens/propuestas_screen.dart';
 import '../../features/publicaciones/presentation/screens/publicacion_escanear_screen.dart';
 import '../../features/publicaciones/presentation/screens/publicacion_form_screen.dart';
 import '../../features/publicaciones/presentation/screens/publicaciones_list_screen.dart';
@@ -162,10 +164,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             salaInicial: datos?['sala'],
             observacionesInicial: datos?['observaciones'],
             avisoInicial: datos?['avisoOcr'],
+            idClientePublicacionPropuestaInicial: datos?['idClientePublicacionPropuesta'],
           );
         },
       ),
       GoRoute(path: '/publicar/escanear', builder: (context, state) => const PublicacionEscanearScreen()),
+      GoRoute(path: '/publicar/importar-web', builder: (context, state) => const ConfigurarImportacionWebScreen()),
+      GoRoute(path: '/publicar/propuestas', builder: (context, state) => const PropuestasScreen()),
       GoRoute(
         path: '/publicaciones/:sedeId',
         builder: (context, state) => PublicacionesListScreen(

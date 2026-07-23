@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../../core/preferences/escala_texto_provider.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
+import '../../../../core/widgets/cruz_icon.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../application/publicaciones_providers.dart';
 import '../../data/publicacion_con_sede.dart';
@@ -103,7 +104,16 @@ class _MiPublicacionCardState extends ConsumerState<_MiPublicacionCard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('✝ ${publicacion.nombreFallecido}', style: Theme.of(context).textTheme.titleLarge),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CruzIcon(size: 20 * escala),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(publicacion.nombreFallecido, style: Theme.of(context).textTheme.titleLarge),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 4),
                   Text(publicacion.concello, style: Theme.of(context).textTheme.titleSmall),
                   const SizedBox(height: 8),

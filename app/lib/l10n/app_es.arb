@@ -125,6 +125,20 @@
   "terminosContinuar": "Continuar",
   "terminosVerEnCuenta": "Términos y privacidad",
 
+  "importacionWebTitulo": "Importar datos automáticamente",
+  "importacionWebConsentimiento": "Autorizo a TanApp a rastrear la web indicada más abajo para proponer esquelas automáticamente a partir de su contenido público. Cada propuesta la seguiré revisando y publicando yo mismo/a antes de que sea visible para el público; TanApp no publica nada sin mi revisión.",
+  "importacionWebAceptoCheckbox": "Acepto y autorizo el rastreo de mi web",
+  "importacionWebUrlLabel": "URL de mi web",
+  "importacionWebUrlInvalida": "Introduce una URL válida (debe empezar por http:// o https://)",
+  "importacionWebGuardar": "Guardar y autorizar",
+  "importacionWebActualizar": "Actualizar URL",
+  "importacionWebDesactivar": "Desactivar",
+  "importacionWebActiva": "Activa desde {fecha}",
+  "@importacionWebActiva": {
+    "placeholders": { "fecha": { "type": "String" } }
+  },
+  "importacionWebDesactivada": "Desactivada",
+
   "usuarioFichaTitulo": "Ficha de usuario",
   "usuarioCambiosGuardados": "Cambios guardados",
   "usuarioNoSePudoAsignarRol": "No se pudo asignar el rol",
@@ -362,6 +376,22 @@
 
   "publicarEscanear": "Escanear",
   "publicarManual": "Manual",
+  "publicarImportarWeb": "Importación automática",
+  "publicarPropuestas": "Propuestas",
+  "publicarAvisoImportadoWeb": "Datos importados automáticamente desde tu web. Revisa todos los campos antes de publicar.",
+  "propuestasTitulo": "Propuestas de publicación",
+  "propuestasVacio": "No hay propuestas pendientes de revisar.",
+  "propuestasDetectadaEl": "Detectada el {fecha}",
+  "@propuestasDetectadaEl": {
+    "placeholders": { "fecha": { "type": "String" } }
+  },
+  "propuestasRevisar": "Revisar",
+  "propuestasDescartar": "Descartar",
+  "propuestasConfirmarDescartarTitulo": "Descartar propuesta",
+  "propuestasConfirmarDescartarMensaje": "¿Descartar la propuesta de \"{nombre}\"? No se publicará y no se volverá a proponer.",
+  "@propuestasConfirmarDescartarMensaje": {
+    "placeholders": { "nombre": { "type": "String" } }
+  },
   "publicarNuevaPublicacion": "Nueva publicación",
   "publicarSeleccionaSede": "Selecciona la sede",
   "publicarSinSedes": "Todavía no tienes ninguna sede. Da de alta una sede en \"Miñas sedes\" antes de publicar.",

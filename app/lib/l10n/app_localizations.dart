@@ -626,6 +626,66 @@ abstract class AppLocalizations {
   /// **'Términos y privacidad'**
   String get terminosVerEnCuenta;
 
+  /// No description provided for @importacionWebTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Importar datos automáticamente'**
+  String get importacionWebTitulo;
+
+  /// No description provided for @importacionWebConsentimiento.
+  ///
+  /// In es, this message translates to:
+  /// **'Autorizo a TanApp a rastrear la web indicada más abajo para proponer esquelas automáticamente a partir de su contenido público. Cada propuesta la seguiré revisando y publicando yo mismo/a antes de que sea visible para el público; TanApp no publica nada sin mi revisión.'**
+  String get importacionWebConsentimiento;
+
+  /// No description provided for @importacionWebAceptoCheckbox.
+  ///
+  /// In es, this message translates to:
+  /// **'Acepto y autorizo el rastreo de mi web'**
+  String get importacionWebAceptoCheckbox;
+
+  /// No description provided for @importacionWebUrlLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'URL de mi web'**
+  String get importacionWebUrlLabel;
+
+  /// No description provided for @importacionWebUrlInvalida.
+  ///
+  /// In es, this message translates to:
+  /// **'Introduce una URL válida (debe empezar por http:// o https://)'**
+  String get importacionWebUrlInvalida;
+
+  /// No description provided for @importacionWebGuardar.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar y autorizar'**
+  String get importacionWebGuardar;
+
+  /// No description provided for @importacionWebActualizar.
+  ///
+  /// In es, this message translates to:
+  /// **'Actualizar URL'**
+  String get importacionWebActualizar;
+
+  /// No description provided for @importacionWebDesactivar.
+  ///
+  /// In es, this message translates to:
+  /// **'Desactivar'**
+  String get importacionWebDesactivar;
+
+  /// No description provided for @importacionWebActiva.
+  ///
+  /// In es, this message translates to:
+  /// **'Activa desde {fecha}'**
+  String importacionWebActiva(String fecha);
+
+  /// No description provided for @importacionWebDesactivada.
+  ///
+  /// In es, this message translates to:
+  /// **'Desactivada'**
+  String get importacionWebDesactivada;
+
   /// No description provided for @usuarioFichaTitulo.
   ///
   /// In es, this message translates to:
@@ -1627,6 +1687,66 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Manual'**
   String get publicarManual;
+
+  /// No description provided for @publicarImportarWeb.
+  ///
+  /// In es, this message translates to:
+  /// **'Importación automática'**
+  String get publicarImportarWeb;
+
+  /// No description provided for @publicarPropuestas.
+  ///
+  /// In es, this message translates to:
+  /// **'Propuestas'**
+  String get publicarPropuestas;
+
+  /// No description provided for @publicarAvisoImportadoWeb.
+  ///
+  /// In es, this message translates to:
+  /// **'Datos importados automáticamente desde tu web. Revisa todos los campos antes de publicar.'**
+  String get publicarAvisoImportadoWeb;
+
+  /// No description provided for @propuestasTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Propuestas de publicación'**
+  String get propuestasTitulo;
+
+  /// No description provided for @propuestasVacio.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay propuestas pendientes de revisar.'**
+  String get propuestasVacio;
+
+  /// No description provided for @propuestasDetectadaEl.
+  ///
+  /// In es, this message translates to:
+  /// **'Detectada el {fecha}'**
+  String propuestasDetectadaEl(String fecha);
+
+  /// No description provided for @propuestasRevisar.
+  ///
+  /// In es, this message translates to:
+  /// **'Revisar'**
+  String get propuestasRevisar;
+
+  /// No description provided for @propuestasDescartar.
+  ///
+  /// In es, this message translates to:
+  /// **'Descartar'**
+  String get propuestasDescartar;
+
+  /// No description provided for @propuestasConfirmarDescartarTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Descartar propuesta'**
+  String get propuestasConfirmarDescartarTitulo;
+
+  /// No description provided for @propuestasConfirmarDescartarMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Descartar la propuesta de \"{nombre}\"? No se publicará y no se volverá a proponer.'**
+  String propuestasConfirmarDescartarMensaje(String nombre);
 
   /// No description provided for @publicarNuevaPublicacion.
   ///

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/preferences/escala_texto_provider.dart';
+import '../../../../core/widgets/cruz_icon.dart';
 import '../../data/publicacion_con_sede.dart';
 import 'archivar_publicacion_button.dart';
 import 'escuchar_esquela_button.dart';
@@ -27,8 +28,10 @@ class PublicacionCard extends ConsumerWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  CruzIcon(size: 20 * escala),
+                  const SizedBox(width: 6),
                   Expanded(
-                    child: Text('✝ ${publicacion.nombreFallecido}', style: Theme.of(context).textTheme.titleLarge),
+                    child: Text(publicacion.nombreFallecido, style: Theme.of(context).textTheme.titleLarge),
                   ),
                   EscucharEsquelaButton(publicacion: publicacion),
                   ArchivarPublicacionButton(idClientePublicacion: publicacion.idClientePublicacion),
