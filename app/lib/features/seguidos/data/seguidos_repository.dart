@@ -41,12 +41,14 @@ class SeguidosRepository {
   }
 
   /// Sedes que sigue el usuario actual, con el cliente dueño embebido para poder mostrar su
-  /// nombre/teléfono/avatar junto a los datos propios de la sede.
-  Future<List<ClienteSeguible>> listMisSeguidosClientes() async {
+  /// nombre/teléfono/avatar junto a los datos propios de la sede. Paginada para el scroll
+  /// infinito: [offset]/[limit] son la página pedida.
+  Future<List<ClienteSeguible>> listMisSeguidosClientes({int offset = 0, int limit = 20}) async {
     final data = await _client
         .from('TClienteSeguimientos')
         .select('*, TClienteSedes(*, TSistemaUsuarios(*))')
-        .order('FechaAlta', ascending: false);
+        .order('FechaAlta', ascending: false)
+        .range(offset, offset + limit - 1);
     return (data as List)
         .map((e) => ClienteSeguible.fromSedeMap((e as Map<String, dynamic>)['TClienteSedes'] as Map<String, dynamic>))
         .toList();

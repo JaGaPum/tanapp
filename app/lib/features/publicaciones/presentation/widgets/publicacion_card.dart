@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/preferences/escala_texto_provider.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/cruz_icon.dart';
 import '../../data/publicacion_con_sede.dart';
 import 'archivar_publicacion_button.dart';
@@ -18,6 +19,10 @@ class PublicacionCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final escala = ref.watch(escalaTextoProvider);
     return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: AppColors.black, width: 2),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: MediaQuery(

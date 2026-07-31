@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'publicacion_con_sede.dart';
+import 'publicaciones_por_mes.dart';
 
 class PublicacionesRepository {
   final SupabaseClient _client;
@@ -44,9 +45,13 @@ class PublicacionesRepository {
   }
 
   /// Todas las publicaciones visibles (la RLS ya solo deja ver las de clientes activos), para
-  /// el Taboleiro.
-  Future<List<PublicacionConSede>> listTodas() async {
-    final data = await _client.from('TClientePublicaciones').select(_selectConSede).order('FechaAlta', ascending: false);
+  /// el Taboleiro. Paginada para el scroll infinito: [offset]/[limit] son la página pedida.
+  Future<List<PublicacionConSede>> listTodas({int offset = 0, int limit = 20}) async {
+    final data = await _client
+        .from('TClientePublicaciones')
+        .select(_selectConSede)
+        .order('FechaAlta', ascending: false)
+        .range(offset, offset + limit - 1);
     return (data as List).map((e) => PublicacionConSede.fromMap(e as Map<String, dynamic>)).toList();
   }
 
@@ -100,11 +105,12 @@ class PublicacionesRepository {
     return (data as List).map((e) => (e as Map<String, dynamic>)['IdClientePublicacion'] as String).toSet();
   }
 
-  Future<List<PublicacionConSede>> listMisArchivadas() async {
+  Future<List<PublicacionConSede>> listMisArchivadas({int offset = 0, int limit = 20}) async {
     final data = await _client
         .from('TClientePublicacionesArchivadas')
         .select('TClientePublicaciones($_selectConSede)')
-        .order('FechaAlta', ascending: false);
+        .order('FechaAlta', ascending: false)
+        .range(offset, offset + limit - 1);
     return (data as List)
         .map((e) => PublicacionConSede.fromMap((e as Map<String, dynamic>)['TClientePublicaciones'] as Map<String, dynamic>))
         .toList();
@@ -123,6 +129,36 @@ class PublicacionesRepository {
         .delete()
         .eq('IdSistemaUsuario', idSistemaUsuario)
         .eq('IdClientePublicacion', idClientePublicacion);
+  }
+
+  /// Publicaciones creadas por mes en los últimos [meses] meses (incluido el actual), para la
+  /// gráfica de actividad del Panel de Datos. Se agrega en Dart en vez de con un RPC en SQL,
+  /// mismo criterio que el resto de estadísticas sencillas de la app.
+  Future<List<PublicacionesPorMes>> listPublicacionesPorMes(
+    List<String> idsClienteSede, {
+    int meses = 6,
+  }) async {
+    if (idsClienteSede.isEmpty) return [];
+    final ahora = DateTime.now();
+    final desde = DateTime(ahora.year, ahora.month - (meses - 1), 1);
+    final data = await _client
+        .from('TClientePublicaciones')
+        .select('FechaAlta')
+        .inFilter('IdClienteSede', idsClienteSede)
+        .gte('FechaAlta', desde.toIso8601String());
+
+    final conteos = <String, int>{};
+    for (final fila in data as List) {
+      final fecha = DateTime.parse((fila as Map<String, dynamic>)['FechaAlta'] as String).toLocal();
+      final clave = '${fecha.year}-${fecha.month}';
+      conteos[clave] = (conteos[clave] ?? 0) + 1;
+    }
+
+    return List.generate(meses, (i) {
+      final mes = DateTime(desde.year, desde.month + i, 1);
+      final clave = '${mes.year}-${mes.month}';
+      return PublicacionesPorMes(mes: mes, total: conteos[clave] ?? 0);
+    });
   }
 }
 

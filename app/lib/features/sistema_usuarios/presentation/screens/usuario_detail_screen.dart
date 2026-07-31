@@ -16,6 +16,8 @@ import '../../../cliente_sedes/data/cliente_sede.dart';
 import '../../../cliente_sedes/data/cliente_sedes_repository.dart';
 import '../../../cliente_sedes/presentation/widgets/sede_form_dialog.dart';
 import '../../../cliente_tipos/application/cliente_tipos_providers.dart';
+import '../../../importacion_web/application/importacion_web_providers.dart';
+import '../../../importacion_web/data/importacion_web_repository.dart';
 import '../../../sesiones/application/sesiones_providers.dart';
 import '../../application/usuarios_providers.dart';
 import '../../data/catalogos_repository.dart';
@@ -189,6 +191,11 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
     if (!confirmado) return;
     await ref.read(clienteSedesRepositoryProvider).eliminarSede(sede.idClienteSede);
     ref.invalidate(sedesDeUsuarioProvider(widget.perfil.idSistemaUsuario));
+  }
+
+  Future<void> _toggleImportacionWeb(bool activo) async {
+    await ref.read(importacionWebRepositoryProvider).actualizarActivoAdmin(widget.perfil.idSistemaUsuario, activo);
+    ref.invalidate(importacionWebDeUsuarioProvider(widget.perfil.idSistemaUsuario));
   }
 
   Future<void> _mostrarSelectorRoles() async {
@@ -414,6 +421,38 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                                 ),
                               )
                               .toList(),
+                        );
+                      },
+                      loading: () => const Padding(
+                        padding: EdgeInsets.only(top: 8),
+                        child: LinearProgressIndicator(),
+                      ),
+                      error: (e, _) => Text(context.l10n.errorGenerico(e.toString())),
+                    ),
+                const SizedBox(height: 32),
+                Text(context.l10n.importacionWebTitulo, style: _sectionTitleStyle(context)),
+                ref.watch(importacionWebDeUsuarioProvider(widget.perfil.idSistemaUsuario)).when(
+                      data: (config) {
+                        if (config == null) {
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Text(context.l10n.usuarioImportacionWebSinConfigurar),
+                          );
+                        }
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: Text(config.url, style: Theme.of(context).textTheme.bodyMedium),
+                            ),
+                            SwitchListTile(
+                              title: Text(context.l10n.usuarioImportacionWebActiva),
+                              value: config.activo,
+                              onChanged: _toggleImportacionWeb,
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                          ],
                         );
                       },
                       loading: () => const Padding(

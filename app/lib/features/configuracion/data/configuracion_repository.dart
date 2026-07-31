@@ -68,6 +68,34 @@ class ConfiguracionRepository {
   Future<void> eliminarConcello(String idConfiguracionConcello) async {
     await _client.from('TConfiguracionConcellos').delete().eq('IdConfiguracionConcello', idConfiguracionConcello);
   }
+
+  /// Fila única de parámetros globales (ver migración 030). Se lee sin filtro porque solo existe
+  /// esa fila.
+  Future<bool> fetchImportacionWebIaActiva() async {
+    final data = await _client.from('TConfiguracionGlobal').select('ImportacionWebIaActiva').single();
+    return data['ImportacionWebIaActiva'] as bool;
+  }
+
+  /// Solo hay una fila y no hay policy de INSERT/DELETE que permita que aparezca una segunda,
+  /// pero Supabase exige igualmente una cláusula WHERE en todo UPDATE/DELETE (protección
+  /// "safeupdate" activada por defecto): de ahí el filtro "no nulo" sobre la clave primaria, que
+  /// siempre es cierto. Se fuerza además ".select()" (en vez de dejar el "return=minimal" por
+  /// defecto) para poder detectar si la policy de UPDATE bloqueó la fila: en RLS eso no da error,
+  /// sencillamente actualiza 0 filas, así que sin esta comprobación el fallo pasaría
+  /// desapercibido y el interruptor "no se quedaría marcado" sin explicación.
+  Future<void> actualizarImportacionWebIaActiva(bool activa) async {
+    final data = await _client
+        .from('TConfiguracionGlobal')
+        .update({'ImportacionWebIaActiva': activa})
+        .not('IdConfiguracionGlobal', 'is', null)
+        .select();
+    if ((data as List).isEmpty) {
+      throw Exception(
+        'No se pudo actualizar la configuración global: tu usuario no tiene permiso de administrador '
+        '(revisa que tenga el rol ADMIN) o falta aplicar la migración 030.',
+      );
+    }
+  }
 }
 
 final configuracionRepositoryProvider = Provider<ConfiguracionRepository>((ref) {

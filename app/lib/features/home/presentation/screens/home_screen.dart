@@ -9,6 +9,8 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_drawer.dart';
 import '../../../archivo/presentation/screens/archivo_screen.dart';
 import '../../../auth/application/auth_providers.dart';
+import '../../../avisos/application/avisos_providers.dart';
+import '../../../avisos/presentation/screens/avisos_enviados_screen.dart';
 import '../../../avisos/presentation/screens/avisos_screen.dart';
 import '../../../clientes_solicitudes/application/solicitudes_providers.dart';
 import '../../../notificaciones_push/application/push_service.dart';
@@ -26,15 +28,39 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObserver {
+  // Índice de la pestaña "Avisos" dentro de la barra inferior de un usuario ordinario/seguidor
+  // (TablonScreen, SeguidosScreen, MisSeguidosScreen, ArchivoScreen, AvisosScreen): solo un
+  // seguidor puede recibir un push de aviso (es a quien el trigger le crea el destinatario), así
+  // que al tocar esa notificación siempre es esta la pestaña a la que hay que saltar.
+  static const _tabIndexAvisosSeguidor = 4;
+
   int _tabIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     // El permiso de notificaciones y el registro del token no deben bloquear el primer frame;
     // si el usuario deniega el permiso o falla el registro, la app sigue funcionando igual.
     WidgetsBinding.instance.addPostFrameCallback((_) => _inicializarPush());
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Igual que hace TablonScreen con las publicaciones: al volver a primer plano, refrescamos
+    // el buzón de avisos por si ha llegado algo mientras la app estaba en segundo plano y el
+    // usuario no ha tocado la notificación (la ha visto y ha abierto la app directamente).
+    if (state == AppLifecycleState.resumed) {
+      ref.invalidate(avisosNoLeidosCountProvider);
+      ref.invalidate(misAvisosRecibidosProvider);
+    }
   }
 
   Future<void> _inicializarPush() async {
@@ -42,6 +68,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (kIsWeb) return;
     try {
       await ref.read(pushServiceProvider).inicializar();
+      // Mensaje recibido con la app abierta en primer plano: no hay ninguna notificación que
+      // tocar, pero el buzón de avisos hay que refrescarlo igualmente para que el badge y la
+      // lista se enteren sin esperar a que el usuario reabra la app.
+      FirebaseMessaging.onMessage.listen(_alRecibirEnPrimerPlano);
       // Notificación tocada con la app en segundo plano, o app abierta desde cero por ella.
       FirebaseMessaging.onMessageOpenedApp.listen(_abrirDesdeNotificacion);
       final mensajeInicial = await FirebaseMessaging.instance.getInitialMessage();
@@ -51,9 +81,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  void _alRecibirEnPrimerPlano(RemoteMessage message) {
+    if (message.data['idClienteAviso'] != null) {
+      ref.invalidate(avisosNoLeidosCountProvider);
+      ref.invalidate(misAvisosRecibidosProvider);
+    }
+  }
+
   void _abrirDesdeNotificacion(RemoteMessage message) {
+    if (!mounted) return;
+    final idClienteAviso = message.data['idClienteAviso'];
+    if (idClienteAviso != null && idClienteAviso.isNotEmpty) {
+      ref.invalidate(avisosNoLeidosCountProvider);
+      ref.invalidate(misAvisosRecibidosProvider);
+      // Solo un seguidor (no un cliente) tiene esta pestaña en esa posición; si por lo que sea
+      // llega este dato con otro tipo de cuenta, no tocamos el índice para no salirnos de rango.
+      final esCliente = ref.read(isClienteProvider);
+      final esOrdinario = ref.read(esUsuarioOrdinarioProvider);
+      if (!esCliente && esOrdinario) {
+        setState(() => _tabIndex = _tabIndexAvisosSeguidor);
+      }
+      return;
+    }
     final idClienteSede = message.data['idClienteSede'];
-    if (idClienteSede != null && idClienteSede.isNotEmpty && mounted) {
+    if (idClienteSede != null && idClienteSede.isNotEmpty) {
       context.push('/publicaciones/$idClienteSede');
     }
   }
@@ -64,12 +115,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final isCliente = ref.watch(isClienteProvider);
     final esUsuarioOrdinario = ref.watch(esUsuarioOrdinarioProvider);
     final isAdmin = ref.watch(isAdminProvider);
-    final pendientes = isAdmin ? ref.watch(solicitudesPendientesCountProvider).value ?? 0 : 0;
+    final avisosNoLeidos = ref.watch(avisosNoLeidosCountProvider).value ?? 0;
 
     // Un CLIENTE tiene también el rol USUARIO_ORDINARIO (se lo asigna el alta por defecto),
     // pero su navegación es la suya propia, no la de un usuario ordinario cualquiera.
     final mostrarTabsCliente = isCliente;
     final mostrarTabsOrdinario = !isCliente && esUsuarioOrdinario;
+    // Un ADMIN puede además seguir clientes como cualquier usuario ordinario, así que el badge de
+    // "Avisos" suma las dos cosas: solicitudes de cliente pendientes de aprobar (solo ADMIN) y
+    // avisos propios sin leer (solo si se ven las pestañas de seguidor; los clientes tienen su
+    // propia pestaña "Avisos" con el histórico de enviados, sin badge de pendientes).
+    final pendientesSolicitudes = isAdmin ? ref.watch(solicitudesPendientesCountProvider).value ?? 0 : 0;
+    final pendientes = pendientesSolicitudes + (mostrarTabsOrdinario ? avisosNoLeidos : 0);
 
     return Scaffold(
       appBar: AppBar(
@@ -87,7 +144,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: mostrarTabsCliente
           ? IndexedStack(
               index: _tabIndex,
-              children: const [PublicarScreen(), MisPublicacionesScreen(), PanelDatosScreen()],
+              children: const [
+                PublicarScreen(),
+                MisPublicacionesScreen(),
+                AvisosEnviadosScreen(),
+                PanelDatosScreen(),
+              ],
             )
           : mostrarTabsOrdinario
               ? IndexedStack(
@@ -126,6 +188,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 BottomNavigationBarItem(
                   icon: const Icon(Icons.feed_outlined),
                   label: context.l10n.tabPublicaciones,
+                ),
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.notifications_outlined),
+                  label: context.l10n.avisos,
                 ),
                 BottomNavigationBarItem(
                   icon: const Icon(Icons.dashboard_outlined),

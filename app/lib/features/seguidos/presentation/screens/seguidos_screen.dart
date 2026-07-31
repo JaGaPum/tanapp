@@ -36,7 +36,9 @@ class SeguidosScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(16),
       child: tiposAsync.when(
         data: (tipos) {
-          final activos = tipos.where((t) => t.activo).toList()
+          // "Parroquia" se oculta por ahora en Buscar (se valorará más adelante si se activa),
+          // sin tocar su configuración en Sistema > Configuración > Tipos de cliente.
+          final activos = tipos.where((t) => t.activo && t.nombre != 'Parroquia').toList()
             ..sort((a, b) => _compararOrdenTipos(a.nombre, b.nombre));
           if (activos.isEmpty) {
             return EmptyState(message: context.l10n.proximamente, icon: Icons.people_outline);

@@ -6,6 +6,8 @@ import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/como_llegar_button.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/llamar_button.dart';
+import '../../../../core/widgets/paginated_list_view.dart';
 import '../../../auth/application/auth_providers.dart';
 import '../../../configuracion/application/configuracion_providers.dart';
 import '../../application/seguidos_providers.dart';
@@ -113,24 +115,28 @@ class _MisSeguidosScreenState extends ConsumerState<MisSeguidosScreen> {
           ],
           const SizedBox(height: 16),
           Expanded(
-            child: clientesAsync.when(
-              data: (clientes) {
-                final filtrados = _filtrar(clientes);
-                if (filtrados.isEmpty) {
-                  return EmptyState(
-                    message: context.l10n.misSeguidosVacio,
-                    icon: Icons.favorite_border,
-                  );
-                }
-                return ListView.separated(
-                  itemCount: filtrados.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 8),
-                  itemBuilder: (context, index) => _ClienteSeguidoTile(cliente: filtrados[index]),
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
-            ),
+            child: clientesAsync.cargandoInicial
+                ? const Center(child: CircularProgressIndicator())
+                : clientesAsync.error != null
+                    ? Center(child: Text(context.l10n.errorGenerico(clientesAsync.error.toString())))
+                    : Builder(
+                        builder: (context) {
+                          final filtrados = _filtrar(clientesAsync.items);
+                          if (filtrados.isEmpty) {
+                            return EmptyState(
+                              message: context.l10n.misSeguidosVacio,
+                              icon: Icons.favorite_border,
+                            );
+                          }
+                          return PaginatedListView<ClienteSeguible>(
+                            items: filtrados,
+                            cargandoMas: clientesAsync.cargandoMas,
+                            hasMore: clientesAsync.hasMore,
+                            onCargarMas: () => ref.read(misSeguidosClientesProvider.notifier).cargarMas(),
+                            itemBuilder: (context, cliente) => _ClienteSeguidoTile(cliente: cliente),
+                          );
+                        },
+                      ),
           ),
         ],
       ),
@@ -222,6 +228,10 @@ class _ClienteSeguidoTileState extends ConsumerState<_ClienteSeguidoTile> {
                 ),
               ],
             ),
+            if (cliente.telefono != null && cliente.telefono!.trim().isNotEmpty) ...[
+              const SizedBox(height: 12),
+              LlamarButton(telefono: cliente.telefono!),
+            ],
             const SizedBox(height: 12),
             OutlinedButton.icon(
               icon: const Icon(Icons.person_remove_outlined),

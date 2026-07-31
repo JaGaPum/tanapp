@@ -1,12 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/pagination/paginated_notifier.dart';
 import '../../cliente_sedes/application/cliente_sedes_providers.dart';
 import '../data/publicacion_con_sede.dart';
+import '../data/publicaciones_por_mes.dart';
 import '../data/publicaciones_repository.dart';
 
-final publicacionesTablonProvider = FutureProvider.autoDispose<List<PublicacionConSede>>((ref) {
-  return ref.watch(publicacionesRepositoryProvider).listTodas();
-});
+class PublicacionesTablonNotifier extends PaginatedNotifier<PublicacionConSede> {
+  @override
+  Future<List<PublicacionConSede>> cargarPagina(int offset, int limit) {
+    return ref.read(publicacionesRepositoryProvider).listTodas(offset: offset, limit: limit);
+  }
+}
+
+final publicacionesTablonProvider =
+    NotifierProvider.autoDispose<PublicacionesTablonNotifier, PaginaResultado<PublicacionConSede>>(
+  PublicacionesTablonNotifier.new,
+);
 
 final publicacionesPorSedeProvider =
     FutureProvider.autoDispose.family<List<PublicacionConSede>, String>((ref, idClienteSede) {
@@ -22,6 +32,20 @@ final misPublicacionesArchivadasIdsProvider = FutureProvider.autoDispose<Set<Str
   return ref.watch(publicacionesRepositoryProvider).listMisArchivadasIds();
 });
 
-final misPublicacionesArchivadasProvider = FutureProvider.autoDispose<List<PublicacionConSede>>((ref) {
-  return ref.watch(publicacionesRepositoryProvider).listMisArchivadas();
+class PublicacionesArchivadasNotifier extends PaginatedNotifier<PublicacionConSede> {
+  @override
+  Future<List<PublicacionConSede>> cargarPagina(int offset, int limit) {
+    return ref.read(publicacionesRepositoryProvider).listMisArchivadas(offset: offset, limit: limit);
+  }
+}
+
+final misPublicacionesArchivadasProvider =
+    NotifierProvider.autoDispose<PublicacionesArchivadasNotifier, PaginaResultado<PublicacionConSede>>(
+  PublicacionesArchivadasNotifier.new,
+);
+
+/// Actividad de publicaciones de los últimos meses, para la gráfica del Panel de Datos.
+final publicacionesPorMesProvider = FutureProvider.autoDispose<List<PublicacionesPorMes>>((ref) async {
+  final sedes = await ref.watch(misSedesProvider.future);
+  return ref.watch(publicacionesRepositoryProvider).listPublicacionesPorMes(sedes.map((s) => s.idClienteSede).toList());
 });

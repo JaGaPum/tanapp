@@ -39,6 +39,15 @@ class ConfiguracionScreen extends StatelessWidget {
               onTap: () => context.push('/admin/configuracion/tipos-cliente'),
             ),
           ),
+          const SizedBox(height: 8),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.smart_toy_outlined),
+              title: Text(context.l10n.configuracionIa),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/admin/configuracion/ia'),
+            ),
+          ),
         ],
       ),
     );

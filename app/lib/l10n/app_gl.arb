@@ -34,6 +34,7 @@
   "fieldNombreEmpresa": "Nome da empresa",
   "comoLlegar": "Como chegar",
   "mapa": "Mapa",
+  "llamar": "Chamar",
   "filtroTodasProvincias": "Todas",
   "filtroTodosConcellos": "Todos",
   "fieldConfirmarContrasena": "Confirmar contrasinal",
@@ -140,6 +141,8 @@
   "usuarioTipoCliente": "Tipo de cliente",
   "errorCargarTiposCliente": "Non se puideron cargar os tipos de cliente: {error}",
   "usuarioActivo": "Usuario activo",
+  "usuarioImportacionWebSinConfigurar": "Este cliente non configurou ningunha URL de importación automática.",
+  "usuarioImportacionWebActiva": "Importación automática activa",
   "validacionEmail": "Validación de email",
   "marcarComoValidado": "Marcar como validado",
   "validado": "Validado",
@@ -199,6 +202,11 @@
 
   "tiposCliente": "Tipos de Clientes",
   "configuracionTiposClienteTitulo": "Configuración > Tipos de Clientes",
+
+  "configuracionIa": "Configuración IA",
+  "configuracionIaTitulo": "Configuración > IA",
+  "configuracionIaImportacionWebLabel": "Importación de esquelas con IA",
+  "configuracionIaImportacionWebDescripcion": "Se a desactivas, ningún cliente poderá activar a importación automática da súa web nin ver propostas, aínda que xa a tivese configurada.",
   "noHayTiposClienteDadosDeAlta": "Non hai tipos de cliente dados de alta",
   "clienteTipoNuevo": "Novo tipo de cliente",
   "clienteTipoEditar": "Editar tipo de cliente",
@@ -277,6 +285,36 @@
   "seguidos": "Buscar",
   "avisos": "Avisos",
 
+  "avisosNuevo": "Novo aviso",
+  "avisosFormTitulo": "Novo aviso",
+  "avisosTituloLabel": "Título",
+  "avisosTextoLabel": "Texto",
+  "avisosEnviar": "Enviar",
+  "avisosEnviadoOk": "Aviso enviado",
+  "avisosEnviadoEl": "Enviado o {fecha} ás {hora}",
+  "@avisosEnviadoEl": {
+    "placeholders": { "fecha": { "type": "String" }, "hora": { "type": "String" } }
+  },
+  "avisosVacioEnviados": "Aínda non enviaches ningún aviso.",
+  "avisosVacioRecibidos": "Non tes avisos.",
+  "avisosCerrar": "Pechar",
+  "avisosEliminarTitulo": "Eliminar aviso",
+  "avisosEliminarMensaje": "Eliminar o aviso \"{titulo}\"? Esta acción non se pode desfacer.",
+  "@avisosEliminarMensaje": {
+    "placeholders": { "titulo": { "type": "String" } }
+  },
+  "avisosEliminarSeleccionadosMensaje": "{count, plural, one{Eliminar o aviso seleccionado? Esta acción non se pode desfacer.} other{Eliminar os {count} avisos seleccionados? Esta acción non se pode desfacer.}}",
+  "@avisosEliminarSeleccionadosMensaje": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "avisosVaciarTodoTitulo": "Baleirar avisos",
+  "avisosVaciarTodoMensaje": "Eliminar todos os teus avisos? Esta acción non se pode desfacer.",
+  "avisosNSeleccionados": "{count, plural, one{1 seleccionado} other{{count} seleccionados}}",
+  "@avisosNSeleccionados": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "avisosCancelarSeleccion": "Cancelar",
+
   "seguidosSeleccionaTipo": "¿A quen quero seguir?",
   "seguidosSeleccionaProvincia": "Escolle a provincia",
   "seguidosSeleccionaConcello": "Escolle o concello",
@@ -323,6 +361,13 @@
   "@propuestasConfirmarDescartarMensaje": {
     "placeholders": { "nombre": { "type": "String" } }
   },
+  "propuestasImportarAhora": "Importar agora",
+  "propuestasImportando": "Importando",
+  "propuestasImportarAhoraResultado": "{nuevas, plural, =0{Non se atopou ningunha esquela nova.} =1{Atopouse 1 esquela nova.} other{Atopáronse {nuevas} esquelas novas.}}",
+  "@propuestasImportarAhoraResultado": {
+    "placeholders": { "nuevas": { "type": "int" } }
+  },
+  "importacionWebReconfigurar": "Configurar importación automática",
   "publicarNuevaPublicacion": "Nova publicación",
   "publicarSeleccionaSede": "Escolle a sede",
   "publicarSinSedes": "Aínda non tes ningunha sede. Dá de alta unha sede en \"Miñas sedes\" antes de publicar.",
@@ -386,6 +431,11 @@
   "panelDatosSeguidores": "Seguidores",
   "panelDatosSinSeguidores": "Aínda non ten seguidores",
   "panelDatosConcelloDesconocido": "Sen concello indicado",
+  "panelDatosPublicacionesPorMes": "Publicacións por mes",
+  "panelDatosAvisos": "Avisos",
+  "panelDatosAvisosVacio": "Aínda non enviaches ningún aviso",
+  "panelDatosAvisosLeidos": "Lidos",
+  "panelDatosAvisosPendientes": "Sen ler",
 
   "tablonBuscar": "Buscar por texto, cliente ou concello",
 

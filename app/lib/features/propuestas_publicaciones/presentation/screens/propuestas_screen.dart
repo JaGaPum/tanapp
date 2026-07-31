@@ -6,19 +6,62 @@ import 'package:intl/intl.dart';
 import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../importacion_web/data/importacion_web_repository.dart';
 import '../../application/propuestas_providers.dart';
 import '../../data/propuestas_repository.dart';
 import '../../data/publicacion_propuesta.dart';
 
-class PropuestasScreen extends ConsumerWidget {
+class PropuestasScreen extends ConsumerStatefulWidget {
   const PropuestasScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PropuestasScreen> createState() => _PropuestasScreenState();
+}
+
+class _PropuestasScreenState extends ConsumerState<PropuestasScreen> {
+  bool _ejecutando = false;
+
+  Future<void> _ejecutarAhora() async {
+    setState(() => _ejecutando = true);
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const _ImportandoDialog(),
+    );
+    try {
+      final resultado = await ref.read(importacionWebRepositoryProvider).ejecutarAhora();
+      ref.invalidate(propuestasPendientesProvider);
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.propuestasImportarAhoraResultado(resultado.nuevas))),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.errorGenerico(e.toString()))));
+      }
+    } finally {
+      if (mounted) setState(() => _ejecutando = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final propuestasAsync = ref.watch(propuestasPendientesProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.propuestasTitulo)),
+      appBar: AppBar(
+        title: Text(context.l10n.propuestasTitulo),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: context.l10n.importacionWebReconfigurar,
+            onPressed: () => context.push('/publicar/importar-web'),
+          ),
+        ],
+      ),
       body: propuestasAsync.when(
         data: (propuestas) {
           if (propuestas.isEmpty) {
@@ -33,6 +76,51 @@ class PropuestasScreen extends ConsumerWidget {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        icon: const Icon(Icons.play_arrow),
+        label: Text(context.l10n.propuestasImportarAhora),
+        onPressed: _ejecutando ? null : _ejecutarAhora,
+      ),
+    );
+  }
+}
+
+class _ImportandoDialog extends StatefulWidget {
+  const _ImportandoDialog();
+
+  @override
+  State<_ImportandoDialog> createState() => _ImportandoDialogState();
+}
+
+class _ImportandoDialogState extends State<_ImportandoDialog> with SingleTickerProviderStateMixin {
+  late final _controller = AnimationController(vsync: this, duration: const Duration(seconds: 1))..repeat();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      child: Dialog(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RotationTransition(
+                turns: _controller,
+                child: const Icon(Icons.settings, size: 48),
+              ),
+              const SizedBox(height: 16),
+              Text(context.l10n.propuestasImportando),
+            ],
+          ),
+        ),
       ),
     );
   }

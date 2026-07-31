@@ -6,9 +6,15 @@
 // Los resultados caen en "TClientePublicacionesPropuestas" (migración 028) en estado
 // PENDIENTE: NUNCA se publican solos, el cliente los revisa y publica él mismo desde la app.
 //
-// NO la llama la app Flutter: la dispara un cron diario (pg_cron + pg_net, ver el bloque
-// comentado al final de db/028_propuestas_publicaciones.sql), no un Database Webhook, así que
-// aquí también hace falta una cabecera propia para autenticar la llamada.
+// Se puede invocar de dos formas:
+//   1. El cron diario (pg_cron + pg_net, ver el bloque comentado al final de
+//      db/028_propuestas_publicaciones.sql), con la cabecera "X-Cron-Secret": rastrea TODOS
+//      los clientes activos.
+//   2. La propia app Flutter (botón "Ejecutar ahora" en Propuestas), con la sesión normal del
+//      cliente logueado (sin "X-Cron-Secret"): rastrea SOLO la web de ese cliente, y solo si
+//      la tiene activa. La pasarela de Supabase ya valida el JWT antes de que esta función se
+//      ejecute, así que basta con leer el "sub" del token para saber quién llama, sin
+//      necesidad de volver a verificarlo.
 //
 // Despliegue (sin CLI, desde el panel de Supabase):
 //   1. Dashboard del proyecto -> Edge Functions -> "Deploy a new function".
@@ -45,17 +51,22 @@ Deno.serve(async (req) => {
   }
 });
 
+function extraerAuthUserId(authHeader: string | null): string | null {
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  const token = authHeader.slice('Bearer '.length);
+  const partes = token.split('.');
+  if (partes.length !== 3) return null;
+  try {
+    const payload = JSON.parse(atob(partes[1].replace(/-/g, '+').replace(/_/g, '/')));
+    return typeof payload.sub === 'string' ? payload.sub : null;
+  } catch {
+    return null;
+  }
+}
+
 async function handle(req: Request): Promise<Response> {
   if (req.method !== 'POST') {
     return jsonResponse({ error: 'Método no permitido' }, 405);
-  }
-
-  // Solo el propio cron (configurado con esta misma clave en su cabecera "X-Cron-Secret")
-  // puede invocar esta función; evita que alguien con la URL pública dispare rastreos falsos.
-  const secretoRecibido = req.headers.get('X-Cron-Secret');
-  const secretoEsperado = Deno.env.get('CRON_SHARED_SECRET');
-  if (!secretoEsperado || secretoRecibido !== secretoEsperado) {
-    return jsonResponse({ error: 'No autorizado' }, 401);
   }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -65,17 +76,65 @@ async function handle(req: Request): Promise<Response> {
   });
   const anthropic = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY') });
 
-  const { data: clientes, error: clientesError } = await adminClient
-    .from('TClienteImportacionWeb')
-    .select('IdSistemaUsuario, Url')
-    .eq('Activo', true);
-  if (clientesError) {
-    console.error('escanear-webs-clientes: error listando clientes activos', clientesError);
-    return jsonResponse({ error: 'No se pudo listar clientes activos' }, 500);
+  // Interruptor global (migración 030, editable desde Configuración > IA en la app): si está
+  // desactivado no se procesa a nadie, ni por cron ni a petición de un cliente concreto, aunque
+  // tenga su propia importación activa.
+  const { data: configGlobal, error: configGlobalError } = await adminClient
+    .from('TConfiguracionGlobal')
+    .select('ImportacionWebIaActiva')
+    .maybeSingle();
+  if (configGlobalError) {
+    console.error('escanear-webs-clientes: error leyendo configuración global', configGlobalError);
+    return jsonResponse({ error: 'No se pudo comprobar la configuración global' }, 500);
+  }
+  if (!configGlobal?.ImportacionWebIaActiva) {
+    return jsonResponse({ error: 'La importación de esquelas con IA está desactivada' }, 403);
+  }
+
+  const secretoRecibido = req.headers.get('X-Cron-Secret');
+  const secretoEsperado = Deno.env.get('CRON_SHARED_SECRET');
+  const esCron = !!secretoEsperado && secretoRecibido === secretoEsperado;
+
+  let clientes: { IdSistemaUsuario: string; Url: string }[];
+  if (esCron) {
+    const { data, error } = await adminClient
+      .from('TClienteImportacionWeb')
+      .select('IdSistemaUsuario, Url')
+      .eq('Activo', true);
+    if (error) {
+      console.error('escanear-webs-clientes: error listando clientes activos', error);
+      return jsonResponse({ error: 'No se pudo listar clientes activos' }, 500);
+    }
+    clientes = data ?? [];
+  } else {
+    // Llamada de la app: solo se rastrea la web del propio cliente que la pide (nunca la de
+    // otros), y solo si la tiene activa.
+    const authUserId = extraerAuthUserId(req.headers.get('Authorization'));
+    if (!authUserId) {
+      return jsonResponse({ error: 'No autorizado' }, 401);
+    }
+    const { data: usuario, error: usuarioError } = await adminClient
+      .from('TSistemaUsuarios')
+      .select('IdSistemaUsuario')
+      .eq('IdAuthSupabase', authUserId)
+      .maybeSingle();
+    if (usuarioError || !usuario) {
+      return jsonResponse({ error: 'No autorizado' }, 401);
+    }
+    const { data: config, error: configError } = await adminClient
+      .from('TClienteImportacionWeb')
+      .select('IdSistemaUsuario, Url')
+      .eq('IdSistemaUsuario', usuario.IdSistemaUsuario)
+      .eq('Activo', true)
+      .maybeSingle();
+    if (configError || !config) {
+      return jsonResponse({ error: 'No tienes la importación automática activa' }, 400);
+    }
+    clientes = [config];
   }
 
   const resultados = [];
-  for (const cliente of clientes ?? []) {
+  for (const cliente of clientes) {
     resultados.push(await procesarCliente(adminClient, anthropic, cliente.IdSistemaUsuario, cliente.Url));
   }
 

@@ -26,6 +26,20 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<!-- Deep link de vuelta del login con Google (ver signInWithGoogle() en
+	     auth_repository.dart): tras autenticarse en el navegador, Supabase redirige aquí para
+	     que la app retome la sesión. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>io.supabase.tanapp</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>io.supabase.tanapp</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

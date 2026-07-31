@@ -102,6 +102,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get mapa => 'Mapa';
 
   @override
+  String get llamar => 'Llamar';
+
+  @override
   String get filtroTodasProvincias => 'Todas';
 
   @override
@@ -395,6 +398,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get usuarioActivo => 'Usuario activo';
 
   @override
+  String get usuarioImportacionWebSinConfigurar =>
+      'Este cliente no ha configurado ninguna URL de importación automática.';
+
+  @override
+  String get usuarioImportacionWebActiva => 'Importación automática activa';
+
+  @override
   String get validacionEmail => 'Validación de email';
 
   @override
@@ -569,6 +579,20 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get configuracionTiposClienteTitulo =>
       'Configuración > Tipos de Clientes';
+
+  @override
+  String get configuracionIa => 'Configuración IA';
+
+  @override
+  String get configuracionIaTitulo => 'Configuración > IA';
+
+  @override
+  String get configuracionIaImportacionWebLabel =>
+      'Importación de esquelas con IA';
+
+  @override
+  String get configuracionIaImportacionWebDescripcion =>
+      'Si la desactivas, ningún cliente podrá activar la importación automática de su web ni ver propuestas, aunque ya la tuviera configurada.';
 
   @override
   String get noHayTiposClienteDadosDeAlta =>
@@ -804,6 +828,79 @@ class AppLocalizationsEs extends AppLocalizations {
   String get avisos => 'Avisos';
 
   @override
+  String get avisosNuevo => 'Nuevo aviso';
+
+  @override
+  String get avisosFormTitulo => 'Nuevo aviso';
+
+  @override
+  String get avisosTituloLabel => 'Título';
+
+  @override
+  String get avisosTextoLabel => 'Texto';
+
+  @override
+  String get avisosEnviar => 'Enviar';
+
+  @override
+  String get avisosEnviadoOk => 'Aviso enviado';
+
+  @override
+  String avisosEnviadoEl(String fecha, String hora) {
+    return 'Enviado el $fecha a las $hora';
+  }
+
+  @override
+  String get avisosVacioEnviados => 'No has enviado ningún aviso todavía.';
+
+  @override
+  String get avisosVacioRecibidos => 'No tienes avisos.';
+
+  @override
+  String get avisosCerrar => 'Cerrar';
+
+  @override
+  String get avisosEliminarTitulo => 'Eliminar aviso';
+
+  @override
+  String avisosEliminarMensaje(String titulo) {
+    return '¿Eliminar el aviso \"$titulo\"? Esta acción no se puede deshacer.';
+  }
+
+  @override
+  String avisosEliminarSeleccionadosMensaje(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '¿Eliminar los $count avisos seleccionados? Esta acción no se puede deshacer.',
+      one: '¿Eliminar el aviso seleccionado? Esta acción no se puede deshacer.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get avisosVaciarTodoTitulo => 'Vaciar avisos';
+
+  @override
+  String get avisosVaciarTodoMensaje =>
+      '¿Eliminar todos tus avisos? Esta acción no se puede deshacer.';
+
+  @override
+  String avisosNSeleccionados(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count seleccionados',
+      one: '1 seleccionado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get avisosCancelarSeleccion => 'Cancelar';
+
+  @override
   String get seguidosSeleccionaTipo => '¿A quién quiero seguir?';
 
   @override
@@ -920,6 +1017,27 @@ class AppLocalizationsEs extends AppLocalizations {
   String propuestasConfirmarDescartarMensaje(String nombre) {
     return '¿Descartar la propuesta de \"$nombre\"? No se publicará y no se volverá a proponer.';
   }
+
+  @override
+  String get propuestasImportarAhora => 'Importar ahora';
+
+  @override
+  String get propuestasImportando => 'Importando';
+
+  @override
+  String propuestasImportarAhoraResultado(int nuevas) {
+    String _temp0 = intl.Intl.pluralLogic(
+      nuevas,
+      locale: localeName,
+      other: 'Se han encontrado $nuevas esquelas nuevas.',
+      one: 'Se ha encontrado 1 esquela nueva.',
+      zero: 'No se ha encontrado ninguna esquela nueva.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importacionWebReconfigurar => 'Configurar importación automática';
 
   @override
   String get publicarNuevaPublicacion => 'Nueva publicación';
@@ -1075,6 +1193,21 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get panelDatosConcelloDesconocido => 'Sin concello indicado';
+
+  @override
+  String get panelDatosPublicacionesPorMes => 'Publicaciones por mes';
+
+  @override
+  String get panelDatosAvisos => 'Avisos';
+
+  @override
+  String get panelDatosAvisosVacio => 'Todavía no has enviado ningún aviso';
+
+  @override
+  String get panelDatosAvisosLeidos => 'Leídos';
+
+  @override
+  String get panelDatosAvisosPendientes => 'Sin leer';
 
   @override
   String get tablonBuscar => 'Buscar por texto, cliente o concello';

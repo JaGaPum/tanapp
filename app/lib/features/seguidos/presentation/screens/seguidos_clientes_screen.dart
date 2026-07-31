@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../../core/widgets/como_llegar_button.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/llamar_button.dart';
 import '../../../auth/application/auth_providers.dart';
 import '../../../cliente_tipos/application/cliente_tipos_providers.dart';
 import '../../../configuracion/application/configuracion_providers.dart';
@@ -177,6 +178,8 @@ class _ClienteCardState extends ConsumerState<_ClienteCard> {
                   concello: cliente.concello,
                   provincia: cliente.provincia,
                 ),
+                if (cliente.telefono != null && cliente.telefono!.trim().isNotEmpty)
+                  LlamarButton(telefono: cliente.telefono!),
                 FilledButton.icon(
                   icon: Icon(widget.siguiendo ? Icons.person_remove_outlined : Icons.person_add_alt_1_outlined),
                   label: Text(widget.siguiendo ? context.l10n.seguidosDejarDeSeguir : context.l10n.seguidosSeguir),

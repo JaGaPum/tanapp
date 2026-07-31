@@ -278,6 +278,12 @@ abstract class AppLocalizations {
   /// **'Mapa'**
   String get mapa;
 
+  /// No description provided for @llamar.
+  ///
+  /// In es, this message translates to:
+  /// **'Llamar'**
+  String get llamar;
+
   /// No description provided for @filtroTodasProvincias.
   ///
   /// In es, this message translates to:
@@ -800,6 +806,18 @@ abstract class AppLocalizations {
   /// **'Usuario activo'**
   String get usuarioActivo;
 
+  /// No description provided for @usuarioImportacionWebSinConfigurar.
+  ///
+  /// In es, this message translates to:
+  /// **'Este cliente no ha configurado ninguna URL de importación automática.'**
+  String get usuarioImportacionWebSinConfigurar;
+
+  /// No description provided for @usuarioImportacionWebActiva.
+  ///
+  /// In es, this message translates to:
+  /// **'Importación automática activa'**
+  String get usuarioImportacionWebActiva;
+
   /// No description provided for @validacionEmail.
   ///
   /// In es, this message translates to:
@@ -1129,6 +1147,30 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Configuración > Tipos de Clientes'**
   String get configuracionTiposClienteTitulo;
+
+  /// No description provided for @configuracionIa.
+  ///
+  /// In es, this message translates to:
+  /// **'Configuración IA'**
+  String get configuracionIa;
+
+  /// No description provided for @configuracionIaTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Configuración > IA'**
+  String get configuracionIaTitulo;
+
+  /// No description provided for @configuracionIaImportacionWebLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Importación de esquelas con IA'**
+  String get configuracionIaImportacionWebLabel;
+
+  /// No description provided for @configuracionIaImportacionWebDescripcion.
+  ///
+  /// In es, this message translates to:
+  /// **'Si la desactivas, ningún cliente podrá activar la importación automática de su web ni ver propuestas, aunque ya la tuviera configurada.'**
+  String get configuracionIaImportacionWebDescripcion;
 
   /// No description provided for @noHayTiposClienteDadosDeAlta.
   ///
@@ -1544,6 +1586,108 @@ abstract class AppLocalizations {
   /// **'Avisos'**
   String get avisos;
 
+  /// No description provided for @avisosNuevo.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo aviso'**
+  String get avisosNuevo;
+
+  /// No description provided for @avisosFormTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo aviso'**
+  String get avisosFormTitulo;
+
+  /// No description provided for @avisosTituloLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Título'**
+  String get avisosTituloLabel;
+
+  /// No description provided for @avisosTextoLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Texto'**
+  String get avisosTextoLabel;
+
+  /// No description provided for @avisosEnviar.
+  ///
+  /// In es, this message translates to:
+  /// **'Enviar'**
+  String get avisosEnviar;
+
+  /// No description provided for @avisosEnviadoOk.
+  ///
+  /// In es, this message translates to:
+  /// **'Aviso enviado'**
+  String get avisosEnviadoOk;
+
+  /// No description provided for @avisosEnviadoEl.
+  ///
+  /// In es, this message translates to:
+  /// **'Enviado el {fecha} a las {hora}'**
+  String avisosEnviadoEl(String fecha, String hora);
+
+  /// No description provided for @avisosVacioEnviados.
+  ///
+  /// In es, this message translates to:
+  /// **'No has enviado ningún aviso todavía.'**
+  String get avisosVacioEnviados;
+
+  /// No description provided for @avisosVacioRecibidos.
+  ///
+  /// In es, this message translates to:
+  /// **'No tienes avisos.'**
+  String get avisosVacioRecibidos;
+
+  /// No description provided for @avisosCerrar.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar'**
+  String get avisosCerrar;
+
+  /// No description provided for @avisosEliminarTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar aviso'**
+  String get avisosEliminarTitulo;
+
+  /// No description provided for @avisosEliminarMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Eliminar el aviso \"{titulo}\"? Esta acción no se puede deshacer.'**
+  String avisosEliminarMensaje(String titulo);
+
+  /// No description provided for @avisosEliminarSeleccionadosMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, one{¿Eliminar el aviso seleccionado? Esta acción no se puede deshacer.} other{¿Eliminar los {count} avisos seleccionados? Esta acción no se puede deshacer.}}'**
+  String avisosEliminarSeleccionadosMensaje(int count);
+
+  /// No description provided for @avisosVaciarTodoTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Vaciar avisos'**
+  String get avisosVaciarTodoTitulo;
+
+  /// No description provided for @avisosVaciarTodoMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Eliminar todos tus avisos? Esta acción no se puede deshacer.'**
+  String get avisosVaciarTodoMensaje;
+
+  /// No description provided for @avisosNSeleccionados.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, one{1 seleccionado} other{{count} seleccionados}}'**
+  String avisosNSeleccionados(int count);
+
+  /// No description provided for @avisosCancelarSeleccion.
+  ///
+  /// In es, this message translates to:
+  /// **'Cancelar'**
+  String get avisosCancelarSeleccion;
+
   /// No description provided for @seguidosSeleccionaTipo.
   ///
   /// In es, this message translates to:
@@ -1747,6 +1891,30 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'¿Descartar la propuesta de \"{nombre}\"? No se publicará y no se volverá a proponer.'**
   String propuestasConfirmarDescartarMensaje(String nombre);
+
+  /// No description provided for @propuestasImportarAhora.
+  ///
+  /// In es, this message translates to:
+  /// **'Importar ahora'**
+  String get propuestasImportarAhora;
+
+  /// No description provided for @propuestasImportando.
+  ///
+  /// In es, this message translates to:
+  /// **'Importando'**
+  String get propuestasImportando;
+
+  /// No description provided for @propuestasImportarAhoraResultado.
+  ///
+  /// In es, this message translates to:
+  /// **'{nuevas, plural, =0{No se ha encontrado ninguna esquela nueva.} =1{Se ha encontrado 1 esquela nueva.} other{Se han encontrado {nuevas} esquelas nuevas.}}'**
+  String propuestasImportarAhoraResultado(int nuevas);
+
+  /// No description provided for @importacionWebReconfigurar.
+  ///
+  /// In es, this message translates to:
+  /// **'Configurar importación automática'**
+  String get importacionWebReconfigurar;
 
   /// No description provided for @publicarNuevaPublicacion.
   ///
@@ -2017,6 +2185,36 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Sin concello indicado'**
   String get panelDatosConcelloDesconocido;
+
+  /// No description provided for @panelDatosPublicacionesPorMes.
+  ///
+  /// In es, this message translates to:
+  /// **'Publicaciones por mes'**
+  String get panelDatosPublicacionesPorMes;
+
+  /// No description provided for @panelDatosAvisos.
+  ///
+  /// In es, this message translates to:
+  /// **'Avisos'**
+  String get panelDatosAvisos;
+
+  /// No description provided for @panelDatosAvisosVacio.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no has enviado ningún aviso'**
+  String get panelDatosAvisosVacio;
+
+  /// No description provided for @panelDatosAvisosLeidos.
+  ///
+  /// In es, this message translates to:
+  /// **'Leídos'**
+  String get panelDatosAvisosLeidos;
+
+  /// No description provided for @panelDatosAvisosPendientes.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin leer'**
+  String get panelDatosAvisosPendientes;
 
   /// No description provided for @tablonBuscar.
   ///

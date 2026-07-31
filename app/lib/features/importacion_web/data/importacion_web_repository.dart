@@ -57,6 +57,40 @@ class ImportacionWebRepository {
       idSistemaUsuario,
     );
   }
+
+  /// Para el administrador: consulta/activa/desactiva la configuración de un cliente
+  /// cualquiera (no el usuario logueado), permitido por las policies de ADMIN de la 029.
+  Future<ClienteImportacionWeb?> fetchPorUsuario(String idSistemaUsuario) async {
+    final data = await _client
+        .from('TClienteImportacionWeb')
+        .select()
+        .eq('IdSistemaUsuario', idSistemaUsuario)
+        .maybeSingle();
+    return data == null ? null : ClienteImportacionWeb.fromMap(data);
+  }
+
+  Future<void> actualizarActivoAdmin(String idSistemaUsuario, bool activo) async {
+    await _client.from('TClienteImportacionWeb').update({'Activo': activo}).eq(
+      'IdSistemaUsuario',
+      idSistemaUsuario,
+    );
+  }
+
+  /// Dispara el rastreo de la propia web ahora mismo (sin esperar al cron diario). Devuelve
+  /// cuántas esquelas encontró y cuántas eran nuevas, o lanza si la función responde con error
+  /// (p. ej. si la importación no está activa).
+  Future<({int encontradas, int nuevas})> ejecutarAhora() async {
+    final respuesta = await _client.functions.invoke('escanear-webs-clientes');
+    final data = respuesta.data;
+    if (data is! Map || data['resultados'] is! List || (data['resultados'] as List).isEmpty) {
+      throw Exception(data is Map ? (data['error'] ?? 'Respuesta inesperada') : 'Respuesta inesperada');
+    }
+    final resultado = (data['resultados'] as List).first as Map;
+    if (resultado['error'] != null) {
+      throw Exception(resultado['error']);
+    }
+    return (encontradas: resultado['encontradas'] as int? ?? 0, nuevas: resultado['nuevas'] as int? ?? 0);
+  }
 }
 
 final importacionWebRepositoryProvider = Provider<ImportacionWebRepository>((ref) {

@@ -6,6 +6,8 @@ import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../auth/application/auth_providers.dart';
 import '../../../cliente_tipos/application/cliente_tipos_providers.dart';
+import '../../../configuracion/application/configuracion_providers.dart';
+import '../../../importacion_web/application/importacion_web_providers.dart';
 import '../../../propuestas_publicaciones/application/propuestas_providers.dart';
 import '../../../seguidos/presentation/widgets/big_choice_card.dart';
 
@@ -19,6 +21,10 @@ class PublicarScreen extends ConsumerWidget {
     final perfilAsync = ref.watch(currentUserProfileProvider);
     final tiposAsync = ref.watch(clienteTiposListProvider);
     final propuestasPendientes = ref.watch(propuestasPendientesCountProvider);
+    final importacionWebConfigurada =
+        ref.watch(miImportacionWebProvider).maybeWhen(data: (config) => config != null, orElse: () => false);
+    final importacionWebIaActiva =
+        ref.watch(importacionWebIaActivaProvider).maybeWhen(data: (activa) => activa, orElse: () => false);
 
     return perfilAsync.when(
       data: (perfil) => tiposAsync.when(
@@ -64,25 +70,37 @@ class PublicarScreen extends ConsumerWidget {
                         width: anchoTarjeta,
                         height: anchoTarjeta,
                         child: BigChoiceCard(
-                          icon: const Icon(Icons.travel_explore, size: 48),
-                          label: context.l10n.publicarImportarWeb,
-                          onTap: () => context.push('/publicar/importar-web'),
+                          icon: const Icon(Icons.campaign_outlined, size: 48),
+                          label: context.l10n.avisosNuevo,
+                          onTap: () => context.push('/publicar/avisos'),
                         ),
                       ),
-                      SizedBox(
-                        width: anchoTarjeta,
-                        height: anchoTarjeta,
-                        child: BigChoiceCard(
-                          icon: Badge(
-                            isLabelVisible: propuestasPendientes > 0,
-                            label: Text('$propuestasPendientes'),
-                            backgroundColor: const Color(0xFFD50000),
-                            child: const Icon(Icons.fact_check_outlined, size: 48),
+                      if (importacionWebIaActiva)
+                        if (!importacionWebConfigurada)
+                          SizedBox(
+                            width: anchoTarjeta,
+                            height: anchoTarjeta,
+                            child: BigChoiceCard(
+                              icon: const Icon(Icons.travel_explore, size: 48),
+                              label: context.l10n.publicarImportarWeb,
+                              onTap: () => context.push('/publicar/importar-web'),
+                            ),
+                          )
+                        else
+                          SizedBox(
+                            width: anchoTarjeta,
+                            height: anchoTarjeta,
+                            child: BigChoiceCard(
+                              icon: Badge(
+                                isLabelVisible: propuestasPendientes > 0,
+                                label: Text('$propuestasPendientes'),
+                                backgroundColor: const Color(0xFFD50000),
+                                child: const Icon(Icons.fact_check_outlined, size: 48),
+                              ),
+                              label: context.l10n.publicarPropuestas,
+                              onTap: () => context.push('/publicar/propuestas'),
+                            ),
                           ),
-                          label: context.l10n.publicarPropuestas,
-                          onTap: () => context.push('/publicar/propuestas'),
-                        ),
-                      ),
                     ],
                   ),
                 );

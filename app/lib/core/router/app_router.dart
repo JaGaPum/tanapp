@@ -11,6 +11,7 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/auth/presentation/screens/verify_otp_screen.dart';
+import '../../features/avisos/presentation/screens/aviso_form_screen.dart';
 import '../../features/cliente_sedes/presentation/screens/mis_sedes_screen.dart';
 import '../../features/clientes_solicitudes/presentation/screens/solicitud_cliente_form_screen.dart';
 import '../../features/clientes_solicitudes/presentation/screens/solicitud_detail_screen.dart';
@@ -20,6 +21,7 @@ import '../../features/configuracion/presentation/screens/comunicacion_detail_sc
 import '../../features/configuracion/presentation/screens/configuracion_cliente_tipos_screen.dart';
 import '../../features/configuracion/presentation/screens/configuracion_comunicaciones_screen.dart';
 import '../../features/configuracion/presentation/screens/configuracion_concellos_screen.dart';
+import '../../features/configuracion/presentation/screens/configuracion_ia_screen.dart';
 import '../../features/configuracion/presentation/screens/configuracion_provincias_screen.dart';
 import '../../features/configuracion/presentation/screens/configuracion_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
@@ -36,6 +38,7 @@ import '../../features/sistema/presentation/screens/sistema_screen.dart';
 import '../../features/sistema_usuarios/data/usuarios_repository.dart';
 import '../../features/sistema_usuarios/presentation/screens/usuario_detail_screen.dart';
 import '../../features/sistema_usuarios/presentation/screens/usuarios_list_screen.dart';
+import '../../features/splash/presentation/screens/splash_screen.dart';
 import '../../features/terminos/data/terminos_repository.dart';
 import '../../features/terminos/presentation/screens/aceptar_terminos_screen.dart';
 import '../../features/terminos/presentation/screens/ver_terminos_screen.dart';
@@ -54,19 +57,46 @@ const _publicLocations = {
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authStream = Supabase.instance.client.auth.onAuthStateChange;
+  final refreshStream = GoRouterRefreshStream(authStream);
 
   return GoRouter(
-    initialLocation: '/login',
-    refreshListenable: GoRouterRefreshStream(authStream),
+    initialLocation: '/splash',
+    refreshListenable: refreshStream,
     redirect: (context, state) async {
-      var session = Supabase.instance.client.auth.currentSession;
       final location = state.matchedLocation;
+      // La splash decide ella misma cuándo pasar a "/login" (tras su duración mínima); hasta
+      // entonces no se debe evaluar sesión ni nada más, para no saltársela.
+      if (location == '/splash') return null;
+
+      var session = Supabase.instance.client.auth.currentSession;
       final isPublic = _publicLocations.contains(location);
 
       final guard = ref.read(sesionBootstrapGuardProvider);
       if (session != null && !guard.completado) {
         guard.completado = true;
-        await ref.read(sesionPolicyServiceProvider).ejecutarBootstrap();
+        // El login por contraseña (login_screen.dart) ya marca "completado = true" ANTES de
+        // pedir el login y registra la sesión él mismo, así que nunca llega aquí. El login con
+        // Google (signInWithOAuth) no puede hacer eso de antemano -no hay forma de saber cuándo
+        // volverá el navegador-, así que es aquí, al ver un "signedIn" recién llegado que nadie
+        // ha registrado todavía, donde se hace el equivalente a
+        // "sesionPolicy.registrarLoginExplicito(...)" del login manual. Un "initialSession" (o
+        // cualquier otro evento) en cambio es la sesión persistida de un arranque en frío
+        // normal, y sigue el camino de siempre.
+        if (refreshStream.ultimoEvento == AuthChangeEvent.signedIn) {
+          final perfil = await ref.read(usuariosRepositoryProvider).fetchPerfilByAuthId(session.user.id);
+          if (perfil != null && perfil.activo) {
+            await ref
+                .read(sesionPolicyServiceProvider)
+                .registrarLoginExplicito(idSistemaUsuario: perfil.idSistemaUsuario, recordar: true);
+          } else {
+            // Mismo criterio silencioso que ejecutarBootstrap() para perfil nulo: sin perfil o
+            // con la cuenta desactivada, se cierra sesión sin más. A diferencia del login por
+            // contraseña, aquí no hay una pantalla "a medio enviar" donde mostrar el motivo.
+            await Supabase.instance.client.auth.signOut();
+          }
+        } else {
+          await ref.read(sesionPolicyServiceProvider).ejecutarBootstrap();
+        }
         session = Supabase.instance.client.auth.currentSession;
       }
 
@@ -119,6 +149,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(path: '/register', builder: (context, state) => const RegisterScreen()),
       GoRoute(
@@ -171,6 +202,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/publicar/escanear', builder: (context, state) => const PublicacionEscanearScreen()),
       GoRoute(path: '/publicar/importar-web', builder: (context, state) => const ConfigurarImportacionWebScreen()),
       GoRoute(path: '/publicar/propuestas', builder: (context, state) => const PropuestasScreen()),
+      GoRoute(path: '/publicar/avisos', builder: (context, state) => const AvisoFormScreen()),
       GoRoute(
         path: '/publicaciones/:sedeId',
         builder: (context, state) => PublicacionesListScreen(
@@ -223,6 +255,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     ClienteTipoDetailScreen(idConfiguracionClienteTipo: state.pathParameters['id']!),
               ),
             ],
+          ),
+          GoRoute(
+            path: 'ia',
+            builder: (context, state) => const ConfiguracionIaScreen(),
           ),
         ],
       ),
@@ -277,11 +313,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 });
 
 class GoRouterRefreshStream extends ChangeNotifier {
-  late final StreamSubscription<dynamic> _subscription;
+  late final StreamSubscription<AuthState> _subscription;
 
-  GoRouterRefreshStream(Stream<dynamic> stream) {
+  /// El evento que trajo el último cambio de sesión: permite distinguir en el `redirect` de
+  /// arriba un "signedIn" recién llegado (login interactivo, incluido el de Google) de un
+  /// "initialSession" (sesión persistida recuperada en un arranque en frío normal).
+  AuthChangeEvent? ultimoEvento;
+
+  GoRouterRefreshStream(Stream<AuthState> stream) {
     notifyListeners();
-    _subscription = stream.asBroadcastStream().listen((_) => notifyListeners());
+    _subscription = stream.asBroadcastStream().listen((estado) {
+      ultimoEvento = estado.event;
+      notifyListeners();
+    });
   }
 
   @override

@@ -27,6 +27,15 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- Deep link de vuelta del login con Google (ver signInWithGoogle() en
+                 auth_repository.dart): tras autenticarse en el navegador, Supabase redirige aquí
+                 para que la app retome la sesión. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="io.supabase.tanapp" android:host="login-callback"/>
+            </intent-filter>
         </activity>
         <!-- Icono de la barra de estado para las notificaciones push: silueta blanca sobre
              transparente generada a partir del propio icono de la app (Android exige ese
@@ -56,6 +65,12 @@
              speak() no da error pero tampoco suena nada. -->
         <intent>
             <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+        <!-- Necesario desde Android 11 para poder abrir el marcador de teléfono (LlamarButton,
+             botón "Llamar" en Seguindo/Buscar) con un enlace "tel:". -->
+        <intent>
+            <action android:name="android.intent.action.DIAL"/>
+            <data android:scheme="tel"/>
         </intent>
     </queries>
 </manifest>

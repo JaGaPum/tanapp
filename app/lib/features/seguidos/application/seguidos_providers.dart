@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/pagination/paginated_notifier.dart';
 import '../../cliente_sedes/application/cliente_sedes_providers.dart';
 import '../data/cliente_seguible.dart';
 import '../data/seguidores_resumen.dart';
@@ -40,9 +41,17 @@ final misSeguidosIdsProvider = FutureProvider.autoDispose<Set<String>>((ref) {
   return ref.watch(seguidosRepositoryProvider).listMisSeguidosIds();
 });
 
-final misSeguidosClientesProvider = FutureProvider.autoDispose<List<ClienteSeguible>>((ref) {
-  return ref.watch(seguidosRepositoryProvider).listMisSeguidosClientes();
-});
+class MisSeguidosClientesNotifier extends PaginatedNotifier<ClienteSeguible> {
+  @override
+  Future<List<ClienteSeguible>> cargarPagina(int offset, int limit) {
+    return ref.read(seguidosRepositoryProvider).listMisSeguidosClientes(offset: offset, limit: limit);
+  }
+}
+
+final misSeguidosClientesProvider =
+    NotifierProvider.autoDispose<MisSeguidosClientesNotifier, PaginaResultado<ClienteSeguible>>(
+  MisSeguidosClientesNotifier.new,
+);
 
 /// Clave usada para agrupar seguidores que no tienen concello indicado en su perfil.
 const seguidorSinConcello = '';

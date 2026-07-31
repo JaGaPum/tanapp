@@ -76,12 +76,25 @@ async function handle(req: Request): Promise<Response> {
 
   const { data: destinatario } = await adminClient
     .from('TSistemaUsuarios')
-    .select('NotificacionesPushActivas')
+    .select('NotificacionesPushActivas, IdSistemaIdiomaPreferido')
     .eq('IdSistemaUsuario', aviso.IdSistemaUsuario)
     .maybeSingle();
   if (!destinatario?.NotificacionesPushActivas) {
     console.log('enviar-push-aviso: omitido, usuario sin notificaciones push activadas', aviso.IdSistemaUsuario);
     return jsonResponse({ omitido: 'usuario sin notificaciones push activadas' });
+  }
+  // Consulta aparte (en vez de pedirle a PostgREST que embeba "TSistemaIdiomas" a partir de
+  // "IdSistemaIdiomaPreferido") para no depender de que esa relación esté declarada como FK y
+  // sea detectable automáticamente; así, si no lo estuviera, esto simplemente no encuentra fila
+  // y cae al español por defecto, en vez de romper toda la petición.
+  let esGallego = false;
+  if (destinatario.IdSistemaIdiomaPreferido) {
+    const { data: idioma } = await adminClient
+      .from('TSistemaIdiomas')
+      .select('Codigo')
+      .eq('IdSistemaIdioma', destinatario.IdSistemaIdiomaPreferido)
+      .maybeSingle();
+    esGallego = idioma?.Codigo === 'GL';
   }
 
   const { data: dispositivos } = await adminClient
@@ -93,22 +106,21 @@ async function handle(req: Request): Promise<Response> {
     return jsonResponse({ omitido: 'usuario sin dispositivos registrados' });
   }
 
-  // Solo se necesita el nombre del cliente/sede para el texto de la notificación — nunca el
-  // nombre del fallecido ni ningún otro dato de la publicación, para no filtrar información
-  // por la bandeja de notificaciones del sistema (visible con el móvil bloqueado, etc.).
+  // Solo se necesita el nombre de la sede para el texto de la notificación — nunca el nombre
+  // del fallecido ni ningún otro dato de la publicación, para no filtrar información por la
+  // bandeja de notificaciones del sistema (visible con el móvil bloqueado, etc.).
   const { data: publicacion, error: publicacionError } = await adminClient
     .from('TClientePublicaciones')
-    .select('TClienteSedes(IdClienteSede, TSistemaUsuarios(Nombre))')
+    .select('TClienteSedes(IdClienteSede, Nombre)')
     .eq('IdClientePublicacion', aviso.IdClientePublicacion)
     .maybeSingle();
   if (publicacionError || !publicacion) {
     return jsonResponse({ error: 'Publicación no encontrada' }, 404);
   }
-  const sede = publicacion.TClienteSedes as unknown as {
-    IdClienteSede: string;
-    TSistemaUsuarios: { Nombre: string } | null;
-  };
-  const nombreCliente = sede?.TSistemaUsuarios?.Nombre ?? '';
+  const sede = publicacion.TClienteSedes as unknown as { IdClienteSede: string; Nombre: string } | null;
+  const nombreSede = sede?.Nombre ?? '';
+  const titulo = esGallego ? 'Nova publicación en TanApp' : 'Nueva publicación en TanApp';
+  const cuerpo = esGallego ? `${nombreSede} fixo unha nova publicación.` : `${nombreSede} hizo una nueva publicación.`;
 
   const serviceAccount = JSON.parse(Deno.env.get('FIREBASE_SERVICE_ACCOUNT_KEY')!);
   const auth = new GoogleAuth({
@@ -131,7 +143,8 @@ async function handle(req: Request): Promise<Response> {
           message: {
             token,
             notification: {
-              title: `${nombreCliente} fixo unha nova publicación.`,
+              title: titulo,
+              body: cuerpo,
             },
             data: {
               idClienteSede: sede?.IdClienteSede ?? '',

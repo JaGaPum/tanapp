@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../../core/preferences/escala_texto_provider.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/paginated_list_view.dart';
 import '../../../publicaciones/application/publicaciones_providers.dart';
 import '../../../publicaciones/data/publicacion_con_sede.dart';
 import '../../../publicaciones/presentation/widgets/publicacion_card.dart';
@@ -97,21 +98,28 @@ class _TablonScreenState extends ConsumerState<TablonScreen> with WidgetsBinding
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: publicacionesAsync.when(
-              data: (publicaciones) {
-                final filtradas = _filtrar(publicaciones);
-                if (filtradas.isEmpty) {
-                  return EmptyState(message: context.l10n.publicarSinPublicaciones, icon: Icons.dynamic_feed_outlined);
-                }
-                return ListView.separated(
-                  itemCount: filtradas.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 8),
-                  itemBuilder: (context, index) => PublicacionCard(publicacion: filtradas[index]),
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
-            ),
+            child: publicacionesAsync.cargandoInicial
+                ? const Center(child: CircularProgressIndicator())
+                : publicacionesAsync.error != null
+                    ? Center(child: Text(context.l10n.errorGenerico(publicacionesAsync.error.toString())))
+                    : Builder(
+                        builder: (context) {
+                          final filtradas = _filtrar(publicacionesAsync.items);
+                          if (filtradas.isEmpty) {
+                            return EmptyState(
+                              message: context.l10n.publicarSinPublicaciones,
+                              icon: Icons.dynamic_feed_outlined,
+                            );
+                          }
+                          return PaginatedListView<PublicacionConSede>(
+                            items: filtradas,
+                            cargandoMas: publicacionesAsync.cargandoMas,
+                            hasMore: publicacionesAsync.hasMore,
+                            onCargarMas: () => ref.read(publicacionesTablonProvider.notifier).cargarMas(),
+                            itemBuilder: (context, publicacion) => PublicacionCard(publicacion: publicacion),
+                          );
+                        },
+                      ),
           ),
         ],
       ),
