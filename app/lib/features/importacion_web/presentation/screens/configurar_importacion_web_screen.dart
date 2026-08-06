@@ -21,7 +21,8 @@ class ConfigurarImportacionWebScreen extends ConsumerWidget {
       body: configAsync.when(
         data: (config) => _ImportacionWebBody(config: config),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorGenerico(e.toString()))),
       ),
     );
   }
@@ -32,12 +33,15 @@ class _ImportacionWebBody extends ConsumerStatefulWidget {
   const _ImportacionWebBody({required this.config});
 
   @override
-  ConsumerState<_ImportacionWebBody> createState() => _ImportacionWebBodyState();
+  ConsumerState<_ImportacionWebBody> createState() =>
+      _ImportacionWebBodyState();
 }
 
 class _ImportacionWebBodyState extends ConsumerState<_ImportacionWebBody> {
   final _formKey = GlobalKey<FormState>();
-  late final _urlController = TextEditingController(text: widget.config?.url ?? '');
+  late final _urlController = TextEditingController(
+    text: widget.config?.url ?? '',
+  );
   late bool _aceptado = widget.config?.activo ?? false;
   bool _guardando = false;
 
@@ -49,7 +53,8 @@ class _ImportacionWebBodyState extends ConsumerState<_ImportacionWebBody> {
 
   String? _validarUrl(String? value) {
     final texto = value?.trim() ?? '';
-    if (texto.isEmpty || !(texto.startsWith('http://') || texto.startsWith('https://'))) {
+    if (texto.isEmpty ||
+        !(texto.startsWith('http://') || texto.startsWith('https://'))) {
       return context.l10n.importacionWebUrlInvalida;
     }
     return null;
@@ -59,7 +64,9 @@ class _ImportacionWebBodyState extends ConsumerState<_ImportacionWebBody> {
     if (!_formKey.currentState!.validate() || !_aceptado) return;
     setState(() => _guardando = true);
     try {
-      await ref.read(importacionWebRepositoryProvider).guardar(_urlController.text.trim());
+      await ref
+          .read(importacionWebRepositoryProvider)
+          .guardar(_urlController.text.trim());
       ref.invalidate(miImportacionWebProvider);
     } finally {
       if (mounted) setState(() => _guardando = false);
@@ -82,16 +89,25 @@ class _ImportacionWebBodyState extends ConsumerState<_ImportacionWebBody> {
     return Form(
       key: _formKey,
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.fromLTRB(
+          16,
+          16,
+          16,
+          16 + MediaQuery.of(context).padding.bottom,
+        ),
         children: [
           if (config != null) ...[
             Text(
               config.activo
-                  ? context.l10n.importacionWebActiva(DateFormat('dd/MM/yyyy').format(config.fechaAutorizacion))
+                  ? context.l10n.importacionWebActiva(
+                      DateFormat('dd/MM/yyyy').format(config.fechaAutorizacion),
+                    )
                   : context.l10n.importacionWebDesactivada,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: config.activo ? Colors.green : Theme.of(context).colorScheme.outline,
-                  ),
+                color: config.activo
+                    ? Colors.green
+                    : Theme.of(context).colorScheme.outline,
+              ),
             ),
             const SizedBox(height: 16),
           ],
@@ -109,11 +125,14 @@ class _ImportacionWebBodyState extends ConsumerState<_ImportacionWebBody> {
             contentPadding: EdgeInsets.zero,
             value: _aceptado,
             title: Text(context.l10n.importacionWebAceptoCheckbox),
-            onChanged: (marcado) => setState(() => _aceptado = marcado ?? false),
+            onChanged: (marcado) =>
+                setState(() => _aceptado = marcado ?? false),
           ),
           const SizedBox(height: 16),
           AppButton(
-            label: config == null ? context.l10n.importacionWebGuardar : context.l10n.importacionWebActualizar,
+            label: config == null
+                ? context.l10n.importacionWebGuardar
+                : context.l10n.importacionWebActualizar,
             loading: _guardando,
             onPressed: _aceptado ? _guardar : null,
           ),

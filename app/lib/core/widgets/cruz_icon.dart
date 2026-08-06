@@ -19,8 +19,19 @@ class _CruzPainter extends CustomPainter {
     final paint = Paint()..color = Colors.black;
     final barW = size.width * 0.18;
 
-    canvas.drawRect(Rect.fromLTWH((size.width - barW) / 2, 0, barW, size.height), paint);
-    canvas.drawRect(Rect.fromLTWH(size.width * 0.12, size.height * 0.22, size.width * 0.76, barW), paint);
+    canvas.drawRect(
+      Rect.fromLTWH((size.width - barW) / 2, 0, barW, size.height),
+      paint,
+    );
+    canvas.drawRect(
+      Rect.fromLTWH(
+        size.width * 0.12,
+        size.height * 0.22,
+        size.width * 0.76,
+        barW,
+      ),
+      paint,
+    );
   }
 
   @override

@@ -66,7 +66,9 @@ class _AvisosScreenState extends ConsumerState<AvisosScreen> {
     if (!confirmado) return;
     setState(() => _procesando = true);
     try {
-      await ref.read(avisosRepositoryProvider).eliminarAviso(aviso.idClienteAvisoDestinatario);
+      await ref
+          .read(avisosRepositoryProvider)
+          .eliminarAviso(aviso.idClienteAvisoDestinatario);
       await _refrescarTrasBorrar();
     } finally {
       if (mounted) setState(() => _procesando = false);
@@ -77,13 +79,17 @@ class _AvisosScreenState extends ConsumerState<AvisosScreen> {
     final confirmado = await showConfirmDialog(
       context,
       title: context.l10n.avisosEliminarTitulo,
-      message: context.l10n.avisosEliminarSeleccionadosMensaje(_seleccionados.length),
+      message: context.l10n.avisosEliminarSeleccionadosMensaje(
+        _seleccionados.length,
+      ),
       confirmLabel: context.l10n.eliminar,
     );
     if (!confirmado) return;
     setState(() => _procesando = true);
     try {
-      await ref.read(avisosRepositoryProvider).eliminarAvisos(_seleccionados.toList());
+      await ref
+          .read(avisosRepositoryProvider)
+          .eliminarAvisos(_seleccionados.toList());
       await _refrescarTrasBorrar();
       _cancelarSeleccion();
     } finally {
@@ -115,17 +121,24 @@ class _AvisosScreenState extends ConsumerState<AvisosScreen> {
     // Un ADMIN también puede seguir clientes como cualquier usuario ordinario, así que esta
     // pestaña le muestra las dos cosas: sus solicitudes de cliente pendientes de aprobar (si
     // las hay) Y su propia bandeja de avisos recibidos, no una cosa en vez de la otra.
-    final pendientesSolicitudes = isAdmin ? ref.watch(solicitudesPendientesCountProvider).value ?? 0 : 0;
+    final pendientesSolicitudes = isAdmin
+        ? ref.watch(solicitudesPendientesCountProvider).value ?? 0
+        : 0;
     final resultado = ref.watch(misAvisosRecibidosProvider);
 
     if (resultado.cargandoInicial) {
       return const Center(child: CircularProgressIndicator());
     }
     if (resultado.error != null) {
-      return Center(child: Text(context.l10n.errorGenerico(resultado.error.toString())));
+      return Center(
+        child: Text(context.l10n.errorGenerico(resultado.error.toString())),
+      );
     }
     if (pendientesSolicitudes == 0 && resultado.items.isEmpty) {
-      return EmptyState(message: context.l10n.avisosVacioRecibidos, icon: Icons.notifications_outlined);
+      return EmptyState(
+        message: context.l10n.avisosVacioRecibidos,
+        icon: Icons.notifications_outlined,
+      );
     }
 
     return Padding(
@@ -136,8 +149,15 @@ class _AvisosScreenState extends ConsumerState<AvisosScreen> {
           if (pendientesSolicitudes > 0) ...[
             Card(
               child: ListTile(
-                leading: const Icon(Icons.assignment_late_outlined, color: Colors.red),
-                title: Text(context.l10n.avisoSolicitudesPendientes(pendientesSolicitudes)),
+                leading: Icon(
+                  Icons.assignment_late_outlined,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                title: Text(
+                  context.l10n.avisoSolicitudesPendientes(
+                    pendientesSolicitudes,
+                  ),
+                ),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => context.push('/admin/solicitudes'),
               ),
@@ -148,7 +168,11 @@ class _AvisosScreenState extends ConsumerState<AvisosScreen> {
             if (_seleccionando)
               Row(
                 children: [
-                  Expanded(child: Text(context.l10n.avisosNSeleccionados(_seleccionados.length))),
+                  Expanded(
+                    child: Text(
+                      context.l10n.avisosNSeleccionados(_seleccionados.length),
+                    ),
+                  ),
                   TextButton(
                     onPressed: _procesando ? null : _cancelarSeleccion,
                     child: Text(context.l10n.avisosCancelarSeleccion),
@@ -156,7 +180,9 @@ class _AvisosScreenState extends ConsumerState<AvisosScreen> {
                   FilledButton.icon(
                     icon: const Icon(Icons.delete_outline),
                     label: Text(context.l10n.eliminar),
-                    onPressed: _procesando || _seleccionados.isEmpty ? null : _eliminarSeleccionados,
+                    onPressed: _procesando || _seleccionados.isEmpty
+                        ? null
+                        : _eliminarSeleccionados,
                   ),
                 ],
               )
@@ -177,13 +203,18 @@ class _AvisosScreenState extends ConsumerState<AvisosScreen> {
                 items: resultado.items,
                 cargandoMas: resultado.cargandoMas,
                 hasMore: resultado.hasMore,
-                onCargarMas: () => ref.read(misAvisosRecibidosProvider.notifier).cargarMas(),
+                onCargarMas: () =>
+                    ref.read(misAvisosRecibidosProvider.notifier).cargarMas(),
                 itemBuilder: (context, aviso) => _AvisoRecibidoCard(
                   aviso: aviso,
                   seleccionando: _seleccionando,
-                  seleccionado: _seleccionados.contains(aviso.idClienteAvisoDestinatario),
-                  onIniciarSeleccion: () => _iniciarSeleccion(aviso.idClienteAvisoDestinatario),
-                  onAlternarSeleccion: () => _alternarSeleccion(aviso.idClienteAvisoDestinatario),
+                  seleccionado: _seleccionados.contains(
+                    aviso.idClienteAvisoDestinatario,
+                  ),
+                  onIniciarSeleccion: () =>
+                      _iniciarSeleccion(aviso.idClienteAvisoDestinatario),
+                  onAlternarSeleccion: () =>
+                      _alternarSeleccion(aviso.idClienteAvisoDestinatario),
                   onEliminar: () => _eliminarUno(aviso),
                 ),
               ),
@@ -214,12 +245,17 @@ class _AvisoRecibidoCard extends ConsumerWidget {
 
   Future<void> _abrir(BuildContext context, WidgetRef ref) async {
     if (!aviso.leido) {
-      await ref.read(avisosRepositoryProvider).marcarLeido(aviso.idClienteAvisoDestinatario);
+      await ref
+          .read(avisosRepositoryProvider)
+          .marcarLeido(aviso.idClienteAvisoDestinatario);
       ref.invalidate(avisosNoLeidosCountProvider);
       ref.invalidate(misAvisosRecibidosProvider);
     }
     if (context.mounted) {
-      showDialog<void>(context: context, builder: (_) => _AvisoDetailDialog(aviso: aviso));
+      showDialog<void>(
+        context: context,
+        builder: (_) => _AvisoDetailDialog(aviso: aviso),
+      );
     }
   }
 
@@ -228,14 +264,21 @@ class _AvisoRecibidoCard extends ConsumerWidget {
     return Card(
       child: ListTile(
         leading: seleccionando
-            ? Checkbox(value: seleccionado, onChanged: (_) => onAlternarSeleccion())
+            ? Checkbox(
+                value: seleccionado,
+                onChanged: (_) => onAlternarSeleccion(),
+              )
             : Icon(
                 aviso.leido ? Icons.mail_outline : Icons.mark_email_unread,
-                color: aviso.leido ? Theme.of(context).colorScheme.outline : Theme.of(context).colorScheme.primary,
+                color: aviso.leido
+                    ? Theme.of(context).colorScheme.outline
+                    : Theme.of(context).colorScheme.primary,
               ),
         title: Text(
           aviso.titulo,
-          style: TextStyle(fontWeight: aviso.leido ? FontWeight.normal : FontWeight.bold),
+          style: TextStyle(
+            fontWeight: aviso.leido ? FontWeight.normal : FontWeight.bold,
+          ),
         ),
         subtitle: Text(
           '${aviso.nombreCliente} · '
@@ -270,7 +313,9 @@ class _AvisoDetailDialog extends StatelessWidget {
           children: [
             Text(
               '${aviso.nombreCliente} · ${aviso.nombreSede}',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.outline),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.outline,
+              ),
             ),
             const SizedBox(height: 12),
             Text(aviso.texto),

@@ -12,6 +12,7 @@ import '../../../publicaciones/data/publicacion_con_sede.dart';
 import '../../../publicaciones/presentation/widgets/publicacion_card.dart';
 
 const _intervaloActualizacion = Duration(seconds: 30);
+const _debounceBusqueda = Duration(milliseconds: 400);
 
 class TablonScreen extends ConsumerStatefulWidget {
   const TablonScreen({super.key});
@@ -20,15 +21,22 @@ class TablonScreen extends ConsumerStatefulWidget {
   ConsumerState<TablonScreen> createState() => _TablonScreenState();
 }
 
-class _TablonScreenState extends ConsumerState<TablonScreen> with WidgetsBindingObserver {
+class _TablonScreenState extends ConsumerState<TablonScreen>
+    with WidgetsBindingObserver {
   final _busquedaController = TextEditingController();
   Timer? _timer;
+  Timer? _debounce;
+  String _terminoBuscado = '';
+  bool _mostrarFiltros = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _timer = Timer.periodic(_intervaloActualizacion, (_) => ref.invalidate(publicacionesTablonProvider));
+    _timer = Timer.periodic(
+      _intervaloActualizacion,
+      (_) => ref.invalidate(publicacionesTablonProvider),
+    );
   }
 
   @override
@@ -41,31 +49,30 @@ class _TablonScreenState extends ConsumerState<TablonScreen> with WidgetsBinding
   @override
   void dispose() {
     _timer?.cancel();
+    _debounce?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     _busquedaController.dispose();
     super.dispose();
   }
 
-  List<PublicacionConSede> _filtrar(List<PublicacionConSede> publicaciones) {
-    final termino = _busquedaController.text.trim().toLowerCase();
-    if (termino.isEmpty) return publicaciones;
-    return publicaciones.where((p) {
-      return p.nombreFallecido.toLowerCase().contains(termino) ||
-          (p.iglesia?.toLowerCase().contains(termino) ?? false) ||
-          (p.lugar?.toLowerCase().contains(termino) ?? false) ||
-          (p.capillaArdiente?.toLowerCase().contains(termino) ?? false) ||
-          (p.sala?.toLowerCase().contains(termino) ?? false) ||
-          (p.observaciones?.toLowerCase().contains(termino) ?? false) ||
-          p.nombreCliente.toLowerCase().contains(termino) ||
-          p.concello.toLowerCase().contains(termino);
-    }).toList();
+  void _alCambiarBusqueda() {
+    _debounce?.cancel();
+    _debounce = Timer(_debounceBusqueda, () {
+      if (mounted) {
+        setState(() => _terminoBuscado = _busquedaController.text.trim());
+      }
+    });
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    final publicacionesAsync = ref.watch(publicacionesTablonProvider);
     final escala = ref.watch(escalaTextoProvider);
     final notifierEscala = ref.read(escalaTextoProvider.notifier);
+    final buscando = _terminoBuscado.isNotEmpty;
+    final publicacionesAsync = buscando
+        ? ref.watch(busquedaPublicacionesProvider(_terminoBuscado))
+        : ref.watch(publicacionesTablonProvider);
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -75,51 +82,79 @@ class _TablonScreenState extends ConsumerState<TablonScreen> with WidgetsBinding
           Row(
             children: [
               Expanded(
-                child: TextField(
-                  controller: _busquedaController,
-                  decoration: InputDecoration(
-                    labelText: context.l10n.tablonBuscar,
-                    prefixIcon: const Icon(Icons.search),
+                child: TextButton.icon(
+                  onPressed: () =>
+                      setState(() => _mostrarFiltros = !_mostrarFiltros),
+                  icon: Icon(
+                    _mostrarFiltros ? Icons.expand_less : Icons.search,
                   ),
-                  onChanged: (_) => setState(() {}),
+                  label: Text(context.l10n.filtrar),
                 ),
               ),
               IconButton(
                 icon: const Icon(Icons.text_decrease, size: 20),
                 tooltip: context.l10n.tablonDisminuirLetra,
-                onPressed: escala == EscalaTextoNotifier.valores.first ? null : notifierEscala.disminuir,
+                onPressed: escala == EscalaTextoNotifier.valores.first
+                    ? null
+                    : notifierEscala.disminuir,
               ),
               IconButton(
                 icon: const Icon(Icons.text_increase, size: 30),
                 tooltip: context.l10n.tablonAumentarLetra,
-                onPressed: escala == EscalaTextoNotifier.valores.last ? null : notifierEscala.aumentar,
+                onPressed: escala == EscalaTextoNotifier.valores.last
+                    ? null
+                    : notifierEscala.aumentar,
               ),
             ],
           ),
+          if (_mostrarFiltros) ...[
+            const SizedBox(height: 8),
+            TextField(
+              controller: _busquedaController,
+              decoration: InputDecoration(
+                labelText: context.l10n.tablonBuscar,
+                prefixIcon: const Icon(Icons.search),
+              ),
+              onChanged: (_) => _alCambiarBusqueda(),
+            ),
+          ],
           const SizedBox(height: 16),
           Expanded(
             child: publicacionesAsync.cargandoInicial
                 ? const Center(child: CircularProgressIndicator())
                 : publicacionesAsync.error != null
-                    ? Center(child: Text(context.l10n.errorGenerico(publicacionesAsync.error.toString())))
-                    : Builder(
-                        builder: (context) {
-                          final filtradas = _filtrar(publicacionesAsync.items);
-                          if (filtradas.isEmpty) {
-                            return EmptyState(
-                              message: context.l10n.publicarSinPublicaciones,
-                              icon: Icons.dynamic_feed_outlined,
-                            );
-                          }
-                          return PaginatedListView<PublicacionConSede>(
-                            items: filtradas,
-                            cargandoMas: publicacionesAsync.cargandoMas,
-                            hasMore: publicacionesAsync.hasMore,
-                            onCargarMas: () => ref.read(publicacionesTablonProvider.notifier).cargarMas(),
-                            itemBuilder: (context, publicacion) => PublicacionCard(publicacion: publicacion),
-                          );
-                        },
+                ? Center(
+                    child: Text(
+                      context.l10n.errorGenerico(
+                        publicacionesAsync.error.toString(),
                       ),
+                    ),
+                  )
+                : publicacionesAsync.items.isEmpty
+                ? EmptyState(
+                    message: buscando
+                        ? context.l10n.tablonSinResultados
+                        : context.l10n.tablonVacioSinSeguir,
+                    icon: Icons.dynamic_feed_outlined,
+                  )
+                : PaginatedListView<PublicacionConSede>(
+                    items: publicacionesAsync.items,
+                    cargandoMas: publicacionesAsync.cargandoMas,
+                    hasMore: publicacionesAsync.hasMore,
+                    onCargarMas: () => buscando
+                        ? ref
+                              .read(
+                                busquedaPublicacionesProvider(
+                                  _terminoBuscado,
+                                ).notifier,
+                              )
+                              .cargarMas()
+                        : ref
+                              .read(publicacionesTablonProvider.notifier)
+                              .cargarMas(),
+                    itemBuilder: (context, publicacion) =>
+                        PublicacionCard(publicacion: publicacion),
+                  ),
           ),
         ],
       ),

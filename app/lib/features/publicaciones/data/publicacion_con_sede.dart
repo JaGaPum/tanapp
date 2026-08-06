@@ -18,6 +18,7 @@ class PublicacionConSede {
   final String nombreSede;
   final String concello;
   final String provincia;
+  final int numCondolencias;
 
   const PublicacionConSede({
     required this.idClientePublicacion,
@@ -37,6 +38,7 @@ class PublicacionConSede {
     required this.nombreSede,
     required this.concello,
     required this.provincia,
+    required this.numCondolencias,
   });
 
   factory PublicacionConSede.fromMap(Map<String, dynamic> map) {
@@ -46,11 +48,20 @@ class PublicacionConSede {
     final fechaFuneral = map['FechaFuneral'] as String?;
     // Postgres devuelve "time" como "HH:mm:ss"; en la app solo interesan horas y minutos.
     final horaFuneralCruda = map['HoraFuneral'] as String?;
+    // El embed "TClientePublicacionesCondolencias(count)" de PostgREST devuelve una lista con un
+    // único objeto {"count": N}, no la lista de condolencias en sí.
+    final condolenciasEmbed = map['TClientePublicacionesCondolencias'] as List?;
+    final numCondolencias =
+        condolenciasEmbed != null && condolenciasEmbed.isNotEmpty
+        ? (condolenciasEmbed.first as Map<String, dynamic>)['count'] as int
+        : 0;
     return PublicacionConSede(
       idClientePublicacion: map['IdClientePublicacion'] as String,
       idClienteSede: map['IdClienteSede'] as String,
       nombreFallecido: map['NombreFallecido'] as String,
-      fechaFallecimiento: fechaFallecimiento != null ? DateTime.parse(fechaFallecimiento) : null,
+      fechaFallecimiento: fechaFallecimiento != null
+          ? DateTime.parse(fechaFallecimiento)
+          : null,
       edad: map['Edad'] as int?,
       fechaFuneral: fechaFuneral != null ? DateTime.parse(fechaFuneral) : null,
       horaFuneral: horaFuneralCruda != null && horaFuneralCruda.length >= 5
@@ -66,6 +77,40 @@ class PublicacionConSede {
       nombreSede: sede['Nombre'] as String,
       concello: sede['Concello'] as String,
       provincia: sede['Provincia'] as String,
+      numCondolencias: numCondolencias,
+    );
+  }
+
+  /// Fila plana (sin anidar) que devuelve la función "FBuscarPublicacionesHistorico": mismos
+  /// datos que [fromMap], pero el cliente y la sede vienen como columnas propias en vez de como
+  /// recursos embebidos, al ser el resultado de un RPC en vez de un SELECT con joins de PostgREST.
+  factory PublicacionConSede.fromSearchRow(Map<String, dynamic> map) {
+    final fechaFallecimiento = map['FechaFallecimiento'] as String?;
+    final fechaFuneral = map['FechaFuneral'] as String?;
+    final horaFuneralCruda = map['HoraFuneral'] as String?;
+    return PublicacionConSede(
+      idClientePublicacion: map['IdClientePublicacion'] as String,
+      idClienteSede: map['IdClienteSede'] as String,
+      nombreFallecido: map['NombreFallecido'] as String,
+      fechaFallecimiento: fechaFallecimiento != null
+          ? DateTime.parse(fechaFallecimiento)
+          : null,
+      edad: map['Edad'] as int?,
+      fechaFuneral: fechaFuneral != null ? DateTime.parse(fechaFuneral) : null,
+      horaFuneral: horaFuneralCruda != null && horaFuneralCruda.length >= 5
+          ? horaFuneralCruda.substring(0, 5)
+          : horaFuneralCruda,
+      iglesia: map['Iglesia'] as String?,
+      lugar: map['Lugar'] as String?,
+      capillaArdiente: map['CapillaArdiente'] as String?,
+      sala: map['Sala'] as String?,
+      observaciones: map['Observaciones'] as String?,
+      fechaAlta: DateTime.parse(map['FechaAlta'] as String),
+      nombreCliente: map['NombreCliente'] as String,
+      nombreSede: map['NombreSede'] as String,
+      concello: map['Concello'] as String,
+      provincia: map['Provincia'] as String,
+      numCondolencias: map['NumCondolencias'] as int? ?? 0,
     );
   }
 }

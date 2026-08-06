@@ -1,8 +1,23 @@
 /// Preposiciones y artículos (castellano y gallego) que van en minúscula dentro de un nombre o
 /// lugar, salvo que sean la primera palabra.
 const _preposiciones = {
-  'de', 'del', 'la', 'las', 'los', 'el', 'y', 'e', 'en',
-  'da', 'do', 'das', 'dos', 'o', 'a', 'as', 'os',
+  'de',
+  'del',
+  'la',
+  'las',
+  'los',
+  'el',
+  'y',
+  'e',
+  'en',
+  'da',
+  'do',
+  'das',
+  'dos',
+  'o',
+  'a',
+  'as',
+  'os',
 };
 
 /// Primera letra de cada palabra en mayúscula, el resto en minúscula; las preposiciones quedan

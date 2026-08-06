@@ -9,7 +9,8 @@ Future<bool> showConfirmDialog(
   String? confirmLabel,
   String? cancelLabel,
 }) async {
-  final resolvedConfirmLabel = confirmLabel ?? context.l10n.confirmDialogConfirm;
+  final resolvedConfirmLabel =
+      confirmLabel ?? context.l10n.confirmDialogConfirm;
   final resolvedCancelLabel = cancelLabel ?? context.l10n.confirmDialogCancel;
   final result = await showDialog<bool>(
     context: context,
@@ -17,8 +18,14 @@ Future<bool> showConfirmDialog(
       title: Text(title),
       content: Text(message),
       actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(resolvedCancelLabel)),
-        FilledButton(onPressed: () => Navigator.of(context).pop(true), child: Text(resolvedConfirmLabel)),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(resolvedCancelLabel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: Text(resolvedConfirmLabel),
+        ),
       ],
     ),
   );

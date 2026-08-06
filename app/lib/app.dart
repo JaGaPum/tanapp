@@ -18,6 +18,8 @@ class TanApp extends ConsumerWidget {
       title: 'TanApp',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: ThemeMode.system,
       routerConfig: router,
       locale: locale,
       supportedLocales: AppLocalizations.supportedLocales,

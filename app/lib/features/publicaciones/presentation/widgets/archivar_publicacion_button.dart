@@ -10,13 +10,18 @@ import '../../data/publicaciones_repository.dart';
 /// una sede seguida y en el propio Arquivo (donde sirve para desarchivar).
 class ArchivarPublicacionButton extends ConsumerStatefulWidget {
   final String idClientePublicacion;
-  const ArchivarPublicacionButton({super.key, required this.idClientePublicacion});
+  const ArchivarPublicacionButton({
+    super.key,
+    required this.idClientePublicacion,
+  });
 
   @override
-  ConsumerState<ArchivarPublicacionButton> createState() => _ArchivarPublicacionButtonState();
+  ConsumerState<ArchivarPublicacionButton> createState() =>
+      _ArchivarPublicacionButtonState();
 }
 
-class _ArchivarPublicacionButtonState extends ConsumerState<ArchivarPublicacionButton> {
+class _ArchivarPublicacionButtonState
+    extends ConsumerState<ArchivarPublicacionButton> {
   bool _loading = false;
 
   Future<void> _alternar(bool archivada) async {
@@ -26,15 +31,27 @@ class _ArchivarPublicacionButtonState extends ConsumerState<ArchivarPublicacionB
       if (perfil == null) return;
       final repo = ref.read(publicacionesRepositoryProvider);
       if (archivada) {
-        await repo.desarchivar(idSistemaUsuario: perfil.idSistemaUsuario, idClientePublicacion: widget.idClientePublicacion);
+        await repo.desarchivar(
+          idSistemaUsuario: perfil.idSistemaUsuario,
+          idClientePublicacion: widget.idClientePublicacion,
+        );
       } else {
-        await repo.archivar(idSistemaUsuario: perfil.idSistemaUsuario, idClientePublicacion: widget.idClientePublicacion);
+        await repo.archivar(
+          idSistemaUsuario: perfil.idSistemaUsuario,
+          idClientePublicacion: widget.idClientePublicacion,
+        );
       }
       ref.invalidate(misPublicacionesArchivadasIdsProvider);
       ref.invalidate(misPublicacionesArchivadasProvider);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(archivada ? context.l10n.arquivoEliminado : context.l10n.arquivoGardado)),
+          SnackBar(
+            content: Text(
+              archivada
+                  ? context.l10n.arquivoEliminado
+                  : context.l10n.arquivoGardado,
+            ),
+          ),
         );
       }
     } finally {
@@ -51,7 +68,9 @@ class _ArchivarPublicacionButtonState extends ConsumerState<ArchivarPublicacionB
     );
     return IconButton(
       icon: Icon(archivada ? Icons.bookmark : Icons.bookmark_border),
-      tooltip: archivada ? context.l10n.arquivoTooltipQuitar : context.l10n.arquivoTooltipGardar,
+      tooltip: archivada
+          ? context.l10n.arquivoTooltipQuitar
+          : context.l10n.arquivoTooltipGardar,
       onPressed: _loading ? null : () => _alternar(archivada),
     );
   }

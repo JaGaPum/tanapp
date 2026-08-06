@@ -26,7 +26,9 @@ class SesionPolicyService {
       return true;
     }
 
-    final abierta = await _sesionesRepo.fetchUltimaSesionAbierta(perfil.idSistemaUsuario);
+    final abierta = await _sesionesRepo.fetchUltimaSesionAbierta(
+      perfil.idSistemaUsuario,
+    );
     if (abierta == null) {
       await _authRepo.signOut();
       return true;
@@ -42,9 +44,15 @@ class SesionPolicyService {
     return true;
   }
 
-  Future<void> registrarLoginExplicito({required String idSistemaUsuario, required bool recordar}) async {
+  Future<void> registrarLoginExplicito({
+    required String idSistemaUsuario,
+    required bool recordar,
+  }) async {
     await _sesionesRepo.cerrarSesionesAbiertas(idSistemaUsuario);
-    await _sesionesRepo.crearSesion(idSistemaUsuario: idSistemaUsuario, recordar: recordar);
+    await _sesionesRepo.crearSesion(
+      idSistemaUsuario: idSistemaUsuario,
+      recordar: recordar,
+    );
   }
 }
 
@@ -66,4 +74,6 @@ class SesionBootstrapGuard {
   bool? necesitaAceptarTerminos;
 }
 
-final sesionBootstrapGuardProvider = Provider<SesionBootstrapGuard>((ref) => SesionBootstrapGuard());
+final sesionBootstrapGuardProvider = Provider<SesionBootstrapGuard>(
+  (ref) => SesionBootstrapGuard(),
+);

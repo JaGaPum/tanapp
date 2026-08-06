@@ -344,6 +344,12 @@ abstract class AppLocalizations {
   /// **'Mi cuenta'**
   String get drawerMiCuenta;
 
+  /// No description provided for @drawerDashboard.
+  ///
+  /// In es, this message translates to:
+  /// **'Dashboard'**
+  String get drawerDashboard;
+
   /// No description provided for @drawerSistema.
   ///
   /// In es, this message translates to:
@@ -776,6 +782,36 @@ abstract class AppLocalizations {
   /// **'No se pudo eliminar el usuario'**
   String get usuarioNoSePudoEliminar;
 
+  /// No description provided for @suplantarUsuario.
+  ///
+  /// In es, this message translates to:
+  /// **'Suplantar usuario'**
+  String get suplantarUsuario;
+
+  /// No description provided for @suplantarMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'Vas a iniciar sesión como \"{nombre}\" para ver la app tal cual la ve. Podrás volver a tu cuenta de administrador en cualquier momento. ¿Continuar?'**
+  String suplantarMensaje(String nombre);
+
+  /// No description provided for @suplantarConfirmar.
+  ///
+  /// In es, this message translates to:
+  /// **'Suplantar'**
+  String get suplantarConfirmar;
+
+  /// No description provided for @suplantacionBannerTexto.
+  ///
+  /// In es, this message translates to:
+  /// **'Estás viendo la app como {nombre}'**
+  String suplantacionBannerTexto(String nombre);
+
+  /// No description provided for @suplantacionVolver.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver a mi cuenta'**
+  String get suplantacionVolver;
+
   /// No description provided for @usuarioIdiomaPreferido.
   ///
   /// In es, this message translates to:
@@ -817,6 +853,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Importación automática activa'**
   String get usuarioImportacionWebActiva;
+
+  /// No description provided for @usuarioEscaneoEsquelaIaTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Escaneo de esquelas con IA'**
+  String get usuarioEscaneoEsquelaIaTitulo;
+
+  /// No description provided for @usuarioEscaneoEsquelaIaActiva.
+  ///
+  /// In es, this message translates to:
+  /// **'Escaneo con IA activo para este usuario'**
+  String get usuarioEscaneoEsquelaIaActiva;
 
   /// No description provided for @validacionEmail.
   ///
@@ -1171,6 +1219,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Si la desactivas, ningún cliente podrá activar la importación automática de su web ni ver propuestas, aunque ya la tuviera configurada.'**
   String get configuracionIaImportacionWebDescripcion;
+
+  /// No description provided for @configuracionIaEscaneoEsquelaLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Escaneo de esquelas con IA'**
+  String get configuracionIaEscaneoEsquelaLabel;
+
+  /// No description provided for @configuracionIaEscaneoEsquelaDescripcion.
+  ///
+  /// In es, this message translates to:
+  /// **'Si está activado, al escanear una esquela la foto se analiza con IA en vez del reconocimiento de texto local. Si la desactivas (o falla), se sigue usando el escaneo local de siempre.'**
+  String get configuracionIaEscaneoEsquelaDescripcion;
 
   /// No description provided for @noHayTiposClienteDadosDeAlta.
   ///
@@ -1691,7 +1751,7 @@ abstract class AppLocalizations {
   /// No description provided for @seguidosSeleccionaTipo.
   ///
   /// In es, this message translates to:
-  /// **'¿A quién quiero seguir?'**
+  /// **'Elige a quién seguir'**
   String get seguidosSeleccionaTipo;
 
   /// No description provided for @seguidosSeleccionaProvincia.
@@ -1730,6 +1790,18 @@ abstract class AppLocalizations {
   /// **'Dejar de seguir'**
   String get seguidosDejarDeSeguir;
 
+  /// No description provided for @seguidosSiguiendoEtiqueta.
+  ///
+  /// In es, this message translates to:
+  /// **'Siguiendo'**
+  String get seguidosSiguiendoEtiqueta;
+
+  /// No description provided for @seguidosNoSiguiendoEtiqueta.
+  ///
+  /// In es, this message translates to:
+  /// **'No sigues'**
+  String get seguidosNoSiguiendoEtiqueta;
+
   /// No description provided for @siguiendoTab.
   ///
   /// In es, this message translates to:
@@ -1748,46 +1820,100 @@ abstract class AppLocalizations {
   /// **'Todavía no sigues a ningún cliente'**
   String get misSeguidosVacio;
 
+  /// No description provided for @misSeguidosTabClientes.
+  ///
+  /// In es, this message translates to:
+  /// **'Clientes'**
+  String get misSeguidosTabClientes;
+
+  /// No description provided for @misSeguidosTabZonas.
+  ///
+  /// In es, this message translates to:
+  /// **'Zonas'**
+  String get misSeguidosTabZonas;
+
+  /// No description provided for @misSeguidosSeguirNuevo.
+  ///
+  /// In es, this message translates to:
+  /// **'Seguir un cliente nuevo'**
+  String get misSeguidosSeguirNuevo;
+
+  /// No description provided for @zonaTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Zona'**
+  String get zonaTitulo;
+
+  /// No description provided for @zonaExplicacion.
+  ///
+  /// In es, this message translates to:
+  /// **'Sigue un concello sin tener que buscar y seguir a cada cliente por separado: recibirás los avisos de cualquier cliente con sede ahí.'**
+  String get zonaExplicacion;
+
+  /// No description provided for @zonaSeguir.
+  ///
+  /// In es, this message translates to:
+  /// **'Seguir'**
+  String get zonaSeguir;
+
+  /// No description provided for @zonaDejarDeSeguir.
+  ///
+  /// In es, this message translates to:
+  /// **'Dejar de seguir'**
+  String get zonaDejarDeSeguir;
+
+  /// No description provided for @zonaSeguirNueva.
+  ///
+  /// In es, this message translates to:
+  /// **'Seguir una zona nueva'**
+  String get zonaSeguirNueva;
+
+  /// No description provided for @misZonasVacio.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no sigues ninguna zona'**
+  String get misZonasVacio;
+
   /// No description provided for @drawerMisSedes.
   ///
   /// In es, this message translates to:
-  /// **'Mis sedes'**
+  /// **'Mis sedes/tanatorios'**
   String get drawerMisSedes;
 
   /// No description provided for @misSedesTitulo.
   ///
   /// In es, this message translates to:
-  /// **'Mis sedes'**
+  /// **'Mis sedes/tanatorios'**
   String get misSedesTitulo;
 
   /// No description provided for @misSedesVacio.
   ///
   /// In es, this message translates to:
-  /// **'Todavía no has dado de alta ninguna sede'**
+  /// **'Todavía no has dado de alta ninguna sede/tanatorio'**
   String get misSedesVacio;
 
   /// No description provided for @misSedesNueva.
   ///
   /// In es, this message translates to:
-  /// **'Nueva sede'**
+  /// **'Nueva sede/tanatorio'**
   String get misSedesNueva;
 
   /// No description provided for @misSedesEditar.
   ///
   /// In es, this message translates to:
-  /// **'Editar sede'**
+  /// **'Editar sede/tanatorio'**
   String get misSedesEditar;
 
   /// No description provided for @misSedesNombreSede.
   ///
   /// In es, this message translates to:
-  /// **'Nombre de la sede'**
+  /// **'Nombre de la sede/tanatorio'**
   String get misSedesNombreSede;
 
   /// No description provided for @misSedesEliminarTitulo.
   ///
   /// In es, this message translates to:
-  /// **'Eliminar sede'**
+  /// **'Eliminar sede/tanatorio'**
   String get misSedesEliminarTitulo;
 
   /// No description provided for @misSedesEliminarMensaje.
@@ -1799,7 +1925,7 @@ abstract class AppLocalizations {
   /// No description provided for @misSedesUltimaSedeAviso.
   ///
   /// In es, this message translates to:
-  /// **'Debe quedar al menos una sede. Para eliminar esta, primero da de alta otra.'**
+  /// **'Debe quedar al menos una sede/tanatorio. Para eliminar esta, primero da de alta otra.'**
   String get misSedesUltimaSedeAviso;
 
   /// No description provided for @misSedesCodigo.
@@ -1831,6 +1957,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Manual'**
   String get publicarManual;
+
+  /// No description provided for @publicarDeceso.
+  ///
+  /// In es, this message translates to:
+  /// **'Deceso'**
+  String get publicarDeceso;
 
   /// No description provided for @publicarImportarWeb.
   ///
@@ -1925,13 +2057,13 @@ abstract class AppLocalizations {
   /// No description provided for @publicarSeleccionaSede.
   ///
   /// In es, this message translates to:
-  /// **'Selecciona la sede'**
+  /// **'Selecciona la sede/tanatorio'**
   String get publicarSeleccionaSede;
 
   /// No description provided for @publicarSinSedes.
   ///
   /// In es, this message translates to:
-  /// **'Todavía no tienes ninguna sede. Da de alta una sede en \"Miñas sedes\" antes de publicar.'**
+  /// **'Todavía no tienes ninguna sede/tanatorio. Da de alta una en \"Miñas sedes\" antes de publicar.'**
   String get publicarSinSedes;
 
   /// No description provided for @publicarAvisoDatosPersonales.
@@ -2000,6 +2132,18 @@ abstract class AppLocalizations {
   /// **'Sala'**
   String get publicarSala;
 
+  /// No description provided for @publicarVelatorioLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Velatorio'**
+  String get publicarVelatorioLabel;
+
+  /// No description provided for @publicarEntierroLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Entierro'**
+  String get publicarEntierroLabel;
+
   /// No description provided for @publicarObservaciones.
   ///
   /// In es, this message translates to:
@@ -2017,6 +2161,102 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Detener lectura'**
   String get publicarPararEscoita;
+
+  /// No description provided for @publicarCompartirEsquela.
+  ///
+  /// In es, this message translates to:
+  /// **'Enviar por WhatsApp'**
+  String get publicarCompartirEsquela;
+
+  /// No description provided for @publicarCompartidoPor.
+  ///
+  /// In es, this message translates to:
+  /// **'Publicado por'**
+  String get publicarCompartidoPor;
+
+  /// No description provided for @publicarDescargaApp.
+  ///
+  /// In es, this message translates to:
+  /// **'Descarga TanApp:'**
+  String get publicarDescargaApp;
+
+  /// No description provided for @publicarCondolencias.
+  ///
+  /// In es, this message translates to:
+  /// **'Enviar condolencias'**
+  String get publicarCondolencias;
+
+  /// No description provided for @condolenciasCantidad.
+  ///
+  /// In es, this message translates to:
+  /// **'{n, plural, one{1 condolencia} other{{n} condolencias}}'**
+  String condolenciasCantidad(int n);
+
+  /// No description provided for @condolenciasTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Condolencias de {nombre}'**
+  String condolenciasTitulo(String nombre);
+
+  /// No description provided for @condolenciasTuCondolencia.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu condolencia'**
+  String get condolenciasTuCondolencia;
+
+  /// No description provided for @condolenciasEscribeAqui.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe aquí tu mensaje de pésame...'**
+  String get condolenciasEscribeAqui;
+
+  /// No description provided for @condolenciasTodas.
+  ///
+  /// In es, this message translates to:
+  /// **'Todas las condolencias'**
+  String get condolenciasTodas;
+
+  /// No description provided for @condolenciasVacio.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no hay ninguna condolencia.'**
+  String get condolenciasVacio;
+
+  /// No description provided for @condolenciasEliminarTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar condolencia'**
+  String get condolenciasEliminarTitulo;
+
+  /// No description provided for @condolenciasEliminarMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Eliminar tu condolencia? Esta acción no se puede deshacer.'**
+  String get condolenciasEliminarMensaje;
+
+  /// No description provided for @condolenciasDescargarPdf.
+  ///
+  /// In es, this message translates to:
+  /// **'Descargar condolencias en PDF'**
+  String get condolenciasDescargarPdf;
+
+  /// No description provided for @condolenciasPdfTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Condolencias de {nombre}'**
+  String condolenciasPdfTitulo(String nombre);
+
+  /// No description provided for @condolenciasPdfSubtitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Libro de condolencias'**
+  String get condolenciasPdfSubtitulo;
+
+  /// No description provided for @condolenciasPdfPie.
+  ///
+  /// In es, this message translates to:
+  /// **'Descarga TanApp'**
+  String get condolenciasPdfPie;
 
   /// No description provided for @publicarFuneralVoz.
   ///
@@ -2174,6 +2414,12 @@ abstract class AppLocalizations {
   /// **'Seguidores'**
   String get panelDatosSeguidores;
 
+  /// No description provided for @panelDatosSeguidoresUnicos.
+  ///
+  /// In es, this message translates to:
+  /// **'Seguidores únicos (si sigue varias sedes, cuenta una sola vez)'**
+  String get panelDatosSeguidoresUnicos;
+
   /// No description provided for @panelDatosSinSeguidores.
   ///
   /// In es, this message translates to:
@@ -2185,6 +2431,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Sin concello indicado'**
   String get panelDatosConcelloDesconocido;
+
+  /// No description provided for @panelDatosZonaSeguidores.
+  ///
+  /// In es, this message translates to:
+  /// **'{n, plural, one{+1 persona más recibe tus avisos por seguir la zona, sin seguirte a ti} other{+{n} personas más reciben tus avisos por seguir la zona, sin seguirte a ti}}'**
+  String panelDatosZonaSeguidores(int n);
 
   /// No description provided for @panelDatosPublicacionesPorMes.
   ///
@@ -2222,11 +2474,23 @@ abstract class AppLocalizations {
   /// **'Buscar por texto, cliente o concello'**
   String get tablonBuscar;
 
-  /// No description provided for @misSeguidosBuscarYFiltrar.
+  /// No description provided for @tablonSinResultados.
   ///
   /// In es, this message translates to:
-  /// **'Buscar y filtrar'**
-  String get misSeguidosBuscarYFiltrar;
+  /// **'No se ha encontrado ninguna esquela con ese texto.'**
+  String get tablonSinResultados;
+
+  /// No description provided for @tablonVacioSinSeguir.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no ves ninguna esquela aquí: sigue a un cliente o a una zona en \"Seguindo\" para que aparezcan sus publicaciones.'**
+  String get tablonVacioSinSeguir;
+
+  /// No description provided for @filtrar.
+  ///
+  /// In es, this message translates to:
+  /// **'Filtrar'**
+  String get filtrar;
 
   /// No description provided for @proximamente.
   ///
@@ -2257,6 +2521,210 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Crear cuenta de cliente'**
   String get solicitudCrearCuentaBoton;
+
+  /// No description provided for @dashboardTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Dashboard'**
+  String get dashboardTitulo;
+
+  /// No description provided for @dashboardTabClientes.
+  ///
+  /// In es, this message translates to:
+  /// **'Clientes'**
+  String get dashboardTabClientes;
+
+  /// No description provided for @dashboardTabUsuarios.
+  ///
+  /// In es, this message translates to:
+  /// **'Usuarios'**
+  String get dashboardTabUsuarios;
+
+  /// No description provided for @dashboardTabIa.
+  ///
+  /// In es, this message translates to:
+  /// **'IA'**
+  String get dashboardTabIa;
+
+  /// No description provided for @dashboardSinDatos.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no hay datos suficientes.'**
+  String get dashboardSinDatos;
+
+  /// No description provided for @dashboardClientesActivos.
+  ///
+  /// In es, this message translates to:
+  /// **'Clientes activos'**
+  String get dashboardClientesActivos;
+
+  /// No description provided for @dashboardClientesInactivos.
+  ///
+  /// In es, this message translates to:
+  /// **'Clientes inactivos'**
+  String get dashboardClientesInactivos;
+
+  /// No description provided for @dashboardSedesTotal.
+  ///
+  /// In es, this message translates to:
+  /// **'Sedes/Tanatorios'**
+  String get dashboardSedesTotal;
+
+  /// No description provided for @dashboardPublicacionesTotal.
+  ///
+  /// In es, this message translates to:
+  /// **'Publicaciones'**
+  String get dashboardPublicacionesTotal;
+
+  /// No description provided for @dashboardAvisosTotal.
+  ///
+  /// In es, this message translates to:
+  /// **'Avisos'**
+  String get dashboardAvisosTotal;
+
+  /// No description provided for @dashboardClientesPorTipo.
+  ///
+  /// In es, this message translates to:
+  /// **'Clientes por tipo'**
+  String get dashboardClientesPorTipo;
+
+  /// No description provided for @dashboardPublicacionesPorMes.
+  ///
+  /// In es, this message translates to:
+  /// **'Publicaciones por mes'**
+  String get dashboardPublicacionesPorMes;
+
+  /// No description provided for @dashboardAvisosPorMes.
+  ///
+  /// In es, this message translates to:
+  /// **'Avisos por mes'**
+  String get dashboardAvisosPorMes;
+
+  /// No description provided for @dashboardTopClientes.
+  ///
+  /// In es, this message translates to:
+  /// **'Clientes con más publicaciones'**
+  String get dashboardTopClientes;
+
+  /// No description provided for @dashboardUsuariosActivos.
+  ///
+  /// In es, this message translates to:
+  /// **'Usuarios activos'**
+  String get dashboardUsuariosActivos;
+
+  /// No description provided for @dashboardUsuariosInactivos.
+  ///
+  /// In es, this message translates to:
+  /// **'Usuarios inactivos'**
+  String get dashboardUsuariosInactivos;
+
+  /// No description provided for @dashboardUsuariosConPush.
+  ///
+  /// In es, this message translates to:
+  /// **'Con notificaciones activas'**
+  String get dashboardUsuariosConPush;
+
+  /// No description provided for @dashboardSeguimientosTotal.
+  ///
+  /// In es, this message translates to:
+  /// **'Seguimientos a clientes'**
+  String get dashboardSeguimientosTotal;
+
+  /// No description provided for @dashboardZonasSeguidasTotal.
+  ///
+  /// In es, this message translates to:
+  /// **'Zonas seguidas'**
+  String get dashboardZonasSeguidasTotal;
+
+  /// No description provided for @dashboardUsuariosPorIdioma.
+  ///
+  /// In es, this message translates to:
+  /// **'Usuarios por idioma'**
+  String get dashboardUsuariosPorIdioma;
+
+  /// No description provided for @dashboardTopConcellos.
+  ///
+  /// In es, this message translates to:
+  /// **'Concellos con más usuarios'**
+  String get dashboardTopConcellos;
+
+  /// No description provided for @dashboardIaAviso.
+  ///
+  /// In es, this message translates to:
+  /// **'Datos aproximados del escaneo de esquelas con IA (no incluye la importación automática desde web). El coste es una estimación propia a partir de los tokens de cada petición, no el saldo real de la cuenta de Anthropic.'**
+  String get dashboardIaAviso;
+
+  /// No description provided for @dashboardIaPeticionesHoy.
+  ///
+  /// In es, this message translates to:
+  /// **'Peticiones hoy'**
+  String get dashboardIaPeticionesHoy;
+
+  /// No description provided for @dashboardIaCostoHoy.
+  ///
+  /// In es, this message translates to:
+  /// **'Coste estimado hoy'**
+  String get dashboardIaCostoHoy;
+
+  /// No description provided for @dashboardIaPeticionesMes.
+  ///
+  /// In es, this message translates to:
+  /// **'Peticiones este mes'**
+  String get dashboardIaPeticionesMes;
+
+  /// No description provided for @dashboardIaCostoMes.
+  ///
+  /// In es, this message translates to:
+  /// **'Coste estimado este mes'**
+  String get dashboardIaCostoMes;
+
+  /// No description provided for @dashboardIaPeticionesTotal.
+  ///
+  /// In es, this message translates to:
+  /// **'Peticiones totales'**
+  String get dashboardIaPeticionesTotal;
+
+  /// No description provided for @dashboardIaCostoTotal.
+  ///
+  /// In es, this message translates to:
+  /// **'Coste estimado total'**
+  String get dashboardIaCostoTotal;
+
+  /// No description provided for @dashboardIaTasaExito.
+  ///
+  /// In es, this message translates to:
+  /// **'Tasa de éxito'**
+  String get dashboardIaTasaExito;
+
+  /// No description provided for @dashboardIaPeticionesPorDia.
+  ///
+  /// In es, this message translates to:
+  /// **'Peticiones por día (últimos 30 días)'**
+  String get dashboardIaPeticionesPorDia;
+
+  /// No description provided for @dashboardIaUsoPorUsuario.
+  ///
+  /// In es, this message translates to:
+  /// **'Uso por usuario este mes'**
+  String get dashboardIaUsoPorUsuario;
+
+  /// No description provided for @dashboardIaColUsuario.
+  ///
+  /// In es, this message translates to:
+  /// **'Usuario'**
+  String get dashboardIaColUsuario;
+
+  /// No description provided for @dashboardIaColPeticiones.
+  ///
+  /// In es, this message translates to:
+  /// **'Peticiones'**
+  String get dashboardIaColPeticiones;
+
+  /// No description provided for @dashboardIaColCosto.
+  ///
+  /// In es, this message translates to:
+  /// **'Coste estimado'**
+  String get dashboardIaColCosto;
 }
 
 class _AppLocalizationsDelegate

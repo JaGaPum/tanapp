@@ -20,16 +20,26 @@ class ArchivoScreen extends ConsumerWidget {
       child: archivadasAsync.cargandoInicial
           ? const Center(child: CircularProgressIndicator())
           : archivadasAsync.error != null
-              ? Center(child: Text(context.l10n.errorGenerico(archivadasAsync.error.toString())))
-              : archivadasAsync.items.isEmpty
-                  ? EmptyState(message: context.l10n.arquivoVacio, icon: Icons.bookmark_border)
-                  : PaginatedListView<PublicacionConSede>(
-                      items: archivadasAsync.items,
-                      cargandoMas: archivadasAsync.cargandoMas,
-                      hasMore: archivadasAsync.hasMore,
-                      onCargarMas: () => ref.read(misPublicacionesArchivadasProvider.notifier).cargarMas(),
-                      itemBuilder: (context, publicacion) => PublicacionCard(publicacion: publicacion),
-                    ),
+          ? Center(
+              child: Text(
+                context.l10n.errorGenerico(archivadasAsync.error.toString()),
+              ),
+            )
+          : archivadasAsync.items.isEmpty
+          ? EmptyState(
+              message: context.l10n.arquivoVacio,
+              icon: Icons.bookmark_border,
+            )
+          : PaginatedListView<PublicacionConSede>(
+              items: archivadasAsync.items,
+              cargandoMas: archivadasAsync.cargandoMas,
+              hasMore: archivadasAsync.hasMore,
+              onCargarMas: () => ref
+                  .read(misPublicacionesArchivadasProvider.notifier)
+                  .cargarMas(),
+              itemBuilder: (context, publicacion) =>
+                  PublicacionCard(publicacion: publicacion),
+            ),
     );
   }
 }

@@ -29,12 +29,20 @@ class ConfiguracionProvinciasScreen extends ConsumerWidget {
       body: provinciasAsync.when(
         data: (provincias) {
           if (provincias.isEmpty) {
-            return EmptyState(message: context.l10n.noHayProvinciasDadasDeAlta, icon: Icons.map_outlined);
+            return EmptyState(
+              message: context.l10n.noHayProvinciasDadasDeAlta,
+              icon: Icons.map_outlined,
+            );
           }
           return RefreshIndicator(
             onRefresh: () => ref.refresh(provinciasProvider.future),
             child: ListView.separated(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.fromLTRB(
+                16,
+                16,
+                16,
+                16 + MediaQuery.of(context).padding.bottom,
+              ),
               itemCount: provincias.length,
               separatorBuilder: (_, _) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
@@ -42,14 +50,20 @@ class ConfiguracionProvinciasScreen extends ConsumerWidget {
                 return Card(
                   child: ListTile(
                     title: Text(provincia.nombre),
-                    subtitle: Text(context.l10n.prefijoPostalLabel(provincia.prefijoPostal)),
+                    subtitle: Text(
+                      context.l10n.prefijoPostalLabel(provincia.prefijoPostal),
+                    ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
                           icon: const Icon(Icons.edit_outlined),
                           tooltip: context.l10n.editar,
-                          onPressed: () => _mostrarFormulario(context, ref, provincia: provincia),
+                          onPressed: () => _mostrarFormulario(
+                            context,
+                            ref,
+                            provincia: provincia,
+                          ),
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete_outline),
@@ -58,8 +72,9 @@ class ConfiguracionProvinciasScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    onTap: () =>
-                        context.push('/admin/configuracion/provincias/${provincia.idConfiguracionProvincia}'),
+                    onTap: () => context.push(
+                      '/admin/configuracion/provincias/${provincia.idConfiguracionProvincia}',
+                    ),
                   ),
                 );
               },
@@ -67,12 +82,17 @@ class ConfiguracionProvinciasScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorGenerico(e.toString()))),
       ),
     );
   }
 
-  Future<void> _eliminar(BuildContext context, WidgetRef ref, Provincia provincia) async {
+  Future<void> _eliminar(
+    BuildContext context,
+    WidgetRef ref,
+    Provincia provincia,
+  ) async {
     final confirmado = await showConfirmDialog(
       context,
       title: context.l10n.provinciaEliminarTitulo,
@@ -80,11 +100,17 @@ class ConfiguracionProvinciasScreen extends ConsumerWidget {
       confirmLabel: context.l10n.eliminar,
     );
     if (!confirmado) return;
-    await ref.read(configuracionRepositoryProvider).eliminarProvincia(provincia.idConfiguracionProvincia);
+    await ref
+        .read(configuracionRepositoryProvider)
+        .eliminarProvincia(provincia.idConfiguracionProvincia);
     ref.invalidate(provinciasProvider);
   }
 
-  Future<void> _mostrarFormulario(BuildContext context, WidgetRef ref, {Provincia? provincia}) async {
+  Future<void> _mostrarFormulario(
+    BuildContext context,
+    WidgetRef ref, {
+    Provincia? provincia,
+  }) async {
     await showDialog<void>(
       context: context,
       builder: (context) => _ProvinciaFormDialog(provincia: provincia),
@@ -98,13 +124,18 @@ class _ProvinciaFormDialog extends ConsumerStatefulWidget {
   const _ProvinciaFormDialog({this.provincia});
 
   @override
-  ConsumerState<_ProvinciaFormDialog> createState() => _ProvinciaFormDialogState();
+  ConsumerState<_ProvinciaFormDialog> createState() =>
+      _ProvinciaFormDialogState();
 }
 
 class _ProvinciaFormDialogState extends ConsumerState<_ProvinciaFormDialog> {
   final _formKey = GlobalKey<FormState>();
-  late final _nombreController = TextEditingController(text: widget.provincia?.nombre ?? '');
-  late final _prefijoController = TextEditingController(text: widget.provincia?.prefijoPostal ?? '');
+  late final _nombreController = TextEditingController(
+    text: widget.provincia?.nombre ?? '',
+  );
+  late final _prefijoController = TextEditingController(
+    text: widget.provincia?.prefijoPostal ?? '',
+  );
   bool _loading = false;
   String? _error;
 
@@ -124,7 +155,10 @@ class _ProvinciaFormDialogState extends ConsumerState<_ProvinciaFormDialog> {
     final repo = ref.read(configuracionRepositoryProvider);
     try {
       if (widget.provincia == null) {
-        await repo.crearProvincia(nombre: _nombreController.text, prefijoPostal: _prefijoController.text);
+        await repo.crearProvincia(
+          nombre: _nombreController.text,
+          prefijoPostal: _prefijoController.text,
+        );
       } else {
         await repo.actualizarProvincia(
           idConfiguracionProvincia: widget.provincia!.idConfiguracionProvincia,
@@ -134,7 +168,11 @@ class _ProvinciaFormDialogState extends ConsumerState<_ProvinciaFormDialog> {
       }
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.errorInesperado);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.errorInesperado,
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -143,7 +181,11 @@ class _ProvinciaFormDialogState extends ConsumerState<_ProvinciaFormDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.provincia == null ? context.l10n.provinciaNueva : context.l10n.provinciaEditar),
+      title: Text(
+        widget.provincia == null
+            ? context.l10n.provinciaNueva
+            : context.l10n.provinciaEditar,
+      ),
       content: Form(
         key: _formKey,
         child: Column(
@@ -154,21 +196,32 @@ class _ProvinciaFormDialogState extends ConsumerState<_ProvinciaFormDialog> {
             AppTextField(
               controller: _nombreController,
               label: context.l10n.fieldNombre,
-              validator: (v) => v == null || v.trim().isEmpty ? context.l10n.errorNombreRequerido : null,
+              validator: (v) => v == null || v.trim().isEmpty
+                  ? context.l10n.errorNombreRequerido
+                  : null,
             ),
             const SizedBox(height: 16),
             AppTextField(
               controller: _prefijoController,
               label: context.l10n.fieldPrefijoPostal,
               keyboardType: TextInputType.number,
-              validator: (v) => v == null || v.trim().isEmpty ? context.l10n.errorPrefijoRequerido : null,
+              validator: (v) => v == null || v.trim().isEmpty
+                  ? context.l10n.errorPrefijoRequerido
+                  : null,
             ),
           ],
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(context.l10n.confirmDialogCancel)),
-        AppButton(label: context.l10n.guardar, loading: _loading, onPressed: _guardar),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(context.l10n.confirmDialogCancel),
+        ),
+        AppButton(
+          label: context.l10n.guardar,
+          loading: _loading,
+          onPressed: _guardar,
+        ),
       ],
     );
   }

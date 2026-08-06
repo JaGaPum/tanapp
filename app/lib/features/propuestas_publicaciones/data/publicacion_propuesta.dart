@@ -34,9 +34,12 @@ class PublicacionPropuesta {
     final fechaFuneral = map['FechaFuneral'] as String?;
     final horaFuneralCruda = map['HoraFuneral'] as String?;
     return PublicacionPropuesta(
-      idClientePublicacionPropuesta: map['IdClientePublicacionPropuesta'] as String,
+      idClientePublicacionPropuesta:
+          map['IdClientePublicacionPropuesta'] as String,
       nombreFallecido: map['NombreFallecido'] as String,
-      fechaFallecimiento: fechaFallecimiento != null ? DateTime.parse(fechaFallecimiento) : null,
+      fechaFallecimiento: fechaFallecimiento != null
+          ? DateTime.parse(fechaFallecimiento)
+          : null,
       edad: map['Edad'] as int?,
       fechaFuneral: fechaFuneral != null ? DateTime.parse(fechaFuneral) : null,
       horaFuneral: horaFuneralCruda != null && horaFuneralCruda.length >= 5

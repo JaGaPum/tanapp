@@ -39,45 +39,66 @@ class AppDrawer extends ConsumerWidget {
       backgroundColor: AppColors.black,
       child: SafeArea(
         child: ListTileTheme(
-          data: const ListTileThemeData(iconColor: AppColors.white, textColor: AppColors.white),
+          data: const ListTileThemeData(
+            iconColor: AppColors.white,
+            textColor: AppColors.white,
+          ),
           child: Column(
             children: [
               DrawerHeader(
                 decoration: const BoxDecoration(color: AppColors.black),
                 child: perfilAsync.when(
                   data: (perfil) {
-                    final iniciales = [perfil?.nombre, perfil?.apellido1]
-                        .where((s) => s != null && s.trim().isNotEmpty)
-                        .map((s) => s!.trim()[0].toUpperCase())
+                    final nombreMostrado = perfil?.nombrePublico ?? '';
+                    final iniciales = nombreMostrado
+                        .split(' ')
+                        .where((s) => s.trim().isNotEmpty)
+                        .map((s) => s.trim()[0].toUpperCase())
+                        .take(2)
                         .join();
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         CircleAvatar(
-                          backgroundColor: AppColors.brown,
-                          backgroundImage: perfil?.fotoUrl != null ? NetworkImage(perfil!.fotoUrl!) : null,
+                          backgroundColor: AppColors.plum,
+                          backgroundImage: perfil?.fotoUrl != null
+                              ? NetworkImage(perfil!.fotoUrl!)
+                              : null,
                           child: perfil?.fotoUrl == null
                               ? Text(
                                   iniciales.isNotEmpty ? iniciales : '?',
-                                  style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w600),
+                                  style: const TextStyle(
+                                    color: AppColors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 )
                               : null,
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          [perfil?.nombre, perfil?.apellido1].where((s) => s != null && s.isNotEmpty).join(' '),
-                          style: const TextStyle(color: AppColors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                          nombreMostrado,
+                          style: const TextStyle(
+                            color: AppColors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         Text(
                           perfil?.email ?? '',
-                          style: const TextStyle(color: Colors.white70, fontSize: 13),
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 13,
+                          ),
                         ),
                       ],
                     );
                   },
-                  loading: () => const Center(child: CircularProgressIndicator(color: AppColors.white)),
-                  error: (e, _) => const Icon(Icons.error_outline, color: AppColors.white),
+                  loading: () => const Center(
+                    child: CircularProgressIndicator(color: AppColors.white),
+                  ),
+                  error: (e, _) =>
+                      const Icon(Icons.error_outline, color: AppColors.white),
                 ),
               ),
               ListTile(
@@ -97,6 +118,12 @@ class AppDrawer extends ConsumerWidget {
                   title: Text(context.l10n.drawerConfiguracion),
                   onTap: () => _navigate(context, '/admin/configuracion'),
                 ),
+              if (isAdmin)
+                ListTile(
+                  leading: const Icon(Icons.bar_chart_outlined),
+                  title: Text(context.l10n.drawerDashboard),
+                  onTap: () => _navigate(context, '/admin/dashboard'),
+                ),
               if (isCliente)
                 ListTile(
                   leading: const Icon(Icons.storefront_outlined),
@@ -108,7 +135,10 @@ class AppDrawer extends ConsumerWidget {
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: Transform.scale(scale: 0.7, child: const XagaLabsLogo(dark: true)),
+                  child: Transform.scale(
+                    scale: 0.7,
+                    child: const XagaLabsLogo(dark: true),
+                  ),
                 ),
               ),
               const Divider(height: 1, color: Colors.white24),

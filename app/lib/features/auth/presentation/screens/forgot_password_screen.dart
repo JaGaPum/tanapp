@@ -14,7 +14,8 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
 }
 
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
@@ -36,12 +37,21 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       _error = null;
     });
     try {
-      await ref.read(authRepositoryProvider).requestPasswordReset(email: _emailController.text);
+      await ref
+          .read(authRepositoryProvider)
+          .requestPasswordReset(email: _emailController.text);
       if (mounted) {
-        context.push('/forgot-password/verify', extra: _emailController.text.trim());
+        context.push(
+          '/forgot-password/verify',
+          extra: _emailController.text.trim(),
+        );
       }
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.errorInesperado);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.errorInesperado,
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -75,7 +85,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       validator: Validators.email(context),
                     ),
                     const SizedBox(height: 24),
-                    AppButton(label: context.l10n.forgotPasswordEnviarCodigo, loading: _loading, onPressed: _submit),
+                    AppButton(
+                      label: context.l10n.forgotPasswordEnviarCodigo,
+                      loading: _loading,
+                      onPressed: _submit,
+                    ),
                   ],
                 ),
               ),

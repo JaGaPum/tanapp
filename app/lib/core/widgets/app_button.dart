@@ -22,7 +22,9 @@ class AppButton extends StatelessWidget {
             width: 20,
             child: CircularProgressIndicator(
               strokeWidth: 2,
-              color: secondary ? Theme.of(context).colorScheme.primary : Colors.white,
+              color: secondary
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.white,
             ),
           )
         : Text(label);
@@ -30,12 +32,18 @@ class AppButton extends StatelessWidget {
     if (secondary) {
       return SizedBox(
         width: double.infinity,
-        child: OutlinedButton(onPressed: loading ? null : onPressed, child: child),
+        child: OutlinedButton(
+          onPressed: loading ? null : onPressed,
+          child: child,
+        ),
       );
     }
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton(onPressed: loading ? null : onPressed, child: child),
+      child: ElevatedButton(
+        onPressed: loading ? null : onPressed,
+        child: child,
+      ),
     );
   }
 }

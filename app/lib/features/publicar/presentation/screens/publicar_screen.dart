@@ -3,12 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/l10n_extensions.dart';
+import '../../../../core/widgets/cruz_icon.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../auth/application/auth_providers.dart';
 import '../../../cliente_tipos/application/cliente_tipos_providers.dart';
-import '../../../configuracion/application/configuracion_providers.dart';
-import '../../../importacion_web/application/importacion_web_providers.dart';
-import '../../../propuestas_publicaciones/application/propuestas_providers.dart';
 import '../../../seguidos/presentation/widgets/big_choice_card.dart';
 
 const _tiposHabilitados = {'Funeraria', 'Tanatorio'};
@@ -20,21 +18,23 @@ class PublicarScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final perfilAsync = ref.watch(currentUserProfileProvider);
     final tiposAsync = ref.watch(clienteTiposListProvider);
-    final propuestasPendientes = ref.watch(propuestasPendientesCountProvider);
-    final importacionWebConfigurada =
-        ref.watch(miImportacionWebProvider).maybeWhen(data: (config) => config != null, orElse: () => false);
-    final importacionWebIaActiva =
-        ref.watch(importacionWebIaActivaProvider).maybeWhen(data: (activa) => activa, orElse: () => false);
 
     return perfilAsync.when(
       data: (perfil) => tiposAsync.when(
         data: (tipos) {
           final tipoNombre = tipos
-              .where((t) => t.idConfiguracionClienteTipo == perfil?.idConfiguracionClienteTipo)
+              .where(
+                (t) =>
+                    t.idConfiguracionClienteTipo ==
+                    perfil?.idConfiguracionClienteTipo,
+              )
               .map((t) => t.nombre)
               .firstOrNull;
           if (tipoNombre == null || !_tiposHabilitados.contains(tipoNombre)) {
-            return EmptyState(message: context.l10n.proximamente, icon: Icons.campaign_outlined);
+            return EmptyState(
+              message: context.l10n.proximamente,
+              icon: Icons.campaign_outlined,
+            );
           }
           return Padding(
             padding: const EdgeInsets.all(16),
@@ -52,17 +52,8 @@ class PublicarScreen extends ConsumerWidget {
                         width: anchoTarjeta,
                         height: anchoTarjeta,
                         child: BigChoiceCard(
-                          icon: const Icon(Icons.document_scanner_outlined, size: 48),
-                          label: context.l10n.publicarEscanear,
-                          onTap: () => context.push('/publicar/escanear'),
-                        ),
-                      ),
-                      SizedBox(
-                        width: anchoTarjeta,
-                        height: anchoTarjeta,
-                        child: BigChoiceCard(
-                          icon: const Icon(Icons.edit_note_outlined, size: 48),
-                          label: context.l10n.publicarManual,
+                          icon: const CruzIcon(size: 48),
+                          label: context.l10n.publicarDeceso,
                           onTap: () => context.push('/publicar/manual'),
                         ),
                       ),
@@ -75,32 +66,6 @@ class PublicarScreen extends ConsumerWidget {
                           onTap: () => context.push('/publicar/avisos'),
                         ),
                       ),
-                      if (importacionWebIaActiva)
-                        if (!importacionWebConfigurada)
-                          SizedBox(
-                            width: anchoTarjeta,
-                            height: anchoTarjeta,
-                            child: BigChoiceCard(
-                              icon: const Icon(Icons.travel_explore, size: 48),
-                              label: context.l10n.publicarImportarWeb,
-                              onTap: () => context.push('/publicar/importar-web'),
-                            ),
-                          )
-                        else
-                          SizedBox(
-                            width: anchoTarjeta,
-                            height: anchoTarjeta,
-                            child: BigChoiceCard(
-                              icon: Badge(
-                                isLabelVisible: propuestasPendientes > 0,
-                                label: Text('$propuestasPendientes'),
-                                backgroundColor: const Color(0xFFD50000),
-                                child: const Icon(Icons.fact_check_outlined, size: 48),
-                              ),
-                              label: context.l10n.publicarPropuestas,
-                              onTap: () => context.push('/publicar/propuestas'),
-                            ),
-                          ),
                     ],
                   ),
                 );
@@ -109,10 +74,12 @@ class PublicarScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorGenerico(e.toString()))),
       ),
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+      error: (e, _) =>
+          Center(child: Text(context.l10n.errorGenerico(e.toString()))),
     );
   }
 }

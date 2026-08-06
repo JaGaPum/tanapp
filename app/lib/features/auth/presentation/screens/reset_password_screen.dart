@@ -14,7 +14,8 @@ class ResetPasswordScreen extends ConsumerStatefulWidget {
   const ResetPasswordScreen({super.key});
 
   @override
-  ConsumerState<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+  ConsumerState<ResetPasswordScreen> createState() =>
+      _ResetPasswordScreenState();
 }
 
 class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
@@ -44,12 +45,16 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
       await repo.signOut();
       if (mounted) {
         context.go('/login');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(actualizadaMensaje)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(actualizadaMensaje)));
       }
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.errorInesperado);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.errorInesperado,
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -80,10 +85,17 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     PasswordField(
                       controller: _confirmController,
                       label: context.l10n.fieldConfirmarContrasena,
-                      validator: Validators.confirmPassword(context, () => _passwordController.text),
+                      validator: Validators.confirmPassword(
+                        context,
+                        () => _passwordController.text,
+                      ),
                     ),
                     const SizedBox(height: 24),
-                    AppButton(label: context.l10n.resetPasswordGuardar, loading: _loading, onPressed: _submit),
+                    AppButton(
+                      label: context.l10n.resetPasswordGuardar,
+                      loading: _loading,
+                      onPressed: _submit,
+                    ),
                   ],
                 ),
               ),

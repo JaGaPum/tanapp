@@ -19,10 +19,12 @@ class SeguidosConcellosScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<SeguidosConcellosScreen> createState() => _SeguidosConcellosScreenState();
+  ConsumerState<SeguidosConcellosScreen> createState() =>
+      _SeguidosConcellosScreenState();
 }
 
-class _SeguidosConcellosScreenState extends ConsumerState<SeguidosConcellosScreen> {
+class _SeguidosConcellosScreenState
+    extends ConsumerState<SeguidosConcellosScreen> {
   final _busquedaController = TextEditingController();
 
   @override
@@ -33,8 +35,11 @@ class _SeguidosConcellosScreenState extends ConsumerState<SeguidosConcellosScree
 
   List<Concello> _ordenados(List<Concello> concellos, String? concelloPropio) {
     final termino = _busquedaController.text.trim().toLowerCase();
-    final filtrados =
-        termino.isEmpty ? concellos : concellos.where((c) => c.nombre.toLowerCase().contains(termino)).toList();
+    final filtrados = termino.isEmpty
+        ? concellos
+        : concellos
+              .where((c) => c.nombre.toLowerCase().contains(termino))
+              .toList();
     final ordenados = [...filtrados]
       ..sort((a, b) {
         if (concelloPropio != null) {
@@ -50,7 +55,9 @@ class _SeguidosConcellosScreenState extends ConsumerState<SeguidosConcellosScree
 
   @override
   Widget build(BuildContext context) {
-    final concellosAsync = ref.watch(concellosPorProvinciaProvider(widget.idConfiguracionProvincia));
+    final concellosAsync = ref.watch(
+      concellosPorProvinciaProvider(widget.idConfiguracionProvincia),
+    );
     final perfilAsync = ref.watch(currentUserProfileProvider);
     final concelloPropio = perfilAsync.value?.concello;
 
@@ -81,14 +88,23 @@ class _SeguidosConcellosScreenState extends ConsumerState<SeguidosConcellosScree
                     );
                   }
                   return ListView.separated(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).padding.bottom,
+                    ),
                     itemCount: ordenados.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 8),
                     itemBuilder: (context, index) {
                       final concello = ordenados[index];
                       return Card(
                         child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                          title: Text(concello.nombre, style: Theme.of(context).textTheme.titleLarge),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
+                          title: Text(
+                            concello.nombre,
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () => context.push(
                             '/seguidos/${widget.idConfiguracionClienteTipo}/provincias/'
@@ -100,7 +116,9 @@ class _SeguidosConcellosScreenState extends ConsumerState<SeguidosConcellosScree
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+                error: (e, _) => Center(
+                  child: Text(context.l10n.errorGenerico(e.toString())),
+                ),
               ),
             ),
           ],

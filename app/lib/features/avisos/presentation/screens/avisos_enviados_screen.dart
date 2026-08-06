@@ -15,7 +15,8 @@ class AvisosEnviadosScreen extends ConsumerStatefulWidget {
   const AvisosEnviadosScreen({super.key});
 
   @override
-  ConsumerState<AvisosEnviadosScreen> createState() => _AvisosEnviadosScreenState();
+  ConsumerState<AvisosEnviadosScreen> createState() =>
+      _AvisosEnviadosScreenState();
 }
 
 class _AvisosEnviadosScreenState extends ConsumerState<AvisosEnviadosScreen> {
@@ -59,7 +60,9 @@ class _AvisosEnviadosScreenState extends ConsumerState<AvisosEnviadosScreen> {
     if (!confirmado) return;
     setState(() => _procesando = true);
     try {
-      await ref.read(avisosRepositoryProvider).eliminarAvisoEnviado(aviso.idClienteAviso);
+      await ref
+          .read(avisosRepositoryProvider)
+          .eliminarAvisoEnviado(aviso.idClienteAviso);
       ref.invalidate(misAvisosEnviadosProvider);
     } finally {
       if (mounted) setState(() => _procesando = false);
@@ -70,13 +73,17 @@ class _AvisosEnviadosScreenState extends ConsumerState<AvisosEnviadosScreen> {
     final confirmado = await showConfirmDialog(
       context,
       title: context.l10n.avisosEliminarTitulo,
-      message: context.l10n.avisosEliminarSeleccionadosMensaje(_seleccionados.length),
+      message: context.l10n.avisosEliminarSeleccionadosMensaje(
+        _seleccionados.length,
+      ),
       confirmLabel: context.l10n.eliminar,
     );
     if (!confirmado) return;
     setState(() => _procesando = true);
     try {
-      await ref.read(avisosRepositoryProvider).eliminarAvisosEnviados(_seleccionados.toList());
+      await ref
+          .read(avisosRepositoryProvider)
+          .eliminarAvisosEnviados(_seleccionados.toList());
       ref.invalidate(misAvisosEnviadosProvider);
       _cancelarSeleccion();
     } finally {
@@ -97,7 +104,9 @@ class _AvisosEnviadosScreenState extends ConsumerState<AvisosEnviadosScreen> {
       final sedes = await ref.read(misSedesProvider.future);
       await ref
           .read(avisosRepositoryProvider)
-          .eliminarTodosAvisosEnviados(sedes.map((s) => s.idClienteSede).toList());
+          .eliminarTodosAvisosEnviados(
+            sedes.map((s) => s.idClienteSede).toList(),
+          );
       ref.invalidate(misAvisosEnviadosProvider);
       _cancelarSeleccion();
     } finally {
@@ -113,10 +122,15 @@ class _AvisosEnviadosScreenState extends ConsumerState<AvisosEnviadosScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     if (resultado.error != null) {
-      return Center(child: Text(context.l10n.errorGenerico(resultado.error.toString())));
+      return Center(
+        child: Text(context.l10n.errorGenerico(resultado.error.toString())),
+      );
     }
     if (resultado.items.isEmpty) {
-      return EmptyState(message: context.l10n.avisosVacioEnviados, icon: Icons.campaign_outlined);
+      return EmptyState(
+        message: context.l10n.avisosVacioEnviados,
+        icon: Icons.campaign_outlined,
+      );
     }
 
     return Padding(
@@ -127,7 +141,11 @@ class _AvisosEnviadosScreenState extends ConsumerState<AvisosEnviadosScreen> {
           if (_seleccionando)
             Row(
               children: [
-                Expanded(child: Text(context.l10n.avisosNSeleccionados(_seleccionados.length))),
+                Expanded(
+                  child: Text(
+                    context.l10n.avisosNSeleccionados(_seleccionados.length),
+                  ),
+                ),
                 TextButton(
                   onPressed: _procesando ? null : _cancelarSeleccion,
                   child: Text(context.l10n.avisosCancelarSeleccion),
@@ -135,7 +153,9 @@ class _AvisosEnviadosScreenState extends ConsumerState<AvisosEnviadosScreen> {
                 FilledButton.icon(
                   icon: const Icon(Icons.delete_outline),
                   label: Text(context.l10n.eliminar),
-                  onPressed: _procesando || _seleccionados.isEmpty ? null : _eliminarSeleccionados,
+                  onPressed: _procesando || _seleccionados.isEmpty
+                      ? null
+                      : _eliminarSeleccionados,
                 ),
               ],
             )
@@ -156,13 +176,16 @@ class _AvisosEnviadosScreenState extends ConsumerState<AvisosEnviadosScreen> {
               items: resultado.items,
               cargandoMas: resultado.cargandoMas,
               hasMore: resultado.hasMore,
-              onCargarMas: () => ref.read(misAvisosEnviadosProvider.notifier).cargarMas(),
+              onCargarMas: () =>
+                  ref.read(misAvisosEnviadosProvider.notifier).cargarMas(),
               itemBuilder: (context, aviso) => _AvisoEnviadoCard(
                 aviso: aviso,
                 seleccionando: _seleccionando,
                 seleccionado: _seleccionados.contains(aviso.idClienteAviso),
-                onIniciarSeleccion: () => _iniciarSeleccion(aviso.idClienteAviso),
-                onAlternarSeleccion: () => _alternarSeleccion(aviso.idClienteAviso),
+                onIniciarSeleccion: () =>
+                    _iniciarSeleccion(aviso.idClienteAviso),
+                onAlternarSeleccion: () =>
+                    _alternarSeleccion(aviso.idClienteAviso),
                 onEliminar: () => _eliminarUno(aviso),
               ),
             ),
@@ -202,23 +225,31 @@ class _AvisoEnviadoCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (seleccionando) ...[
-                Checkbox(value: seleccionado, onChanged: (_) => onAlternarSeleccion()),
+                Checkbox(
+                  value: seleccionado,
+                  onChanged: (_) => onAlternarSeleccion(),
+                ),
                 const SizedBox(width: 4),
               ],
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(aviso.titulo, style: Theme.of(context).textTheme.titleLarge),
+                    Text(
+                      aviso.titulo,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
                     const SizedBox(height: 4),
                     Text(
                       context.l10n.avisosEnviadoEl(
-                        DateFormat('dd/MM/yyyy').format(aviso.fechaAlta.toLocal()),
+                        DateFormat(
+                          'dd/MM/yyyy',
+                        ).format(aviso.fechaAlta.toLocal()),
                         DateFormat('HH:mm').format(aviso.fechaAlta.toLocal()),
                       ),
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.outline),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     Text(aviso.texto),
@@ -226,9 +257,9 @@ class _AvisoEnviadoCard extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text(
                         aviso.nombreSede,
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.outline),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
                       ),
                     ],
                   ],

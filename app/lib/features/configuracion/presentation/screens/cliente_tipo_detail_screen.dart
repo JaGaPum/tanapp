@@ -23,9 +23,14 @@ class ClienteTipoDetailScreen extends ConsumerWidget {
     if (id == null) {
       return Scaffold(
         appBar: AppBar(title: Text(context.l10n.clienteTipoNuevo)),
-        body: const SingleChildScrollView(
-          padding: EdgeInsets.all(24),
-          child: Center(child: _ClienteTipoForm(clienteTipo: null)),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(
+            24,
+            24,
+            24,
+            24 + MediaQuery.of(context).padding.bottom,
+          ),
+          child: const Center(child: _ClienteTipoForm(clienteTipo: null)),
         ),
       );
     }
@@ -35,11 +40,17 @@ class ClienteTipoDetailScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(context.l10n.clienteTipoEditar)),
       body: clienteTipoAsync.when(
         data: (clienteTipo) => SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.fromLTRB(
+            24,
+            24,
+            24,
+            24 + MediaQuery.of(context).padding.bottom,
+          ),
           child: Center(child: _ClienteTipoForm(clienteTipo: clienteTipo)),
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorGenerico(e.toString()))),
       ),
     );
   }
@@ -55,7 +66,9 @@ class _ClienteTipoForm extends ConsumerStatefulWidget {
 
 class _ClienteTipoFormState extends ConsumerState<_ClienteTipoForm> {
   final _formKey = GlobalKey<FormState>();
-  late final _nombreController = TextEditingController(text: widget.clienteTipo?.nombre ?? '');
+  late final _nombreController = TextEditingController(
+    text: widget.clienteTipo?.nombre ?? '',
+  );
   late bool _activo = widget.clienteTipo?.activo ?? true;
   bool _loading = false;
   String? _error;
@@ -75,23 +88,41 @@ class _ClienteTipoFormState extends ConsumerState<_ClienteTipoForm> {
     final repo = ref.read(clienteTiposRepositoryProvider);
     try {
       if (widget.clienteTipo == null) {
-        final nuevoId = await repo.crearClienteTipo(nombre: _nombreController.text, activo: _activo);
-        ref.invalidate(clienteTiposListProvider);
-        if (mounted) context.pushReplacement('/admin/configuracion/tipos-cliente/$nuevoId');
-      } else {
-        await repo.actualizarClienteTipo(
-          idConfiguracionClienteTipo: widget.clienteTipo!.idConfiguracionClienteTipo,
+        final nuevoId = await repo.crearClienteTipo(
           nombre: _nombreController.text,
           activo: _activo,
         );
         ref.invalidate(clienteTiposListProvider);
-        ref.invalidate(clienteTipoDetailProvider(widget.clienteTipo!.idConfiguracionClienteTipo));
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.cambiosGuardados)));
+          context.pushReplacement(
+            '/admin/configuracion/tipos-cliente/$nuevoId',
+          );
+        }
+      } else {
+        await repo.actualizarClienteTipo(
+          idConfiguracionClienteTipo:
+              widget.clienteTipo!.idConfiguracionClienteTipo,
+          nombre: _nombreController.text,
+          activo: _activo,
+        );
+        ref.invalidate(clienteTiposListProvider);
+        ref.invalidate(
+          clienteTipoDetailProvider(
+            widget.clienteTipo!.idConfiguracionClienteTipo,
+          ),
+        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(context.l10n.cambiosGuardados)),
+          );
         }
       }
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.errorInesperado);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.errorInesperado,
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -113,7 +144,10 @@ class _ClienteTipoFormState extends ConsumerState<_ClienteTipoForm> {
                 AppTextField(
                   controller: _nombreController,
                   label: context.l10n.fieldNombre,
-                  validator: Validators.required(context, context.l10n.fieldNombre),
+                  validator: Validators.required(
+                    context,
+                    context.l10n.fieldNombre,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 SwitchListTile(
@@ -123,7 +157,11 @@ class _ClienteTipoFormState extends ConsumerState<_ClienteTipoForm> {
                   contentPadding: EdgeInsets.zero,
                 ),
                 const SizedBox(height: 8),
-                AppButton(label: context.l10n.guardar, loading: _loading, onPressed: _guardar),
+                AppButton(
+                  label: context.l10n.guardar,
+                  loading: _loading,
+                  onPressed: _guardar,
+                ),
               ],
             ),
           ),
@@ -131,7 +169,9 @@ class _ClienteTipoFormState extends ConsumerState<_ClienteTipoForm> {
             const SizedBox(height: 40),
             Text(
               context.l10n.clienteTipoTraduccionesPorIdioma,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             _TraduccionesSection(clienteTipo: widget.clienteTipo!),
@@ -189,7 +229,9 @@ class _TraduccionCard extends ConsumerStatefulWidget {
 }
 
 class _TraduccionCardState extends ConsumerState<_TraduccionCard> {
-  late final _nombreController = TextEditingController(text: widget.traduccionExistente?.nombre ?? '');
+  late final _nombreController = TextEditingController(
+    text: widget.traduccionExistente?.nombre ?? '',
+  );
   bool _loading = false;
   String? _error;
 
@@ -205,19 +247,36 @@ class _TraduccionCardState extends ConsumerState<_TraduccionCard> {
       _error = null;
     });
     try {
-      await ref.read(clienteTiposRepositoryProvider).guardarTraduccion(
-            idConfiguracionClienteTipo: widget.clienteTipo.idConfiguracionClienteTipo,
+      await ref
+          .read(clienteTiposRepositoryProvider)
+          .guardarTraduccion(
+            idConfiguracionClienteTipo:
+                widget.clienteTipo.idConfiguracionClienteTipo,
             idSistemaIdioma: widget.idIdioma,
             nombre: _nombreController.text,
           );
-      ref.invalidate(clienteTipoDetailProvider(widget.clienteTipo.idConfiguracionClienteTipo));
+      ref.invalidate(
+        clienteTipoDetailProvider(
+          widget.clienteTipo.idConfiguracionClienteTipo,
+        ),
+      );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.clienteTipoTraduccionGuardadaEnIdioma(widget.nombreIdioma))),
+          SnackBar(
+            content: Text(
+              context.l10n.clienteTipoTraduccionGuardadaEnIdioma(
+                widget.nombreIdioma,
+              ),
+            ),
+          ),
         );
       }
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.clienteTipoNoSePudoGuardar);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.clienteTipoNoSePudoGuardar,
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -231,12 +290,22 @@ class _TraduccionCardState extends ConsumerState<_TraduccionCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(widget.nombreIdioma, style: Theme.of(context).textTheme.titleSmall),
+            Text(
+              widget.nombreIdioma,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
             const SizedBox(height: 12),
             if (_error != null) ErrorBanner(message: _error!),
-            AppTextField(controller: _nombreController, label: context.l10n.fieldNombre),
+            AppTextField(
+              controller: _nombreController,
+              label: context.l10n.fieldNombre,
+            ),
             const SizedBox(height: 12),
-            AppButton(label: context.l10n.clienteTipoGuardarTraduccion, loading: _loading, onPressed: _guardar),
+            AppButton(
+              label: context.l10n.clienteTipoGuardarTraduccion,
+              loading: _loading,
+              onPressed: _guardar,
+            ),
           ],
         ),
       ),

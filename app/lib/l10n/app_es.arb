@@ -57,6 +57,7 @@
   "o": "o",
 
   "drawerMiCuenta": "Mi cuenta",
+  "drawerDashboard": "Dashboard",
   "drawerSistema": "Sistema",
   "drawerConfiguracion": "Configuración",
   "drawerCerrarSesion": "Cerrar sesión",
@@ -160,6 +161,17 @@
   },
   "usuarioEliminar": "Eliminar",
   "usuarioNoSePudoEliminar": "No se pudo eliminar el usuario",
+  "suplantarUsuario": "Suplantar usuario",
+  "suplantarMensaje": "Vas a iniciar sesión como \"{nombre}\" para ver la app tal cual la ve. Podrás volver a tu cuenta de administrador en cualquier momento. ¿Continuar?",
+  "@suplantarMensaje": {
+    "placeholders": { "nombre": { "type": "String" } }
+  },
+  "suplantarConfirmar": "Suplantar",
+  "suplantacionBannerTexto": "Estás viendo la app como {nombre}",
+  "@suplantacionBannerTexto": {
+    "placeholders": { "nombre": { "type": "String" } }
+  },
+  "suplantacionVolver": "Volver a mi cuenta",
   "usuarioIdiomaPreferido": "Idioma preferido",
   "errorCargarIdiomas": "No se pudieron cargar los idiomas: {error}",
   "@errorCargarIdiomas": {
@@ -173,6 +185,8 @@
   "usuarioActivo": "Usuario activo",
   "usuarioImportacionWebSinConfigurar": "Este cliente no ha configurado ninguna URL de importación automática.",
   "usuarioImportacionWebActiva": "Importación automática activa",
+  "usuarioEscaneoEsquelaIaTitulo": "Escaneo de esquelas con IA",
+  "usuarioEscaneoEsquelaIaActiva": "Escaneo con IA activo para este usuario",
   "validacionEmail": "Validación de email",
   "marcarComoValidado": "Marcar como validado",
   "validado": "Validado",
@@ -246,6 +260,8 @@
   "configuracionIaTitulo": "Configuración > IA",
   "configuracionIaImportacionWebLabel": "Importación de esquelas con IA",
   "configuracionIaImportacionWebDescripcion": "Si la desactivas, ningún cliente podrá activar la importación automática de su web ni ver propuestas, aunque ya la tuviera configurada.",
+  "configuracionIaEscaneoEsquelaLabel": "Escaneo de esquelas con IA",
+  "configuracionIaEscaneoEsquelaDescripcion": "Si está activado, al escanear una esquela la foto se analiza con IA en vez del reconocimiento de texto local. Si la desactivas (o falla), se sigue usando el escaneo local de siempre.",
   "noHayTiposClienteDadosDeAlta": "No hay tipos de cliente dados de alta",
   "clienteTipoNuevo": "Nuevo tipo de cliente",
   "clienteTipoEditar": "Editar tipo de cliente",
@@ -381,7 +397,7 @@
   },
   "avisosCancelarSeleccion": "Cancelar",
 
-  "seguidosSeleccionaTipo": "¿A quién quiero seguir?",
+  "seguidosSeleccionaTipo": "Elige a quién seguir",
   "seguidosSeleccionaProvincia": "Elige la provincia",
   "seguidosSeleccionaConcello": "Elige el concello",
   "seguidosBuscarConcello": "Buscar concello",
@@ -391,22 +407,34 @@
   },
   "seguidosSeguir": "Seguir",
   "seguidosDejarDeSeguir": "Dejar de seguir",
+  "seguidosSiguiendoEtiqueta": "Siguiendo",
+  "seguidosNoSiguiendoEtiqueta": "No sigues",
   "siguiendoTab": "Siguiendo",
   "misSeguidosBuscarNombre": "Buscar por nombre",
   "misSeguidosVacio": "Todavía no sigues a ningún cliente",
+  "misSeguidosTabClientes": "Clientes",
+  "misSeguidosTabZonas": "Zonas",
+  "misSeguidosSeguirNuevo": "Seguir un cliente nuevo",
 
-  "drawerMisSedes": "Mis sedes",
-  "misSedesTitulo": "Mis sedes",
-  "misSedesVacio": "Todavía no has dado de alta ninguna sede",
-  "misSedesNueva": "Nueva sede",
-  "misSedesEditar": "Editar sede",
-  "misSedesNombreSede": "Nombre de la sede",
-  "misSedesEliminarTitulo": "Eliminar sede",
+  "zonaTitulo": "Zona",
+  "zonaExplicacion": "Sigue un concello sin tener que buscar y seguir a cada cliente por separado: recibirás los avisos de cualquier cliente con sede ahí.",
+  "zonaSeguir": "Seguir",
+  "zonaDejarDeSeguir": "Dejar de seguir",
+  "zonaSeguirNueva": "Seguir una zona nueva",
+  "misZonasVacio": "Todavía no sigues ninguna zona",
+
+  "drawerMisSedes": "Mis sedes/tanatorios",
+  "misSedesTitulo": "Mis sedes/tanatorios",
+  "misSedesVacio": "Todavía no has dado de alta ninguna sede/tanatorio",
+  "misSedesNueva": "Nueva sede/tanatorio",
+  "misSedesEditar": "Editar sede/tanatorio",
+  "misSedesNombreSede": "Nombre de la sede/tanatorio",
+  "misSedesEliminarTitulo": "Eliminar sede/tanatorio",
   "misSedesEliminarMensaje": "¿Eliminar \"{nombre}\"?",
   "@misSedesEliminarMensaje": {
     "placeholders": { "nombre": { "type": "String" } }
   },
-  "misSedesUltimaSedeAviso": "Debe quedar al menos una sede. Para eliminar esta, primero da de alta otra.",
+  "misSedesUltimaSedeAviso": "Debe quedar al menos una sede/tanatorio. Para eliminar esta, primero da de alta otra.",
   "misSedesCodigo": "Código",
 
   "tabPublicar": "Publicar",
@@ -414,6 +442,7 @@
 
   "publicarEscanear": "Escanear",
   "publicarManual": "Manual",
+  "publicarDeceso": "Deceso",
   "publicarImportarWeb": "Importación automática",
   "publicarPropuestas": "Propuestas",
   "publicarAvisoImportadoWeb": "Datos importados automáticamente desde tu web. Revisa todos los campos antes de publicar.",
@@ -438,8 +467,8 @@
   },
   "importacionWebReconfigurar": "Configurar importación automática",
   "publicarNuevaPublicacion": "Nueva publicación",
-  "publicarSeleccionaSede": "Selecciona la sede",
-  "publicarSinSedes": "Todavía no tienes ninguna sede. Da de alta una sede en \"Miñas sedes\" antes de publicar.",
+  "publicarSeleccionaSede": "Selecciona la sede/tanatorio",
+  "publicarSinSedes": "Todavía no tienes ninguna sede/tanatorio. Da de alta una en \"Miñas sedes\" antes de publicar.",
   "publicarAvisoDatosPersonales": "Por protección de datos, no incluyas datos personales de familiares (nombres, teléfonos, direcciones). Solo el nombre del fallecido y la información relevante para el público.",
   "publicarNombreFallecido": "Nombre del fallecido",
   "publicarAvisoRevisar": "Revisa bien todos los campos antes de publicar: si vienen de un escaneo, corrige o completa lo que haga falta.",
@@ -451,9 +480,37 @@
   "publicarLugar": "Lugar",
   "publicarCapillaArdiente": "Capilla ardiente / velatorio",
   "publicarSala": "Sala",
+  "publicarVelatorioLabel": "Velatorio",
+  "publicarEntierroLabel": "Entierro",
   "publicarObservaciones": "Observaciones",
   "publicarEscoitarEsquela": "Escuchar esquela",
   "publicarPararEscoita": "Detener lectura",
+  "publicarCompartirEsquela": "Enviar por WhatsApp",
+  "publicarCompartidoPor": "Publicado por",
+  "publicarDescargaApp": "Descarga TanApp:",
+  "publicarCondolencias": "Enviar condolencias",
+  "condolenciasCantidad": "{n, plural, one{1 condolencia} other{{n} condolencias}}",
+  "@condolenciasCantidad": {
+    "placeholders": { "n": { "type": "int" } }
+  },
+
+  "condolenciasTitulo": "Condolencias de {nombre}",
+  "@condolenciasTitulo": {
+    "placeholders": { "nombre": { "type": "String" } }
+  },
+  "condolenciasTuCondolencia": "Tu condolencia",
+  "condolenciasEscribeAqui": "Escribe aquí tu mensaje de pésame...",
+  "condolenciasTodas": "Todas las condolencias",
+  "condolenciasVacio": "Todavía no hay ninguna condolencia.",
+  "condolenciasEliminarTitulo": "Eliminar condolencia",
+  "condolenciasEliminarMensaje": "¿Eliminar tu condolencia? Esta acción no se puede deshacer.",
+  "condolenciasDescargarPdf": "Descargar condolencias en PDF",
+  "condolenciasPdfTitulo": "Condolencias de {nombre}",
+  "@condolenciasPdfTitulo": {
+    "placeholders": { "nombre": { "type": "String" } }
+  },
+  "condolenciasPdfSubtitulo": "Libro de condolencias",
+  "condolenciasPdfPie": "Descarga TanApp",
   "publicarFuneralVoz": "El funeral será el {fecha} a las {hora}",
   "@publicarFuneralVoz": {
     "placeholders": { "fecha": { "type": "String" }, "hora": { "type": "String" } }
@@ -498,8 +555,13 @@
 
   "panelDatosPublicaciones": "Publicaciones",
   "panelDatosSeguidores": "Seguidores",
+  "panelDatosSeguidoresUnicos": "Seguidores únicos (si sigue varias sedes, cuenta una sola vez)",
   "panelDatosSinSeguidores": "Todavía no tiene seguidores",
   "panelDatosConcelloDesconocido": "Sin concello indicado",
+  "panelDatosZonaSeguidores": "{n, plural, one{+1 persona más recibe tus avisos por seguir la zona, sin seguirte a ti} other{+{n} personas más reciben tus avisos por seguir la zona, sin seguirte a ti}}",
+  "@panelDatosZonaSeguidores": {
+    "placeholders": { "n": { "type": "int" } }
+  },
   "panelDatosPublicacionesPorMes": "Publicaciones por mes",
   "panelDatosAvisos": "Avisos",
   "panelDatosAvisosVacio": "Todavía no has enviado ningún aviso",
@@ -507,8 +569,10 @@
   "panelDatosAvisosPendientes": "Sin leer",
 
   "tablonBuscar": "Buscar por texto, cliente o concello",
+  "tablonSinResultados": "No se ha encontrado ninguna esquela con ese texto.",
+  "tablonVacioSinSeguir": "Todavía no ves ninguna esquela aquí: sigue a un cliente o a una zona en \"Seguindo\" para que aparezcan sus publicaciones.",
 
-  "misSeguidosBuscarYFiltrar": "Buscar y filtrar",
+  "filtrar": "Filtrar",
 
   "proximamente": "Próximamente",
   "avisoSolicitudesPendientes": "{count, plural, one{Tienes 1 solicitud de cliente pendiente de aprobar} other{Tienes {count} solicitudes de clientes pendientes de aprobar}}",
@@ -518,5 +582,40 @@
 
   "estadoAprobadaSingular": "Aprobada",
   "estadoRechazadaSingular": "Rechazada",
-  "solicitudCrearCuentaBoton": "Crear cuenta de cliente"
+  "solicitudCrearCuentaBoton": "Crear cuenta de cliente",
+
+  "dashboardTitulo": "Dashboard",
+  "dashboardTabClientes": "Clientes",
+  "dashboardTabUsuarios": "Usuarios",
+  "dashboardTabIa": "IA",
+  "dashboardSinDatos": "Todavía no hay datos suficientes.",
+  "dashboardClientesActivos": "Clientes activos",
+  "dashboardClientesInactivos": "Clientes inactivos",
+  "dashboardSedesTotal": "Sedes/Tanatorios",
+  "dashboardPublicacionesTotal": "Publicaciones",
+  "dashboardAvisosTotal": "Avisos",
+  "dashboardClientesPorTipo": "Clientes por tipo",
+  "dashboardPublicacionesPorMes": "Publicaciones por mes",
+  "dashboardAvisosPorMes": "Avisos por mes",
+  "dashboardTopClientes": "Clientes con más publicaciones",
+  "dashboardUsuariosActivos": "Usuarios activos",
+  "dashboardUsuariosInactivos": "Usuarios inactivos",
+  "dashboardUsuariosConPush": "Con notificaciones activas",
+  "dashboardSeguimientosTotal": "Seguimientos a clientes",
+  "dashboardZonasSeguidasTotal": "Zonas seguidas",
+  "dashboardUsuariosPorIdioma": "Usuarios por idioma",
+  "dashboardTopConcellos": "Concellos con más usuarios",
+  "dashboardIaAviso": "Datos aproximados del escaneo de esquelas con IA (no incluye la importación automática desde web). El coste es una estimación propia a partir de los tokens de cada petición, no el saldo real de la cuenta de Anthropic.",
+  "dashboardIaPeticionesHoy": "Peticiones hoy",
+  "dashboardIaCostoHoy": "Coste estimado hoy",
+  "dashboardIaPeticionesMes": "Peticiones este mes",
+  "dashboardIaCostoMes": "Coste estimado este mes",
+  "dashboardIaPeticionesTotal": "Peticiones totales",
+  "dashboardIaCostoTotal": "Coste estimado total",
+  "dashboardIaTasaExito": "Tasa de éxito",
+  "dashboardIaPeticionesPorDia": "Peticiones por día (últimos 30 días)",
+  "dashboardIaUsoPorUsuario": "Uso por usuario este mes",
+  "dashboardIaColUsuario": "Usuario",
+  "dashboardIaColPeticiones": "Peticiones",
+  "dashboardIaColCosto": "Coste estimado"
 }

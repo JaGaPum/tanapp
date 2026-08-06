@@ -42,7 +42,8 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
 
   void _onScroll() {
     if (widget.cargandoMas || !widget.hasMore) return;
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - _umbral) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - _umbral) {
       widget.onCargarMas();
     }
   }
@@ -51,6 +52,10 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
   Widget build(BuildContext context) {
     return ListView.separated(
       controller: _scrollController,
+      // Muchas pantallas que usan esta lista no tienen barra de navegación inferior propia (no
+      // son una de las pestañas de HomeScreen), así que sin esto el último elemento queda medio
+      // tapado por la barra de gestos/navegación del móvil.
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
       itemCount: widget.items.length + (widget.cargandoMas ? 1 : 0),
       separatorBuilder: (_, _) => const SizedBox(height: 8),
       itemBuilder: (context, index) {

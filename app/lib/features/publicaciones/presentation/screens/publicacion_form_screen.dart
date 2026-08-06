@@ -13,6 +13,8 @@ import '../../../../core/widgets/cruz_icon.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_banner.dart';
 import '../../../cliente_sedes/application/cliente_sedes_providers.dart';
+import '../../../configuracion/application/configuracion_providers.dart';
+import '../../../importacion_web/application/importacion_web_providers.dart';
 import '../../../propuestas_publicaciones/application/propuestas_providers.dart';
 import '../../../propuestas_publicaciones/data/propuestas_repository.dart';
 import '../../application/publicaciones_providers.dart';
@@ -70,18 +72,33 @@ class PublicacionFormScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<PublicacionFormScreen> createState() => _PublicacionFormScreenState();
+  ConsumerState<PublicacionFormScreen> createState() =>
+      _PublicacionFormScreenState();
 }
 
 class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  late final _nombreController = TextEditingController(text: widget.nombreInicial ?? '');
-  late final _edadController = TextEditingController(text: widget.edadInicial?.toString() ?? '');
-  late final _iglesiaController = TextEditingController(text: widget.iglesiaInicial ?? '');
-  late final _lugarController = TextEditingController(text: widget.lugarInicial ?? '');
-  late final _capillaArdienteController = TextEditingController(text: widget.capillaArdienteInicial ?? '');
-  late final _salaController = TextEditingController(text: widget.salaInicial ?? '');
-  late final _observacionesController = TextEditingController(text: widget.observacionesInicial ?? '');
+  late final _nombreController = TextEditingController(
+    text: widget.nombreInicial ?? '',
+  );
+  late final _edadController = TextEditingController(
+    text: widget.edadInicial?.toString() ?? '',
+  );
+  late final _iglesiaController = TextEditingController(
+    text: widget.iglesiaInicial ?? '',
+  );
+  late final _lugarController = TextEditingController(
+    text: widget.lugarInicial ?? '',
+  );
+  late final _capillaArdienteController = TextEditingController(
+    text: widget.capillaArdienteInicial ?? '',
+  );
+  late final _salaController = TextEditingController(
+    text: widget.salaInicial ?? '',
+  );
+  late final _observacionesController = TextEditingController(
+    text: widget.observacionesInicial ?? '',
+  );
   late DateTime? _fechaFallecimiento = widget.fechaFallecimientoInicial;
   late DateTime? _fechaFuneral = widget.fechaFuneralInicial;
   late TimeOfDay? _horaFuneral = _parsearHora(widget.horaFuneralInicial);
@@ -98,7 +115,11 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
     final aviso = widget.avisoInicial;
     if (aviso != null && aviso.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(aviso)));
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(aviso)));
+        }
       });
     }
   }
@@ -146,7 +167,10 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
   Future<void> _confirmarYPublicar() async {
     setState(() => _intentoEnviar = true);
     final formValido = _formKey.currentState!.validate();
-    final fechasCompletas = _fechaFallecimiento != null && _fechaFuneral != null && _horaFuneral != null;
+    final fechasCompletas =
+        _fechaFallecimiento != null &&
+        _fechaFuneral != null &&
+        _horaFuneral != null;
     if (!formValido || !fechasCompletas) return;
     if (_idClienteSedeSeleccionada == null) return;
 
@@ -174,7 +198,9 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
       _loading = true;
       _error = null;
     });
-    final mensaje = _esEdicion ? context.l10n.publicarCambiosGuardados : context.l10n.publicarPublicadoOk;
+    final mensaje = _esEdicion
+        ? context.l10n.publicarCambiosGuardados
+        : context.l10n.publicarPublicadoOk;
     try {
       final repo = ref.read(publicacionesRepositoryProvider);
       if (_esEdicion) {
@@ -208,7 +234,9 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
         );
         final idPropuesta = widget.idClientePublicacionPropuestaInicial;
         if (idPropuesta != null) {
-          await ref.read(propuestasRepositoryProvider).marcarPublicada(idPropuesta);
+          await ref
+              .read(propuestasRepositoryProvider)
+              .marcarPublicada(idPropuesta);
           ref.invalidate(propuestasPendientesProvider);
         }
       }
@@ -216,11 +244,17 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
       ref.invalidate(publicacionesTablonProvider);
       ref.invalidate(publicacionesPorSedeProvider(_idClienteSedeSeleccionada!));
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensaje)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(mensaje)));
         Navigator.of(context).pop();
       }
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.errorInesperado);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.errorInesperado,
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -241,20 +275,36 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
           icon: Icons.event_outlined,
           texto: [
             if (_fechaFallecimiento != null)
-              context.l10n.publicarFallecioEl(DateFormat('dd/MM/yyyy').format(_fechaFallecimiento!)),
+              context.l10n.publicarFallecioEl(
+                DateFormat('dd/MM/yyyy').format(_fechaFallecimiento!),
+              ),
             if (edad != null) context.l10n.publicarAnosDeEdad(edad),
           ].join(' · '),
         ),
-      if (_fechaFuneral != null)
-        _FilaVistaPrevia(icon: Icons.event_outlined, texto: DateFormat('dd/MM/yyyy').format(_fechaFuneral!)),
-      if (_horaFuneral != null)
-        _FilaVistaPrevia(icon: Icons.schedule, texto: _formatearHora(_horaFuneral!)),
-      if (iglesia.isNotEmpty) _FilaVistaPrevia(icon: Icons.church_outlined, texto: iglesia),
-      if (lugar.isNotEmpty) _FilaVistaPrevia(icon: Icons.place_outlined, texto: lugar),
       if (capillaArdiente.isNotEmpty)
-        _FilaVistaPrevia(icon: Icons.local_florist_outlined, texto: capillaArdiente),
+        _FilaVistaPrevia(
+          icon: Icons.local_florist_outlined,
+          texto: capillaArdiente,
+        ),
       if (sala.isNotEmpty)
-        _FilaVistaPrevia(icon: Icons.meeting_room_outlined, texto: '${context.l10n.publicarSala} $sala'),
+        _FilaVistaPrevia(
+          icon: Icons.meeting_room_outlined,
+          texto: '${context.l10n.publicarSala} $sala',
+        ),
+      if (_fechaFuneral != null)
+        _FilaVistaPrevia(
+          icon: Icons.event_outlined,
+          texto: DateFormat('dd/MM/yyyy').format(_fechaFuneral!),
+        ),
+      if (_horaFuneral != null)
+        _FilaVistaPrevia(
+          icon: Icons.schedule,
+          texto: _formatearHora(_horaFuneral!),
+        ),
+      if (iglesia.isNotEmpty)
+        _FilaVistaPrevia(icon: Icons.church_outlined, texto: iglesia),
+      if (lugar.isNotEmpty)
+        _FilaVistaPrevia(icon: Icons.place_outlined, texto: lugar),
     ];
 
     return showDialog<bool>(
@@ -271,7 +321,12 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
                 children: [
                   const CruzIcon(size: 20),
                   const SizedBox(width: 6),
-                  Expanded(child: Text(nombre, style: Theme.of(context).textTheme.titleLarge)),
+                  Expanded(
+                    child: Text(
+                      nombre,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
@@ -290,7 +345,9 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text(_esEdicion ? context.l10n.guardar : context.l10n.publicarPublicar),
+            child: Text(
+              _esEdicion ? context.l10n.guardar : context.l10n.publicarPublicar,
+            ),
           ),
         ],
       ),
@@ -300,19 +357,38 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
   @override
   Widget build(BuildContext context) {
     final sedesAsync = ref.watch(misSedesProvider);
+    final propuestasPendientes = ref.watch(propuestasPendientesCountProvider);
+    final importacionWebConfigurada = ref
+        .watch(miImportacionWebProvider)
+        .maybeWhen(data: (config) => config != null, orElse: () => false);
+    final importacionWebIaActiva = ref
+        .watch(importacionWebIaActivaProvider)
+        .maybeWhen(data: (activa) => activa, orElse: () => false);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_esEdicion ? context.l10n.publicarEditarPublicacion : context.l10n.publicarNuevaPublicacion),
+        title: Text(
+          _esEdicion
+              ? context.l10n.publicarEditarPublicacion
+              : context.l10n.publicarNuevaPublicacion,
+        ),
       ),
       body: sedesAsync.when(
         data: (sedes) {
           if (sedes.isEmpty) {
-            return EmptyState(message: context.l10n.publicarSinSedes, icon: Icons.storefront_outlined);
+            return EmptyState(
+              message: context.l10n.publicarSinSedes,
+              icon: Icons.storefront_outlined,
+            );
           }
           _idClienteSedeSeleccionada ??= sedes.first.idClienteSede;
           return SingleChildScrollView(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.of(context).padding.bottom),
+            padding: EdgeInsets.fromLTRB(
+              16,
+              16,
+              16,
+              16 + MediaQuery.of(context).padding.bottom,
+            ),
             child: Form(
               key: _formKey,
               child: Column(
@@ -322,7 +398,9 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
                   if (sedes.length > 1) ...[
                     DropdownButtonFormField<String>(
                       initialValue: _idClienteSedeSeleccionada,
-                      decoration: InputDecoration(labelText: context.l10n.publicarSeleccionaSede),
+                      decoration: InputDecoration(
+                        labelText: context.l10n.publicarSeleccionaSede,
+                      ),
                       items: sedes
                           .map(
                             (sede) => DropdownMenuItem(
@@ -331,7 +409,8 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
                             ),
                           )
                           .toList(),
-                      onChanged: (value) => setState(() => _idClienteSedeSeleccionada = value),
+                      onChanged: (value) =>
+                          setState(() => _idClienteSedeSeleccionada = value),
                     ),
                     const SizedBox(height: 16),
                   ],
@@ -348,7 +427,10 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
                   AppTextField(
                     controller: _nombreController,
                     label: context.l10n.publicarNombreFallecido,
-                    validator: Validators.required(context, context.l10n.publicarNombreFallecido),
+                    validator: Validators.required(
+                      context,
+                      context.l10n.publicarNombreFallecido,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   InkWell(
@@ -357,12 +439,16 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
                       decoration: InputDecoration(
                         labelText: context.l10n.publicarFechaFallecimiento,
                         errorText: _intentoEnviar && _fechaFallecimiento == null
-                            ? context.l10n.validatorRequiredField(context.l10n.publicarFechaFallecimiento)
+                            ? context.l10n.validatorRequiredField(
+                                context.l10n.publicarFechaFallecimiento,
+                              )
                             : null,
                       ),
                       child: Text(
                         _fechaFallecimiento != null
-                            ? DateFormat('dd/MM/yyyy').format(_fechaFallecimiento!)
+                            ? DateFormat(
+                                'dd/MM/yyyy',
+                              ).format(_fechaFallecimiento!)
                             : '',
                       ),
                     ),
@@ -374,10 +460,32 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return context.l10n.validatorRequiredField(context.l10n.publicarEdad);
+                        return context.l10n.validatorRequiredField(
+                          context.l10n.publicarEdad,
+                        );
                       }
-                      return int.tryParse(value.trim()) == null ? context.l10n.publicarEdadInvalida : null;
+                      return int.tryParse(value.trim()) == null
+                          ? context.l10n.publicarEdadInvalida
+                          : null;
                     },
+                  ),
+                  const SizedBox(height: 16),
+                  AppTextField(
+                    controller: _capillaArdienteController,
+                    label: context.l10n.publicarCapillaArdiente,
+                    validator: Validators.required(
+                      context,
+                      context.l10n.publicarCapillaArdiente,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  AppTextField(
+                    controller: _salaController,
+                    label: context.l10n.publicarSala,
+                    validator: Validators.required(
+                      context,
+                      context.l10n.publicarSala,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   InkWell(
@@ -386,10 +494,16 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
                       decoration: InputDecoration(
                         labelText: context.l10n.publicarFechaFuneral,
                         errorText: _intentoEnviar && _fechaFuneral == null
-                            ? context.l10n.validatorRequiredField(context.l10n.publicarFechaFuneral)
+                            ? context.l10n.validatorRequiredField(
+                                context.l10n.publicarFechaFuneral,
+                              )
                             : null,
                       ),
-                      child: Text(_fechaFuneral != null ? DateFormat('dd/MM/yyyy').format(_fechaFuneral!) : ''),
+                      child: Text(
+                        _fechaFuneral != null
+                            ? DateFormat('dd/MM/yyyy').format(_fechaFuneral!)
+                            : '',
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -399,35 +513,35 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
                       decoration: InputDecoration(
                         labelText: context.l10n.publicarHoraFuneral,
                         errorText: _intentoEnviar && _horaFuneral == null
-                            ? context.l10n.validatorRequiredField(context.l10n.publicarHoraFuneral)
+                            ? context.l10n.validatorRequiredField(
+                                context.l10n.publicarHoraFuneral,
+                              )
                             : null,
                       ),
-                      child: Text(_horaFuneral != null ? _formatearHora(_horaFuneral!) : ''),
+                      child: Text(
+                        _horaFuneral != null
+                            ? _formatearHora(_horaFuneral!)
+                            : '',
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
                   AppTextField(
                     controller: _iglesiaController,
                     label: context.l10n.publicarIglesia,
-                    validator: Validators.required(context, context.l10n.publicarIglesia),
+                    validator: Validators.required(
+                      context,
+                      context.l10n.publicarIglesia,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   AppTextField(
                     controller: _lugarController,
                     label: context.l10n.publicarLugar,
-                    validator: Validators.required(context, context.l10n.publicarLugar),
-                  ),
-                  const SizedBox(height: 16),
-                  AppTextField(
-                    controller: _capillaArdienteController,
-                    label: context.l10n.publicarCapillaArdiente,
-                    validator: Validators.required(context, context.l10n.publicarCapillaArdiente),
-                  ),
-                  const SizedBox(height: 16),
-                  AppTextField(
-                    controller: _salaController,
-                    label: context.l10n.publicarSala,
-                    validator: Validators.required(context, context.l10n.publicarSala),
+                    validator: Validators.required(
+                      context,
+                      context.l10n.publicarLugar,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   AppTextField(
@@ -437,7 +551,9 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
                   ),
                   const SizedBox(height: 16),
                   AppButton(
-                    label: _esEdicion ? context.l10n.guardar : context.l10n.publicarPublicar,
+                    label: _esEdicion
+                        ? context.l10n.guardar
+                        : context.l10n.publicarPublicar,
                     loading: _loading,
                     onPressed: _confirmarYPublicar,
                   ),
@@ -446,8 +562,40 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
                     OutlinedButton.icon(
                       icon: const Icon(Icons.document_scanner_outlined),
                       label: Text(context.l10n.publicarEscanear),
-                      onPressed: _loading ? null : () => context.pushReplacement('/publicar/escanear'),
+                      onPressed: _loading
+                          ? null
+                          : () => context.pushReplacement('/publicar/escanear'),
                     ),
+                    if (importacionWebIaActiva) ...[
+                      const SizedBox(height: 12),
+                      if (!importacionWebConfigurada)
+                        OutlinedButton.icon(
+                          icon: const Icon(Icons.travel_explore),
+                          label: Text(context.l10n.publicarImportarWeb),
+                          onPressed: _loading
+                              ? null
+                              : () => context.pushReplacement(
+                                  '/publicar/importar-web',
+                                ),
+                        )
+                      else
+                        OutlinedButton.icon(
+                          icon: Badge(
+                            isLabelVisible: propuestasPendientes > 0,
+                            label: Text('$propuestasPendientes'),
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.error,
+                            child: const Icon(Icons.fact_check_outlined),
+                          ),
+                          label: Text(context.l10n.publicarPropuestas),
+                          onPressed: _loading
+                              ? null
+                              : () => context.pushReplacement(
+                                  '/publicar/propuestas',
+                                ),
+                        ),
+                    ],
                   ],
                 ],
               ),
@@ -455,7 +603,8 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorGenerico(e.toString()))),
       ),
     );
   }

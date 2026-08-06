@@ -22,6 +22,9 @@ class PanelDatosScreen extends ConsumerWidget {
     final publicacionesAsync = ref.watch(misPublicacionesProvider);
     final publicacionesPorMesAsync = ref.watch(publicacionesPorMesProvider);
     final seguidoresAsync = ref.watch(misSeguidoresPorSedeProvider);
+    final seguidoresTotalUnicoAsync = ref.watch(
+      misSeguidoresTotalUnicoProvider,
+    );
     final avisosAsync = ref.watch(avisosEstadisticasProvider);
 
     return SingleChildScrollView(
@@ -35,17 +38,23 @@ class PanelDatosScreen extends ConsumerWidget {
             child: sedesAsync.when(
               data: (sedes) => publicacionesAsync.when(
                 data: (publicaciones) {
-                  final porSede = {for (final sede in sedes) sede.idClienteSede: 0};
+                  final porSede = {
+                    for (final sede in sedes) sede.idClienteSede: 0,
+                  };
                   for (final publicacion in publicaciones) {
-                    porSede[publicacion.idClienteSede] = (porSede[publicacion.idClienteSede] ?? 0) + 1;
+                    porSede[publicacion.idClienteSede] =
+                        (porSede[publicacion.idClienteSede] ?? 0) + 1;
                   }
-                  final maxCount = porSede.values.isEmpty ? 0 : porSede.values.reduce((a, b) => a > b ? a : b);
+                  final maxCount = porSede.values.isEmpty
+                      ? 0
+                      : porSede.values.reduce((a, b) => a > b ? a : b);
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         '${publicaciones.length}',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 16),
                       for (final sede in sedes)
@@ -55,12 +64,18 @@ class PanelDatosScreen extends ConsumerWidget {
                           maxValue: maxCount,
                         ),
                       const SizedBox(height: 20),
-                      Text(context.l10n.panelDatosPublicacionesPorMes, style: Theme.of(context).textTheme.titleSmall),
+                      Text(
+                        context.l10n.panelDatosPublicacionesPorMes,
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
                       const SizedBox(height: 12),
                       publicacionesPorMesAsync.when(
-                        data: (porMes) => _PublicacionesPorMesChart(datos: porMes),
-                        loading: () => const Center(child: CircularProgressIndicator()),
-                        error: (e, _) => Text(context.l10n.errorGenerico(e.toString())),
+                        data: (porMes) =>
+                            _PublicacionesPorMesChart(datos: porMes),
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (e, _) =>
+                            Text(context.l10n.errorGenerico(e.toString())),
                       ),
                     ],
                   );
@@ -77,7 +92,14 @@ class PanelDatosScreen extends ConsumerWidget {
             icon: Icons.favorite_border,
             titulo: context.l10n.panelDatosSeguidores,
             child: seguidoresAsync.when(
-              data: (porSede) => _SeguidoresContenido(porSede: porSede),
+              data: (porSede) => seguidoresTotalUnicoAsync.when(
+                data: (totalUnico) => _SeguidoresContenido(
+                  porSede: porSede,
+                  totalUnico: totalUnico,
+                ),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Text(context.l10n.errorGenerico(e.toString())),
+              ),
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Text(context.l10n.errorGenerico(e.toString())),
             ),
@@ -88,7 +110,10 @@ class PanelDatosScreen extends ConsumerWidget {
             titulo: context.l10n.panelDatosAvisos,
             child: avisosAsync.when(
               data: (avisos) => avisos.isEmpty
-                  ? Text(context.l10n.panelDatosAvisosVacio, style: Theme.of(context).textTheme.bodyMedium)
+                  ? Text(
+                      context.l10n.panelDatosAvisosVacio,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    )
                   : _AvisosChart(datos: avisos),
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Text(context.l10n.errorGenerico(e.toString())),
@@ -102,18 +127,29 @@ class PanelDatosScreen extends ConsumerWidget {
 
 class _SeguidoresContenido extends StatelessWidget {
   final List<SeguidoresPorSede> porSede;
-  const _SeguidoresContenido({required this.porSede});
+  final int totalUnico;
+  const _SeguidoresContenido({required this.porSede, required this.totalUnico});
 
   @override
   Widget build(BuildContext context) {
-    final total = porSede.fold<int>(0, (suma, sede) => suma + sede.total);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '$total',
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+          '$totalUnico',
+          style: Theme.of(
+            context,
+          ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
+        // Aclara que este número no es la suma de los de abajo: un mismo seguidor que sigue dos
+        // sedes del mismo cliente cuenta una sola vez aquí, aunque aparezca en ambas de abajo.
+        if (porSede.length > 1)
+          Text(
+            context.l10n.panelDatosSeguidoresUnicos,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.outline,
+            ),
+          ),
         for (final sede in porSede) ...[
           const SizedBox(height: 20),
           Row(
@@ -126,20 +162,37 @@ class _SeguidoresContenido extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Text('${sede.total}', style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text(
+                '${sede.total}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             ],
           ),
           if (sede.porConcello.isEmpty) ...[
             const SizedBox(height: 4),
-            Text(context.l10n.panelDatosSinSeguidores, style: Theme.of(context).textTheme.bodyMedium),
+            Text(
+              context.l10n.panelDatosSinSeguidores,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
           ] else ...[
             const SizedBox(height: 8),
             for (final entrada in sede.porConcello)
               _BarraFila(
-                label: entrada.key.isEmpty ? context.l10n.panelDatosConcelloDesconocido : entrada.key,
+                label: entrada.key.isEmpty
+                    ? context.l10n.panelDatosConcelloDesconocido
+                    : entrada.key,
                 value: entrada.value,
                 maxValue: sede.porConcello.first.value,
               ),
+          ],
+          if (sede.zonaSeguidores > 0) ...[
+            const SizedBox(height: 4),
+            Text(
+              context.l10n.panelDatosZonaSeguidores(sede.zonaSeguidores),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.outline,
+              ),
+            ),
           ],
         ],
       ],
@@ -155,7 +208,9 @@ class _PublicacionesPorMesChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final maxValor = datos.map((d) => d.total).fold<int>(0, (a, b) => a > b ? a : b);
+    final maxValor = datos
+        .map((d) => d.total)
+        .fold<int>(0, (a, b) => a > b ? a : b);
     final maxY = maxValor == 0 ? 1.0 : maxValor * 1.2;
     return SizedBox(
       height: 160,
@@ -167,24 +222,36 @@ class _PublicacionesPorMesChart extends StatelessWidget {
           borderData: FlBorderData(show: false),
           barTouchData: BarTouchData(
             touchTooltipData: BarTouchTooltipData(
-              getTooltipItem: (group, groupIndex, rod, rodIndex) => BarTooltipItem(
-                '${rod.toY.round()}',
-                const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
+              getTooltipItem: (group, groupIndex, rod, rodIndex) =>
+                  BarTooltipItem(
+                    '${rod.toY.round()}',
+                    const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
             ),
           ),
           titlesData: FlTitlesData(
             show: true,
-            leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            leftTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            rightTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            topTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
                 reservedSize: 28,
                 getTitlesWidget: (value, meta) {
                   final index = value.toInt();
-                  if (index < 0 || index >= datos.length) return const SizedBox.shrink();
+                  if (index < 0 || index >= datos.length) {
+                    return const SizedBox.shrink();
+                  }
                   return Padding(
                     padding: const EdgeInsets.only(top: 6),
                     child: Text(
@@ -205,7 +272,9 @@ class _PublicacionesPorMesChart extends StatelessWidget {
                     toY: datos[i].total.toDouble(),
                     color: AppColors.black,
                     width: 18,
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(4),
+                    ),
                   ),
                 ],
               ),
@@ -228,7 +297,9 @@ class _AvisosChart extends StatelessWidget {
     // datos llega del más reciente al más antiguo; se invierte para leer el gráfico de
     // izquierda (más antiguo) a derecha (más reciente), como el de publicaciones por mes.
     final ordenados = datos.reversed.toList();
-    final maxValor = ordenados.map((d) => d.recibidos).fold<int>(0, (a, b) => a > b ? a : b);
+    final maxValor = ordenados
+        .map((d) => d.recibidos)
+        .fold<int>(0, (a, b) => a > b ? a : b);
     final maxY = maxValor == 0 ? 1.0 : maxValor * 1.2;
 
     return Column(
@@ -244,20 +315,30 @@ class _AvisosChart extends StatelessWidget {
               borderData: FlBorderData(show: false),
               titlesData: FlTitlesData(
                 show: true,
-                leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                leftTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                rightTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                topTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
                 bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
                     reservedSize: 28,
                     getTitlesWidget: (value, meta) {
                       final index = value.toInt();
-                      if (index < 0 || index >= ordenados.length) return const SizedBox.shrink();
+                      if (index < 0 || index >= ordenados.length) {
+                        return const SizedBox.shrink();
+                      }
                       return Padding(
                         padding: const EdgeInsets.only(top: 6),
                         child: Text(
-                          DateFormat('dd/MM').format(ordenados[index].fechaAlta.toLocal()),
+                          DateFormat(
+                            'dd/MM',
+                          ).format(ordenados[index].fechaAlta.toLocal()),
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                       );
@@ -271,7 +352,11 @@ class _AvisosChart extends StatelessWidget {
                     final aviso = ordenados[group.x];
                     return BarTooltipItem(
                       '${aviso.titulo}\n${aviso.leidos}/${aviso.recibidos}',
-                      const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                      const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
                     );
                   },
                 ),
@@ -285,13 +370,19 @@ class _AvisosChart extends StatelessWidget {
                         toY: ordenados[i].recibidos.toDouble(),
                         width: 18,
                         color: Colors.transparent,
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(4),
+                        ),
                         rodStackItems: [
-                          BarChartRodStackItem(0, ordenados[i].leidos.toDouble(), AppColors.green),
+                          BarChartRodStackItem(
+                            0,
+                            ordenados[i].leidos.toDouble(),
+                            AppColors.green,
+                          ),
                           BarChartRodStackItem(
                             ordenados[i].leidos.toDouble(),
                             ordenados[i].recibidos.toDouble(),
-                            AppColors.brownLight,
+                            AppColors.plumLight,
                           ),
                         ],
                       ),
@@ -304,9 +395,15 @@ class _AvisosChart extends StatelessWidget {
         const SizedBox(height: 12),
         Row(
           children: [
-            _LeyendaPunto(color: AppColors.green, label: context.l10n.panelDatosAvisosLeidos),
+            _LeyendaPunto(
+              color: AppColors.green,
+              label: context.l10n.panelDatosAvisosLeidos,
+            ),
             const SizedBox(width: 16),
-            _LeyendaPunto(color: AppColors.brownLight, label: context.l10n.panelDatosAvisosPendientes),
+            _LeyendaPunto(
+              color: AppColors.plumLight,
+              label: context.l10n.panelDatosAvisosPendientes,
+            ),
           ],
         ),
       ],
@@ -324,7 +421,11 @@ class _LeyendaPunto extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
         const SizedBox(width: 6),
         Text(label, style: Theme.of(context).textTheme.bodySmall),
       ],
@@ -337,7 +438,11 @@ class _SeccionCard extends StatelessWidget {
   final String titulo;
   final Widget child;
 
-  const _SeccionCard({required this.icon, required this.titulo, required this.child});
+  const _SeccionCard({
+    required this.icon,
+    required this.titulo,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -368,7 +473,11 @@ class _BarraFila extends StatelessWidget {
   final int value;
   final int maxValue;
 
-  const _BarraFila({required this.label, required this.value, required this.maxValue});
+  const _BarraFila({
+    required this.label,
+    required this.value,
+    required this.maxValue,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -382,7 +491,10 @@ class _BarraFila extends StatelessWidget {
             children: [
               Expanded(child: Text(label, overflow: TextOverflow.ellipsis)),
               const SizedBox(width: 8),
-              Text('$value', style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text(
+                '$value',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             ],
           ),
           const SizedBox(height: 4),
@@ -391,7 +503,9 @@ class _BarraFila extends StatelessWidget {
             child: LinearProgressIndicator(
               value: fraccion,
               minHeight: 10,
-              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+              backgroundColor: Theme.of(
+                context,
+              ).colorScheme.surfaceContainerHighest,
             ),
           ),
         ],

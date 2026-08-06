@@ -17,7 +17,16 @@ import '../../data/cliente_sedes_repository.dart';
 class SedeFormDialog extends ConsumerStatefulWidget {
   final String idSistemaUsuario;
   final ClienteSede? sede;
-  const SedeFormDialog({super.key, required this.idSistemaUsuario, this.sede});
+
+  /// Solo se usa al dar de alta (no al editar): un punto de partida tipo "001", "002"... que
+  /// el usuario puede dejar tal cual o completar con lo que considere (p. ej. "001-Centro").
+  final String? codigoSugerido;
+  const SedeFormDialog({
+    super.key,
+    required this.idSistemaUsuario,
+    this.sede,
+    this.codigoSugerido,
+  });
 
   @override
   ConsumerState<SedeFormDialog> createState() => _SedeFormDialogState();
@@ -25,9 +34,15 @@ class SedeFormDialog extends ConsumerStatefulWidget {
 
 class _SedeFormDialogState extends ConsumerState<SedeFormDialog> {
   final _formKey = GlobalKey<FormState>();
-  late final _codigoController = TextEditingController(text: widget.sede?.codigo ?? '');
-  late final _nombreController = TextEditingController(text: widget.sede?.nombre ?? '');
-  late final _direccionController = TextEditingController(text: widget.sede?.direccion ?? '');
+  late final _codigoController = TextEditingController(
+    text: widget.sede?.codigo ?? widget.codigoSugerido ?? '',
+  );
+  late final _nombreController = TextEditingController(
+    text: widget.sede?.nombre ?? '',
+  );
+  late final _direccionController = TextEditingController(
+    text: widget.sede?.direccion ?? '',
+  );
   String? _provinciaSeleccionada;
   String? _concelloSeleccionado;
   bool _loading = false;
@@ -78,7 +93,11 @@ class _SedeFormDialogState extends ConsumerState<SedeFormDialog> {
       }
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.errorInesperado);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.errorInesperado,
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -87,47 +106,67 @@ class _SedeFormDialogState extends ConsumerState<SedeFormDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.sede == null ? context.l10n.misSedesNueva : context.l10n.misSedesEditar),
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (_error != null) ErrorBanner(message: _error!),
-            AppTextField(
-              controller: _codigoController,
-              label: context.l10n.misSedesCodigo,
-              validator: (v) => v == null || v.trim().isEmpty ? context.l10n.errorNombreRequerido : null,
-            ),
-            const SizedBox(height: 16),
-            AppTextField(
-              controller: _nombreController,
-              label: context.l10n.misSedesNombreSede,
-              validator: (v) => v == null || v.trim().isEmpty ? context.l10n.errorNombreRequerido : null,
-            ),
-            const SizedBox(height: 16),
-            ProvinciaConcelloFields(
-              provinciaInicial: _provinciaSeleccionada,
-              concelloInicial: _concelloSeleccionado,
-              onProvinciaChanged: (value) => setState(() {
-                _provinciaSeleccionada = value;
-                _concelloSeleccionado = null;
-              }),
-              onConcelloChanged: (value) => setState(() => _concelloSeleccionado = value),
-            ),
-            const SizedBox(height: 16),
-            AppTextField(
-              controller: _direccionController,
-              label: context.l10n.fieldDireccion,
-              validator: (v) => v == null || v.trim().isEmpty ? context.l10n.errorNombreRequerido : null,
-            ),
-          ],
+      title: Text(
+        widget.sede == null
+            ? context.l10n.misSedesNueva
+            : context.l10n.misSedesEditar,
+      ),
+      content: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (_error != null) ErrorBanner(message: _error!),
+              AppTextField(
+                controller: _codigoController,
+                label: context.l10n.misSedesCodigo,
+                validator: (v) => v == null || v.trim().isEmpty
+                    ? context.l10n.errorNombreRequerido
+                    : null,
+              ),
+              const SizedBox(height: 16),
+              AppTextField(
+                controller: _nombreController,
+                label: context.l10n.misSedesNombreSede,
+                validator: (v) => v == null || v.trim().isEmpty
+                    ? context.l10n.errorNombreRequerido
+                    : null,
+              ),
+              const SizedBox(height: 16),
+              ProvinciaConcelloFields(
+                provinciaInicial: _provinciaSeleccionada,
+                concelloInicial: _concelloSeleccionado,
+                onProvinciaChanged: (value) => setState(() {
+                  _provinciaSeleccionada = value;
+                  _concelloSeleccionado = null;
+                }),
+                onConcelloChanged: (value) =>
+                    setState(() => _concelloSeleccionado = value),
+              ),
+              const SizedBox(height: 16),
+              AppTextField(
+                controller: _direccionController,
+                label: context.l10n.fieldDireccion,
+                validator: (v) => v == null || v.trim().isEmpty
+                    ? context.l10n.errorNombreRequerido
+                    : null,
+              ),
+            ],
+          ),
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(context.l10n.confirmDialogCancel)),
-        AppButton(label: context.l10n.guardar, loading: _loading, onPressed: _guardar),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(context.l10n.confirmDialogCancel),
+        ),
+        AppButton(
+          label: context.l10n.guardar,
+          loading: _loading,
+          onPressed: _guardar,
+        ),
       ],
     );
   }

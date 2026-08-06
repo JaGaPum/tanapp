@@ -11,7 +11,12 @@ class SistemaScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.drawerSistema)),
       body: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.fromLTRB(
+          24,
+          24,
+          24,
+          24 + MediaQuery.of(context).padding.bottom,
+        ),
         children: [
           Card(
             child: ListTile(

@@ -7,11 +7,17 @@ class ComunicacionesRepository {
   final SupabaseClient _client;
   ComunicacionesRepository(this._client);
 
-  static const _select = '*, TConfiguracionComunicacionesIdiomas(*, TSistemaIdiomas(IdSistemaIdioma, Codigo, Nombre))';
+  static const _select =
+      '*, TConfiguracionComunicacionesIdiomas(*, TSistemaIdiomas(IdSistemaIdioma, Codigo, Nombre))';
 
   Future<List<Comunicacion>> listComunicaciones() async {
-    final data = await _client.from('TConfiguracionComunicaciones').select(_select).order('NombreComunicacion');
-    return (data as List).map((e) => Comunicacion.fromMap(e as Map<String, dynamic>)).toList();
+    final data = await _client
+        .from('TConfiguracionComunicaciones')
+        .select(_select)
+        .order('NombreComunicacion');
+    return (data as List)
+        .map((e) => Comunicacion.fromMap(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<Comunicacion> fetchById(String id) async {
@@ -42,13 +48,19 @@ class ComunicacionesRepository {
     String? remitente,
     required bool activo,
   }) async {
-    final data = await _client.from('TConfiguracionComunicaciones').insert({
-      'TipoComunicacion': tipoComunicacion,
-      'CodComunicacion': codComunicacion.trim(),
-      'NombreComunicacion': nombreComunicacion.trim(),
-      'Remitente': (remitente == null || remitente.trim().isEmpty) ? null : remitente.trim(),
-      'Activo': activo,
-    }).select().single();
+    final data = await _client
+        .from('TConfiguracionComunicaciones')
+        .insert({
+          'TipoComunicacion': tipoComunicacion,
+          'CodComunicacion': codComunicacion.trim(),
+          'NombreComunicacion': nombreComunicacion.trim(),
+          'Remitente': (remitente == null || remitente.trim().isEmpty)
+              ? null
+              : remitente.trim(),
+          'Activo': activo,
+        })
+        .select()
+        .single();
     return data['IdConfiguracionComunicacion'] as String;
   }
 
@@ -60,13 +72,18 @@ class ComunicacionesRepository {
     String? remitente,
     required bool activo,
   }) async {
-    await _client.from('TConfiguracionComunicaciones').update({
-      'TipoComunicacion': tipoComunicacion,
-      'CodComunicacion': codComunicacion.trim(),
-      'NombreComunicacion': nombreComunicacion.trim(),
-      'Remitente': (remitente == null || remitente.trim().isEmpty) ? null : remitente.trim(),
-      'Activo': activo,
-    }).eq('IdConfiguracionComunicacion', idConfiguracionComunicacion);
+    await _client
+        .from('TConfiguracionComunicaciones')
+        .update({
+          'TipoComunicacion': tipoComunicacion,
+          'CodComunicacion': codComunicacion.trim(),
+          'NombreComunicacion': nombreComunicacion.trim(),
+          'Remitente': (remitente == null || remitente.trim().isEmpty)
+              ? null
+              : remitente.trim(),
+          'Activo': activo,
+        })
+        .eq('IdConfiguracionComunicacion', idConfiguracionComunicacion);
   }
 
   Future<void> eliminarComunicacion(String idConfiguracionComunicacion) async {
@@ -82,18 +99,19 @@ class ComunicacionesRepository {
     String? asunto,
     required String cuerpo,
   }) async {
-    await _client.from('TConfiguracionComunicacionesIdiomas').upsert(
-      {
-        'IdConfiguracionComunicacion': idConfiguracionComunicacion,
-        'IdSistemaIdioma': idSistemaIdioma,
-        'Asunto': (asunto == null || asunto.trim().isEmpty) ? null : asunto.trim(),
-        'Cuerpo': cuerpo.trim(),
-      },
-      onConflict: 'IdConfiguracionComunicacion,IdSistemaIdioma',
-    );
+    await _client.from('TConfiguracionComunicacionesIdiomas').upsert({
+      'IdConfiguracionComunicacion': idConfiguracionComunicacion,
+      'IdSistemaIdioma': idSistemaIdioma,
+      'Asunto': (asunto == null || asunto.trim().isEmpty)
+          ? null
+          : asunto.trim(),
+      'Cuerpo': cuerpo.trim(),
+    }, onConflict: 'IdConfiguracionComunicacion,IdSistemaIdioma');
   }
 }
 
-final comunicacionesRepositoryProvider = Provider<ComunicacionesRepository>((ref) {
+final comunicacionesRepositoryProvider = Provider<ComunicacionesRepository>((
+  ref,
+) {
   return ComunicacionesRepository(Supabase.instance.client);
 });

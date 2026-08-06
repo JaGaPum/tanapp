@@ -14,12 +14,14 @@ import '../../../../core/widgets/password_field.dart';
 import '../../../../core/widgets/provincia_concello_fields.dart';
 import '../../../auth/application/auth_providers.dart';
 import '../../../auth/data/auth_repository.dart';
+import '../../../suplantacion/application/suplantacion_providers.dart';
 import '../../../sistema_usuarios/data/catalogos_repository.dart';
 import '../../../sistema_usuarios/data/usuario_perfil.dart';
 import '../../../sistema_usuarios/data/usuarios_repository.dart';
 
-TextStyle? _sectionTitleStyle(BuildContext context) =>
-    Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold);
+TextStyle? _sectionTitleStyle(BuildContext context) => Theme.of(
+  context,
+).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold);
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -35,7 +37,8 @@ class AccountScreen extends ConsumerWidget {
             ? Center(child: Text(context.l10n.accountNoSePudoCargarPerfil))
             : _AccountBody(perfil: perfil),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorGenerico(e.toString()))),
       ),
     );
   }
@@ -48,18 +51,29 @@ class _AccountBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + MediaQuery.of(context).padding.bottom + 24),
+      padding: EdgeInsets.fromLTRB(
+        24,
+        24,
+        24,
+        24 + MediaQuery.of(context).padding.bottom + 24,
+      ),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 560),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(context.l10n.accountFotoPerfil, style: _sectionTitleStyle(context)),
+              Text(
+                context.l10n.accountFotoPerfil,
+                style: _sectionTitleStyle(context),
+              ),
               const SizedBox(height: 16),
               Center(child: _FotoPerfilSection(perfil: perfil)),
               const SizedBox(height: 40),
-              Text(context.l10n.accountDatosPersonales, style: _sectionTitleStyle(context)),
+              Text(
+                context.l10n.accountDatosPersonales,
+                style: _sectionTitleStyle(context),
+              ),
               const SizedBox(height: 16),
               _DatosPersonalesForm(perfil: perfil),
               const SizedBox(height: 40),
@@ -87,7 +101,9 @@ class _FotoPerfilSectionState extends ConsumerState<_FotoPerfilSection> {
   String _extensionDesde(XFile archivo) {
     final nombre = archivo.name;
     final punto = nombre.lastIndexOf('.');
-    if (punto != -1 && punto < nombre.length - 1) return nombre.substring(punto + 1).toLowerCase();
+    if (punto != -1 && punto < nombre.length - 1) {
+      return nombre.substring(punto + 1).toLowerCase();
+    }
     final mime = archivo.mimeType;
     if (mime == 'image/png') return 'png';
     if (mime == 'image/webp') return 'webp';
@@ -95,15 +111,20 @@ class _FotoPerfilSectionState extends ConsumerState<_FotoPerfilSection> {
   }
 
   String _contentTypeDesde(XFile archivo, String extension) {
-    return archivo.mimeType ?? switch (extension) {
-      'png' => 'image/png',
-      'webp' => 'image/webp',
-      _ => 'image/jpeg',
-    };
+    return archivo.mimeType ??
+        switch (extension) {
+          'png' => 'image/png',
+          'webp' => 'image/webp',
+          _ => 'image/jpeg',
+        };
   }
 
   Future<void> _elegirFoto() async {
-    final picked = await ImagePicker().pickImage(source: ImageSource.gallery, maxWidth: 512, imageQuality: 85);
+    final picked = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 512,
+      imageQuality: 85,
+    );
     if (picked == null) return;
     setState(() {
       _subiendo = true;
@@ -112,7 +133,9 @@ class _FotoPerfilSectionState extends ConsumerState<_FotoPerfilSection> {
     try {
       final bytes = await picked.readAsBytes();
       final extension = _extensionDesde(picked);
-      await ref.read(usuariosRepositoryProvider).subirFoto(
+      await ref
+          .read(usuariosRepositoryProvider)
+          .subirFoto(
             idSistemaUsuario: widget.perfil.idSistemaUsuario,
             authId: widget.perfil.idAuthSupabase,
             bytes: bytes,
@@ -121,10 +144,16 @@ class _FotoPerfilSectionState extends ConsumerState<_FotoPerfilSection> {
           );
       ref.invalidate(currentUserProfileProvider);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.accountFotoActualizada)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.accountFotoActualizada)),
+        );
       }
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.accountNoSePudoSubirFoto);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.accountNoSePudoSubirFoto,
+      );
     } finally {
       if (mounted) setState(() => _subiendo = false);
     }
@@ -144,12 +173,18 @@ class _FotoPerfilSectionState extends ConsumerState<_FotoPerfilSection> {
           children: [
             CircleAvatar(
               radius: 48,
-              backgroundColor: AppColors.brown,
-              backgroundImage: widget.perfil.fotoUrl != null ? NetworkImage(widget.perfil.fotoUrl!) : null,
+              backgroundColor: AppColors.plum,
+              backgroundImage: widget.perfil.fotoUrl != null
+                  ? NetworkImage(widget.perfil.fotoUrl!)
+                  : null,
               child: widget.perfil.fotoUrl == null
                   ? Text(
                       iniciales.isNotEmpty ? iniciales : '?',
-                      style: const TextStyle(color: AppColors.white, fontSize: 28, fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                        color: AppColors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w600,
+                      ),
                     )
                   : null,
             ),
@@ -164,9 +199,16 @@ class _FotoPerfilSectionState extends ConsumerState<_FotoPerfilSection> {
                       ? const SizedBox(
                           height: 16,
                           width: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.white),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.white,
+                          ),
                         )
-                      : const Icon(Icons.photo_camera_outlined, color: AppColors.white, size: 20),
+                      : const Icon(
+                          Icons.photo_camera_outlined,
+                          color: AppColors.white,
+                          size: 20,
+                        ),
                   onPressed: _subiendo ? null : _elegirFoto,
                 ),
               ),
@@ -183,7 +225,8 @@ class _DatosPersonalesForm extends ConsumerStatefulWidget {
   const _DatosPersonalesForm({required this.perfil});
 
   @override
-  ConsumerState<_DatosPersonalesForm> createState() => _DatosPersonalesFormState();
+  ConsumerState<_DatosPersonalesForm> createState() =>
+      _DatosPersonalesFormState();
 }
 
 class _DatosPersonalesFormState extends ConsumerState<_DatosPersonalesForm> {
@@ -204,9 +247,15 @@ class _DatosPersonalesFormState extends ConsumerState<_DatosPersonalesForm> {
   void initState() {
     super.initState();
     _nombreController = TextEditingController(text: widget.perfil.nombre);
-    _apellido1Controller = TextEditingController(text: widget.perfil.apellido1 ?? '');
-    _apellido2Controller = TextEditingController(text: widget.perfil.apellido2 ?? '');
-    _telefonoController = TextEditingController(text: widget.perfil.telefono ?? '');
+    _apellido1Controller = TextEditingController(
+      text: widget.perfil.apellido1 ?? '',
+    );
+    _apellido2Controller = TextEditingController(
+      text: widget.perfil.apellido2 ?? '',
+    );
+    _telefonoController = TextEditingController(
+      text: widget.perfil.telefono ?? '',
+    );
     _emailController = TextEditingController(text: widget.perfil.email);
     _provinciaSeleccionada = widget.perfil.provincia;
     _concelloSeleccionado = widget.perfil.concello;
@@ -231,7 +280,9 @@ class _DatosPersonalesFormState extends ConsumerState<_DatosPersonalesForm> {
       _error = null;
     });
     try {
-      await ref.read(usuariosRepositoryProvider).updatePerfil(
+      await ref
+          .read(usuariosRepositoryProvider)
+          .updatePerfil(
             idSistemaUsuario: widget.perfil.idSistemaUsuario,
             nombre: _nombreController.text,
             apellido1: _apellido1Controller.text,
@@ -245,10 +296,16 @@ class _DatosPersonalesFormState extends ConsumerState<_DatosPersonalesForm> {
           );
       ref.invalidate(currentUserProfileProvider);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.accountDatosActualizados)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.accountDatosActualizados)),
+        );
       }
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.errorInesperado);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.errorInesperado,
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -257,15 +314,23 @@ class _DatosPersonalesFormState extends ConsumerState<_DatosPersonalesForm> {
   @override
   Widget build(BuildContext context) {
     final esCliente = widget.perfil.roles.contains('CLIENTE');
-    final labelNombre = esCliente ? context.l10n.fieldNombreEmpresa : context.l10n.fieldNombre;
-    final labelApellido1 = esCliente ? context.l10n.campoPersonaContacto : context.l10n.fieldPrimerApellido;
+    final labelNombre = esCliente
+        ? context.l10n.fieldNombreEmpresa
+        : context.l10n.fieldNombre;
+    final labelApellido1 = esCliente
+        ? context.l10n.campoPersonaContacto
+        : context.l10n.fieldPrimerApellido;
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (_error != null) ErrorBanner(message: _error!),
-          AppTextField(controller: _emailController, label: context.l10n.fieldEmail, enabled: false),
+          AppTextField(
+            controller: _emailController,
+            label: context.l10n.fieldEmail,
+            enabled: false,
+          ),
           const SizedBox(height: 16),
           AppTextField(
             controller: _nombreController,
@@ -280,7 +345,10 @@ class _DatosPersonalesFormState extends ConsumerState<_DatosPersonalesForm> {
           ),
           if (!esCliente) ...[
             const SizedBox(height: 16),
-            AppTextField(controller: _apellido2Controller, label: context.l10n.fieldSegundoApellido),
+            AppTextField(
+              controller: _apellido2Controller,
+              label: context.l10n.fieldSegundoApellido,
+            ),
           ],
           const SizedBox(height: 16),
           AppTextField(
@@ -292,27 +360,41 @@ class _DatosPersonalesFormState extends ConsumerState<_DatosPersonalesForm> {
           ProvinciaConcelloFields(
             provinciaInicial: _provinciaSeleccionada,
             concelloInicial: _concelloSeleccionado,
-            onProvinciaChanged: (value) => setState(() => _provinciaSeleccionada = value),
-            onConcelloChanged: (value) => setState(() => _concelloSeleccionado = value),
+            onProvinciaChanged: (value) =>
+                setState(() => _provinciaSeleccionada = value),
+            onConcelloChanged: (value) =>
+                setState(() => _concelloSeleccionado = value),
           ),
           const SizedBox(height: 16),
-          ref.watch(idiomasCatalogoProvider).when(
+          ref
+              .watch(idiomasCatalogoProvider)
+              .when(
                 data: (idiomas) => DropdownButtonFormField<String>(
                   initialValue: _idiomaSeleccionado,
-                  decoration: InputDecoration(labelText: context.l10n.usuarioIdiomaPreferido),
+                  decoration: InputDecoration(
+                    labelText: context.l10n.usuarioIdiomaPreferido,
+                  ),
                   items: idiomas
-                      .map((idioma) => DropdownMenuItem(value: idioma.idSistemaIdioma, child: Text(idioma.nombre)))
+                      .map(
+                        (idioma) => DropdownMenuItem(
+                          value: idioma.idSistemaIdioma,
+                          child: Text(idioma.nombre),
+                        ),
+                      )
                       .toList(),
-                  onChanged: (value) => setState(() => _idiomaSeleccionado = value),
+                  onChanged: (value) =>
+                      setState(() => _idiomaSeleccionado = value),
                 ),
                 loading: () => const LinearProgressIndicator(),
-                error: (e, _) => Text(context.l10n.errorCargarIdiomas(e.toString())),
+                error: (e, _) =>
+                    Text(context.l10n.errorCargarIdiomas(e.toString())),
               ),
           const SizedBox(height: 16),
           SwitchListTile(
             title: Text(context.l10n.accountNotificacionesPush),
             value: _notificacionesPushActivas,
-            onChanged: (value) => setState(() => _notificacionesPushActivas = value),
+            onChanged: (value) =>
+                setState(() => _notificacionesPushActivas = value),
             contentPadding: EdgeInsets.zero,
           ),
           ListTile(
@@ -322,7 +404,11 @@ class _DatosPersonalesFormState extends ConsumerState<_DatosPersonalesForm> {
             onTap: () => context.push('/terminos'),
           ),
           const SizedBox(height: 16),
-          AppButton(label: context.l10n.accountGuardarCambios, loading: _loading, onPressed: _guardar),
+          AppButton(
+            label: context.l10n.accountGuardarCambios,
+            loading: _loading,
+            onPressed: _guardar,
+          ),
         ],
       ),
     );
@@ -333,7 +419,8 @@ class _CambiarPasswordSection extends StatefulWidget {
   const _CambiarPasswordSection();
 
   @override
-  State<_CambiarPasswordSection> createState() => _CambiarPasswordSectionState();
+  State<_CambiarPasswordSection> createState() =>
+      _CambiarPasswordSectionState();
 }
 
 class _CambiarPasswordSectionState extends State<_CambiarPasswordSection> {
@@ -351,7 +438,9 @@ class _CambiarPasswordSectionState extends State<_CambiarPasswordSection> {
             onPressed: () => setState(() => _expandido = true),
           )
         else
-          _CambiarPasswordForm(onCompletado: () => setState(() => _expandido = false)),
+          _CambiarPasswordForm(
+            onCompletado: () => setState(() => _expandido = false),
+          ),
       ],
     );
   }
@@ -362,7 +451,8 @@ class _CambiarPasswordForm extends ConsumerStatefulWidget {
   const _CambiarPasswordForm({required this.onCompletado});
 
   @override
-  ConsumerState<_CambiarPasswordForm> createState() => _CambiarPasswordFormState();
+  ConsumerState<_CambiarPasswordForm> createState() =>
+      _CambiarPasswordFormState();
 }
 
 class _CambiarPasswordFormState extends ConsumerState<_CambiarPasswordForm> {
@@ -372,8 +462,11 @@ class _CambiarPasswordFormState extends ConsumerState<_CambiarPasswordForm> {
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
   final _actualFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
   bool _loading = false;
   String? _error;
+
+  bool get _estaSuplantando => ref.read(sesionAdminGuardadaProvider) != null;
 
   @override
   void initState() {
@@ -382,9 +475,12 @@ class _CambiarPasswordFormState extends ConsumerState<_CambiarPasswordForm> {
       if (!mounted) return;
       final fieldContext = _formFieldKey.currentContext;
       if (fieldContext != null) {
-        Scrollable.ensureVisible(fieldContext, duration: const Duration(milliseconds: 250));
+        Scrollable.ensureVisible(
+          fieldContext,
+          duration: const Duration(milliseconds: 250),
+        );
       }
-      _actualFocusNode.requestFocus();
+      (_estaSuplantando ? _passwordFocusNode : _actualFocusNode).requestFocus();
     });
   }
 
@@ -394,6 +490,7 @@ class _CambiarPasswordFormState extends ConsumerState<_CambiarPasswordForm> {
     _passwordController.dispose();
     _confirmController.dispose();
     _actualFocusNode.dispose();
+    _passwordFocusNode.dispose();
     super.dispose();
   }
 
@@ -406,27 +503,45 @@ class _CambiarPasswordFormState extends ConsumerState<_CambiarPasswordForm> {
     final actualizadaMensaje = context.l10n.accountContrasenaActualizada;
     try {
       final authRepo = ref.read(authRepositoryProvider);
-      final email = authRepo.currentUser?.email;
-      if (email == null) {
-        setState(() => _error = context.l10n.accountNoSePudoVerificarIdentidad);
-        return;
-      }
-      try {
-        await authRepo.signInWithPassword(email: email, password: _actualController.text);
-      } catch (_) {
-        setState(() => _error = context.l10n.accountContrasenaActualIncorrecta);
-        return;
+      // Mientras se suplanta a otro usuario, la sesión activa YA es la suya (intercambiada al
+      // suplantar): el admin no conoce su contraseña actual, así que aquí se salta la
+      // reautenticación y se deja que "updatePassword" actualice directamente esa sesión.
+      if (!_estaSuplantando) {
+        final email = authRepo.currentUser?.email;
+        if (email == null) {
+          setState(
+            () => _error = context.l10n.accountNoSePudoVerificarIdentidad,
+          );
+          return;
+        }
+        try {
+          await authRepo.signInWithPassword(
+            email: email,
+            password: _actualController.text,
+          );
+        } catch (_) {
+          setState(
+            () => _error = context.l10n.accountContrasenaActualIncorrecta,
+          );
+          return;
+        }
       }
       await authRepo.updatePassword(newPassword: _passwordController.text);
       _actualController.clear();
       _passwordController.clear();
       _confirmController.clear();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(actualizadaMensaje)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(actualizadaMensaje)));
         widget.onCompletado();
       }
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.errorInesperado);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.errorInesperado,
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -434,22 +549,30 @@ class _CambiarPasswordFormState extends ConsumerState<_CambiarPasswordForm> {
 
   @override
   Widget build(BuildContext context) {
+    final estaSuplantando = ref.watch(sesionAdminGuardadaProvider) != null;
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (_error != null) ErrorBanner(message: _error!),
+          if (!estaSuplantando) ...[
+            PasswordField(
+              key: _formFieldKey,
+              controller: _actualController,
+              focusNode: _actualFocusNode,
+              label: context.l10n.accountContrasenaActual,
+              validator: Validators.required(
+                context,
+                context.l10n.accountContrasenaActual,
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
           PasswordField(
-            key: _formFieldKey,
-            controller: _actualController,
-            focusNode: _actualFocusNode,
-            label: context.l10n.accountContrasenaActual,
-            validator: Validators.required(context, context.l10n.accountContrasenaActual),
-          ),
-          const SizedBox(height: 16),
-          PasswordField(
+            key: estaSuplantando ? _formFieldKey : null,
             controller: _passwordController,
+            focusNode: estaSuplantando ? _passwordFocusNode : null,
             label: context.l10n.resetPasswordNuevaContrasena,
             validator: Validators.password(context),
           ),
@@ -457,10 +580,17 @@ class _CambiarPasswordFormState extends ConsumerState<_CambiarPasswordForm> {
           PasswordField(
             controller: _confirmController,
             label: context.l10n.fieldConfirmarContrasena,
-            validator: Validators.confirmPassword(context, () => _passwordController.text),
+            validator: Validators.confirmPassword(
+              context,
+              () => _passwordController.text,
+            ),
           ),
           const SizedBox(height: 16),
-          AppButton(label: context.l10n.accountActualizarContrasena, loading: _loading, onPressed: _guardar),
+          AppButton(
+            label: context.l10n.accountActualizarContrasena,
+            loading: _loading,
+            onPressed: _guardar,
+          ),
         ],
       ),
     );

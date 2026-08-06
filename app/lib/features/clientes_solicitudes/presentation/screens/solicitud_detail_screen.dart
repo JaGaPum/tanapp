@@ -21,7 +21,8 @@ class SolicitudDetailScreen extends ConsumerStatefulWidget {
   const SolicitudDetailScreen({super.key, required this.idClientesSolicitud});
 
   @override
-  ConsumerState<SolicitudDetailScreen> createState() => _SolicitudDetailScreenState();
+  ConsumerState<SolicitudDetailScreen> createState() =>
+      _SolicitudDetailScreenState();
 }
 
 class _SolicitudDetailScreenState extends ConsumerState<SolicitudDetailScreen> {
@@ -49,26 +50,38 @@ class _SolicitudDetailScreenState extends ConsumerState<SolicitudDetailScreen> {
       ref.invalidate(solicitudesListProvider);
       if (mounted) context.pop();
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.solicitudNoSePudoEliminar);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.solicitudNoSePudoEliminar,
+      );
     }
   }
 
   Future<void> _iniciarAprobacion(SolicitudCliente solicitud) async {
     final idTipoCliente = await showDialog<String>(
       context: context,
-      builder: (context) => _ClienteTipoDialog(idInicial: solicitud.idConfiguracionClienteTipo),
+      builder: (context) =>
+          _ClienteTipoDialog(idInicial: solicitud.idConfiguracionClienteTipo),
     );
     if (idTipoCliente == null) return;
     if (!mounted) return;
     await _resolver(true, idConfiguracionClienteTipo: idTipoCliente);
   }
 
-  Future<void> _resolver(bool aprobar, {String? idConfiguracionClienteTipo}) async {
+  Future<void> _resolver(
+    bool aprobar, {
+    String? idConfiguracionClienteTipo,
+  }) async {
     final noIdentificadoMensaje = context.l10n.solicitudNoIdentificado;
     final confirmado = await showConfirmDialog(
       context,
-      title: aprobar ? context.l10n.solicitudAprobarTitulo : context.l10n.solicitudRechazarTitulo,
-      message: aprobar ? context.l10n.solicitudConfirmarAprobar : context.l10n.solicitudConfirmarRechazar,
+      title: aprobar
+          ? context.l10n.solicitudAprobarTitulo
+          : context.l10n.solicitudRechazarTitulo,
+      message: aprobar
+          ? context.l10n.solicitudConfirmarAprobar
+          : context.l10n.solicitudConfirmarRechazar,
       confirmLabel: aprobar ? context.l10n.aprobar : context.l10n.rechazar,
     );
     if (!confirmado) return;
@@ -97,7 +110,9 @@ class _SolicitudDetailScreenState extends ConsumerState<SolicitudDetailScreen> {
       ref.invalidate(solicitudesPendientesCountProvider);
       await ref.read(solicitudesPendientesCountProvider.future);
 
-      final solicitud = await ref.read(solicitudDetailProvider(widget.idClientesSolicitud).future);
+      final solicitud = await ref.read(
+        solicitudDetailProvider(widget.idClientesSolicitud).future,
+      );
       await _notificarResolucion(aprobar: aprobar, solicitud: solicitud);
 
       if (aprobar) {
@@ -111,14 +126,20 @@ class _SolicitudDetailScreenState extends ConsumerState<SolicitudDetailScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(context.l10n.solicitudAprobadaSinCuenta(_detalleError(e))),
+                content: Text(
+                  context.l10n.solicitudAprobadaSinCuenta(_detalleError(e)),
+                ),
               ),
             );
           }
         }
       }
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.errorInesperado);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.errorInesperado,
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -131,15 +152,23 @@ class _SolicitudDetailScreenState extends ConsumerState<SolicitudDetailScreen> {
       _error = null;
     });
     try {
-      await ref.read(solicitudesRepositoryProvider).crearUsuarioCliente(widget.idClientesSolicitud);
+      await ref
+          .read(solicitudesRepositoryProvider)
+          .crearUsuarioCliente(widget.idClientesSolicitud);
       ref.invalidate(solicitudDetailProvider(widget.idClientesSolicitud));
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(cuentaCreadaMensaje)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(cuentaCreadaMensaje)));
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.solicitudNoSePudoCrearCuenta(_detalleError(e)))),
+          SnackBar(
+            content: Text(
+              context.l10n.solicitudNoSePudoCrearCuenta(_detalleError(e)),
+            ),
+          ),
         );
       }
     } finally {
@@ -150,7 +179,9 @@ class _SolicitudDetailScreenState extends ConsumerState<SolicitudDetailScreen> {
   String _detalleError(Object e) {
     if (e is FunctionException) {
       final details = e.details;
-      if (details is Map && details['error'] != null) return details['error'].toString();
+      if (details is Map && details['error'] != null) {
+        return details['error'].toString();
+      }
       if (details is String && details.isNotEmpty) return details;
       return e.reasonPhrase ?? 'error ${e.status}';
     }
@@ -160,10 +191,15 @@ class _SolicitudDetailScreenState extends ConsumerState<SolicitudDetailScreen> {
   /// Sin SMTP configurado todavía: busca el texto de Configuración > Comunicaciones que
   /// correspondería enviar y lo deja preparado (solo log). Cuando haya SMTP, aquí se
   /// invocará la Edge Function real de envío con `comunicacion` y `solicitud.emailContacto`.
-  Future<void> _notificarResolucion({required bool aprobar, required SolicitudCliente solicitud}) async {
+  Future<void> _notificarResolucion({
+    required bool aprobar,
+    required SolicitudCliente solicitud,
+  }) async {
     final codigo = aprobar ? 'SOLICITUD_APROBADA' : 'SOLICITUD_RECHAZADA';
     try {
-      final comunicacion = await ref.read(comunicacionesRepositoryProvider).buscarPorCodigo(codigo);
+      final comunicacion = await ref
+          .read(comunicacionesRepositoryProvider)
+          .buscarPorCodigo(codigo);
       debugPrint(
         'TODO enviar "$codigo" a ${solicitud.emailContacto} '
         '(${comunicacion?.traducciones.length ?? 0} idiomas configurados) — pendiente de SMTP.',
@@ -175,18 +211,29 @@ class _SolicitudDetailScreenState extends ConsumerState<SolicitudDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final solicitudAsync = ref.watch(solicitudDetailProvider(widget.idClientesSolicitud));
+    final solicitudAsync = ref.watch(
+      solicitudDetailProvider(widget.idClientesSolicitud),
+    );
 
     return Scaffold(
       appBar: AppBar(
         title: Text(context.l10n.solicitudDetalleTitulo),
         actions: [
-          IconButton(icon: const Icon(Icons.delete_outline), tooltip: context.l10n.eliminar, onPressed: _eliminar),
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            tooltip: context.l10n.eliminar,
+            onPressed: _eliminar,
+          ),
         ],
       ),
       body: solicitudAsync.when(
         data: (solicitud) => SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.fromLTRB(
+            24,
+            24,
+            24,
+            24 + MediaQuery.of(context).padding.bottom,
+          ),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 560),
             child: Column(
@@ -199,22 +246,51 @@ class _SolicitudDetailScreenState extends ConsumerState<SolicitudDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(solicitud.razonSocial, style: Theme.of(context).textTheme.titleLarge),
+                        Text(
+                          solicitud.razonSocial,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
                         const SizedBox(height: 4),
-                        Chip(label: Text(_estadoLabel(context, solicitud.estado))),
+                        Chip(
+                          label: Text(_estadoLabel(context, solicitud.estado)),
+                        ),
                         const Divider(height: 32),
-                        _Campo(label: context.l10n.fieldNifCif, valor: solicitud.nifCif),
-                        _Campo(label: context.l10n.campoPersonaContacto, valor: solicitud.nombreContacto),
-                        _Campo(label: context.l10n.fieldEmail, valor: solicitud.emailContacto),
-                        _Campo(label: context.l10n.fieldTelefono, valor: solicitud.telefonoContacto),
+                        _Campo(
+                          label: context.l10n.fieldNifCif,
+                          valor: solicitud.nifCif,
+                        ),
+                        _Campo(
+                          label: context.l10n.campoPersonaContacto,
+                          valor: solicitud.nombreContacto,
+                        ),
+                        _Campo(
+                          label: context.l10n.fieldEmail,
+                          valor: solicitud.emailContacto,
+                        ),
+                        _Campo(
+                          label: context.l10n.fieldTelefono,
+                          valor: solicitud.telefonoContacto,
+                        ),
                         if (solicitud.localidad != null)
-                          _Campo(label: context.l10n.campoLocalidad, valor: solicitud.localidad!),
+                          _Campo(
+                            label: context.l10n.campoLocalidad,
+                            valor: solicitud.localidad!,
+                          ),
                         if (solicitud.provincia != null)
-                          _Campo(label: context.l10n.fieldProvincia, valor: solicitud.provincia!),
+                          _Campo(
+                            label: context.l10n.fieldProvincia,
+                            valor: solicitud.provincia!,
+                          ),
                         if (solicitud.direccion != null)
-                          _Campo(label: context.l10n.fieldDireccion, valor: solicitud.direccion!),
+                          _Campo(
+                            label: context.l10n.fieldDireccion,
+                            valor: solicitud.direccion!,
+                          ),
                         if (solicitud.observaciones != null)
-                          _Campo(label: context.l10n.campoObservaciones, valor: solicitud.observaciones!),
+                          _Campo(
+                            label: context.l10n.campoObservaciones,
+                            valor: solicitud.observaciones!,
+                          ),
                       ],
                     ),
                   ),
@@ -256,7 +332,8 @@ class _SolicitudDetailScreenState extends ConsumerState<SolicitudDetailScreen> {
                     ),
                   ],
                   const SizedBox(height: 16),
-                  if (solicitud.estado == 'APROBADA' && solicitud.tieneUsuarioCliente)
+                  if (solicitud.estado == 'APROBADA' &&
+                      solicitud.tieneUsuarioCliente)
                     Chip(
                       avatar: const Icon(Icons.check_circle_outline, size: 18),
                       label: Text(context.l10n.solicitudCuentaCreada),
@@ -279,17 +356,18 @@ class _SolicitudDetailScreenState extends ConsumerState<SolicitudDetailScreen> {
           ),
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorGenerico(e.toString()))),
       ),
     );
   }
 
   String _estadoLabel(BuildContext context, String estado) => switch (estado) {
-        'PENDIENTE' => context.l10n.pendiente,
-        'APROBADA' => context.l10n.estadoAprobadaSingular,
-        'RECHAZADA' => context.l10n.estadoRechazadaSingular,
-        _ => estado,
-      };
+    'PENDIENTE' => context.l10n.pendiente,
+    'APROBADA' => context.l10n.estadoAprobadaSingular,
+    'RECHAZADA' => context.l10n.estadoRechazadaSingular,
+    _ => estado,
+  };
 }
 
 class _ClienteTipoDialog extends ConsumerStatefulWidget {
@@ -320,27 +398,43 @@ class _ClienteTipoDialogState extends ConsumerState<_ClienteTipoDialog> {
         child: clienteTiposAsync.when(
           data: (clienteTipos) {
             final activos = clienteTipos
-                .where((t) => t.activo || t.idConfiguracionClienteTipo == _seleccionado)
+                .where(
+                  (t) =>
+                      t.activo || t.idConfiguracionClienteTipo == _seleccionado,
+                )
                 .toList();
             return DropdownButtonFormField<String>(
               initialValue: _seleccionado,
-              decoration: InputDecoration(labelText: context.l10n.usuarioTipoCliente),
+              decoration: InputDecoration(
+                labelText: context.l10n.usuarioTipoCliente,
+              ),
               items: activos
-                  .map((t) => DropdownMenuItem(value: t.idConfiguracionClienteTipo, child: Text(t.nombre)))
+                  .map(
+                    (t) => DropdownMenuItem(
+                      value: t.idConfiguracionClienteTipo,
+                      child: Text(t.nombre),
+                    ),
+                  )
                   .toList(),
               onChanged: (value) => setState(() => _seleccionado = value),
-              validator: (value) => value == null ? context.l10n.solicitudTipoClienteObligatorio : null,
+              validator: (value) => value == null
+                  ? context.l10n.solicitudTipoClienteObligatorio
+                  : null,
             );
           },
           loading: () => const Padding(
             padding: EdgeInsets.symmetric(vertical: 16),
             child: LinearProgressIndicator(),
           ),
-          error: (e, _) => Text(context.l10n.errorCargarTiposCliente(e.toString())),
+          error: (e, _) =>
+              Text(context.l10n.errorCargarTiposCliente(e.toString())),
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(context.l10n.confirmDialogCancel)),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(context.l10n.confirmDialogCancel),
+        ),
         FilledButton(
           onPressed: () {
             if (!_formKey.currentState!.validate()) return;

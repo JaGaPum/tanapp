@@ -20,7 +20,11 @@ class PaginaResultado<T> {
     this.error,
   });
 
-  PaginaResultado<T> copyWith({List<T>? items, bool? cargandoMas, bool? hasMore}) {
+  PaginaResultado<T> copyWith({
+    List<T>? items,
+    bool? cargandoMas,
+    bool? hasMore,
+  }) {
     return PaginaResultado<T>(
       items: items ?? this.items,
       cargandoInicial: false,
@@ -47,7 +51,11 @@ abstract class PaginatedNotifier<T> extends Notifier<PaginaResultado<T>> {
   Future<void> _cargarInicial() async {
     try {
       final items = await cargarPagina(0, tamanoPagina);
-      state = PaginaResultado(items: items, cargandoInicial: false, hasMore: items.length >= tamanoPagina);
+      state = PaginaResultado(
+        items: items,
+        cargandoInicial: false,
+        hasMore: items.length >= tamanoPagina,
+      );
     } catch (e) {
       state = PaginaResultado(cargandoInicial: false, hasMore: false, error: e);
     }
@@ -59,7 +67,11 @@ abstract class PaginatedNotifier<T> extends Notifier<PaginaResultado<T>> {
     state = actual.copyWith(cargandoMas: true);
     try {
       final nuevos = await cargarPagina(actual.items.length, tamanoPagina);
-      state = state.copyWith(items: [...actual.items, ...nuevos], cargandoMas: false, hasMore: nuevos.length >= tamanoPagina);
+      state = state.copyWith(
+        items: [...actual.items, ...nuevos],
+        cargandoMas: false,
+        hasMore: nuevos.length >= tamanoPagina,
+      );
     } catch (_) {
       // Si falla la página siguiente dejamos lo ya cargado tal cual: el usuario puede
       // reintentar sin más que volver a hacer scroll hasta el final.

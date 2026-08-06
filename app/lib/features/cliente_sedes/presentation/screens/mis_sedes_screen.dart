@@ -26,10 +26,18 @@ class MisSedesScreen extends ConsumerWidget {
       body: sedesAsync.when(
         data: (sedes) {
           if (sedes.isEmpty) {
-            return EmptyState(message: context.l10n.misSedesVacio, icon: Icons.storefront_outlined);
+            return EmptyState(
+              message: context.l10n.misSedesVacio,
+              icon: Icons.storefront_outlined,
+            );
           }
           return ListView.separated(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.fromLTRB(
+              16,
+              16,
+              16,
+              16 + MediaQuery.of(context).padding.bottom,
+            ),
             itemCount: sedes.length,
             separatorBuilder: (_, _) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
@@ -44,12 +52,14 @@ class MisSedesScreen extends ConsumerWidget {
                       IconButton(
                         icon: const Icon(Icons.edit_outlined),
                         tooltip: context.l10n.editar,
-                        onPressed: () => _mostrarFormulario(context, ref, sede: sede),
+                        onPressed: () =>
+                            _mostrarFormulario(context, ref, sede: sede),
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete_outline),
                         tooltip: context.l10n.eliminar,
-                        onPressed: () => _eliminar(context, ref, sede, sedes.length),
+                        onPressed: () =>
+                            _eliminar(context, ref, sede, sedes.length),
                       ),
                     ],
                   ),
@@ -59,14 +69,22 @@ class MisSedesScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorGenerico(e.toString()))),
       ),
     );
   }
 
-  Future<void> _eliminar(BuildContext context, WidgetRef ref, ClienteSede sede, int totalSedes) async {
+  Future<void> _eliminar(
+    BuildContext context,
+    WidgetRef ref,
+    ClienteSede sede,
+    int totalSedes,
+  ) async {
     if (totalSedes <= 1) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.misSedesUltimaSedeAviso)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.misSedesUltimaSedeAviso)),
+      );
       return;
     }
     final confirmado = await showConfirmDialog(
@@ -76,16 +94,29 @@ class MisSedesScreen extends ConsumerWidget {
       confirmLabel: context.l10n.eliminar,
     );
     if (!confirmado) return;
-    await ref.read(clienteSedesRepositoryProvider).eliminarSede(sede.idClienteSede);
+    await ref
+        .read(clienteSedesRepositoryProvider)
+        .eliminarSede(sede.idClienteSede);
     ref.invalidate(misSedesProvider);
   }
 
-  Future<void> _mostrarFormulario(BuildContext context, WidgetRef ref, {ClienteSede? sede}) async {
+  Future<void> _mostrarFormulario(
+    BuildContext context,
+    WidgetRef ref, {
+    ClienteSede? sede,
+  }) async {
     final perfil = await ref.read(currentUserProfileProvider.future);
     if (perfil == null || !context.mounted) return;
+    final totalActuales = ref.read(misSedesProvider).value?.length ?? 0;
     await showDialog<void>(
       context: context,
-      builder: (context) => SedeFormDialog(idSistemaUsuario: perfil.idSistemaUsuario, sede: sede),
+      builder: (context) => SedeFormDialog(
+        idSistemaUsuario: perfil.idSistemaUsuario,
+        sede: sede,
+        codigoSugerido: sede == null
+            ? (totalActuales + 1).toString().padLeft(3, '0')
+            : null,
+      ),
     );
     ref.invalidate(misSedesProvider);
   }

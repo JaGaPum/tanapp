@@ -25,9 +25,14 @@ class ComunicacionDetailScreen extends ConsumerWidget {
     if (id == null) {
       return Scaffold(
         appBar: AppBar(title: Text(context.l10n.comunicacionNueva)),
-        body: const SingleChildScrollView(
-          padding: EdgeInsets.all(24),
-          child: Center(child: _ComunicacionForm(comunicacion: null)),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(
+            24,
+            24,
+            24,
+            24 + MediaQuery.of(context).padding.bottom,
+          ),
+          child: const Center(child: _ComunicacionForm(comunicacion: null)),
         ),
       );
     }
@@ -37,11 +42,17 @@ class ComunicacionDetailScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(context.l10n.comunicacionEditar)),
       body: comunicacionAsync.when(
         data: (comunicacion) => SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.fromLTRB(
+            24,
+            24,
+            24,
+            24 + MediaQuery.of(context).padding.bottom,
+          ),
           child: Center(child: _ComunicacionForm(comunicacion: comunicacion)),
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorGenerico(e.toString()))),
       ),
     );
   }
@@ -57,10 +68,17 @@ class _ComunicacionForm extends ConsumerStatefulWidget {
 
 class _ComunicacionFormState extends ConsumerState<_ComunicacionForm> {
   final _formKey = GlobalKey<FormState>();
-  late final _codController = TextEditingController(text: widget.comunicacion?.codComunicacion ?? '');
-  late final _nombreController = TextEditingController(text: widget.comunicacion?.nombreComunicacion ?? '');
-  late final _remitenteController = TextEditingController(text: widget.comunicacion?.remitente ?? '');
-  late String _tipo = widget.comunicacion?.tipoComunicacion ?? _tiposComunicacion.first;
+  late final _codController = TextEditingController(
+    text: widget.comunicacion?.codComunicacion ?? '',
+  );
+  late final _nombreController = TextEditingController(
+    text: widget.comunicacion?.nombreComunicacion ?? '',
+  );
+  late final _remitenteController = TextEditingController(
+    text: widget.comunicacion?.remitente ?? '',
+  );
+  late String _tipo =
+      widget.comunicacion?.tipoComunicacion ?? _tiposComunicacion.first;
   late bool _activo = widget.comunicacion?.activo ?? true;
   bool _loading = false;
   String? _error;
@@ -90,10 +108,15 @@ class _ComunicacionFormState extends ConsumerState<_ComunicacionForm> {
           activo: _activo,
         );
         ref.invalidate(comunicacionesListProvider);
-        if (mounted) context.pushReplacement('/admin/configuracion/comunicaciones/$nuevoId');
+        if (mounted) {
+          context.pushReplacement(
+            '/admin/configuracion/comunicaciones/$nuevoId',
+          );
+        }
       } else {
         await repo.actualizarComunicacion(
-          idConfiguracionComunicacion: widget.comunicacion!.idConfiguracionComunicacion,
+          idConfiguracionComunicacion:
+              widget.comunicacion!.idConfiguracionComunicacion,
           tipoComunicacion: _tipo,
           codComunicacion: _codController.text,
           nombreComunicacion: _nombreController.text,
@@ -101,13 +124,23 @@ class _ComunicacionFormState extends ConsumerState<_ComunicacionForm> {
           activo: _activo,
         );
         ref.invalidate(comunicacionesListProvider);
-        ref.invalidate(comunicacionDetailProvider(widget.comunicacion!.idConfiguracionComunicacion));
+        ref.invalidate(
+          comunicacionDetailProvider(
+            widget.comunicacion!.idConfiguracionComunicacion,
+          ),
+        );
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.cambiosGuardados)));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(context.l10n.cambiosGuardados)),
+          );
         }
       }
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.errorInesperado);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.errorInesperado,
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -128,24 +161,37 @@ class _ComunicacionFormState extends ConsumerState<_ComunicacionForm> {
                 if (_error != null) ErrorBanner(message: _error!),
                 DropdownButtonFormField<String>(
                   initialValue: _tipo,
-                  decoration: InputDecoration(labelText: context.l10n.comunicacionTipo),
-                  items: _tiposComunicacion.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
+                  decoration: InputDecoration(
+                    labelText: context.l10n.comunicacionTipo,
+                  ),
+                  items: _tiposComunicacion
+                      .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+                      .toList(),
                   onChanged: (value) => setState(() => _tipo = value ?? _tipo),
                 ),
                 const SizedBox(height: 16),
                 AppTextField(
                   controller: _codController,
                   label: context.l10n.comunicacionCodigo,
-                  validator: Validators.required(context, context.l10n.comunicacionCodigo),
+                  validator: Validators.required(
+                    context,
+                    context.l10n.comunicacionCodigo,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 AppTextField(
                   controller: _nombreController,
                   label: context.l10n.fieldNombre,
-                  validator: Validators.required(context, context.l10n.fieldNombre),
+                  validator: Validators.required(
+                    context,
+                    context.l10n.fieldNombre,
+                  ),
                 ),
                 const SizedBox(height: 16),
-                AppTextField(controller: _remitenteController, label: context.l10n.comunicacionRemitente),
+                AppTextField(
+                  controller: _remitenteController,
+                  label: context.l10n.comunicacionRemitente,
+                ),
                 const SizedBox(height: 8),
                 SwitchListTile(
                   title: Text(context.l10n.comunicacionActiva),
@@ -154,7 +200,11 @@ class _ComunicacionFormState extends ConsumerState<_ComunicacionForm> {
                   contentPadding: EdgeInsets.zero,
                 ),
                 const SizedBox(height: 8),
-                AppButton(label: context.l10n.guardar, loading: _loading, onPressed: _guardar),
+                AppButton(
+                  label: context.l10n.guardar,
+                  loading: _loading,
+                  onPressed: _guardar,
+                ),
               ],
             ),
           ),
@@ -162,7 +212,9 @@ class _ComunicacionFormState extends ConsumerState<_ComunicacionForm> {
             const SizedBox(height: 40),
             Text(
               context.l10n.comunicacionTextosPorIdioma,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             _TraduccionesSection(comunicacion: widget.comunicacion!),
@@ -220,8 +272,12 @@ class _TraduccionCard extends ConsumerStatefulWidget {
 }
 
 class _TraduccionCardState extends ConsumerState<_TraduccionCard> {
-  late final _asuntoController = TextEditingController(text: widget.traduccionExistente?.asunto ?? '');
-  late final _cuerpoController = TextEditingController(text: widget.traduccionExistente?.cuerpo ?? '');
+  late final _asuntoController = TextEditingController(
+    text: widget.traduccionExistente?.asunto ?? '',
+  );
+  late final _cuerpoController = TextEditingController(
+    text: widget.traduccionExistente?.cuerpo ?? '',
+  );
   bool _loading = false;
   String? _error;
 
@@ -238,20 +294,37 @@ class _TraduccionCardState extends ConsumerState<_TraduccionCard> {
       _error = null;
     });
     try {
-      await ref.read(comunicacionesRepositoryProvider).guardarTraduccion(
-            idConfiguracionComunicacion: widget.comunicacion.idConfiguracionComunicacion,
+      await ref
+          .read(comunicacionesRepositoryProvider)
+          .guardarTraduccion(
+            idConfiguracionComunicacion:
+                widget.comunicacion.idConfiguracionComunicacion,
             idSistemaIdioma: widget.idIdioma,
             asunto: _asuntoController.text,
             cuerpo: _cuerpoController.text,
           );
-      ref.invalidate(comunicacionDetailProvider(widget.comunicacion.idConfiguracionComunicacion));
+      ref.invalidate(
+        comunicacionDetailProvider(
+          widget.comunicacion.idConfiguracionComunicacion,
+        ),
+      );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.comunicacionTextoGuardadoEnIdioma(widget.nombreIdioma))),
+          SnackBar(
+            content: Text(
+              context.l10n.comunicacionTextoGuardadoEnIdioma(
+                widget.nombreIdioma,
+              ),
+            ),
+          ),
         );
       }
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.comunicacionNoSePudoGuardar);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.comunicacionNoSePudoGuardar,
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -265,14 +338,28 @@ class _TraduccionCardState extends ConsumerState<_TraduccionCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(widget.nombreIdioma, style: Theme.of(context).textTheme.titleSmall),
+            Text(
+              widget.nombreIdioma,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
             const SizedBox(height: 12),
             if (_error != null) ErrorBanner(message: _error!),
-            AppTextField(controller: _asuntoController, label: context.l10n.comunicacionAsunto),
+            AppTextField(
+              controller: _asuntoController,
+              label: context.l10n.comunicacionAsunto,
+            ),
             const SizedBox(height: 12),
-            AppTextField(controller: _cuerpoController, label: context.l10n.comunicacionCuerpo, maxLines: 5),
+            AppTextField(
+              controller: _cuerpoController,
+              label: context.l10n.comunicacionCuerpo,
+              maxLines: 5,
+            ),
             const SizedBox(height: 12),
-            AppButton(label: context.l10n.comunicacionGuardarTexto, loading: _loading, onPressed: _guardar),
+            AppButton(
+              label: context.l10n.comunicacionGuardarTexto,
+              loading: _loading,
+              onPressed: _guardar,
+            ),
           ],
         ),
       ),

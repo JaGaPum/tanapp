@@ -8,7 +8,14 @@ Future<void> abrirIndicacionesGoogleMaps({
   String? concello,
   String? provincia,
 }) async {
-  final destino = [direccion, concello, provincia].where((s) => s != null && s.trim().isNotEmpty).join(', ');
-  final uri = Uri.https('www.google.com', '/maps/dir/', {'api': '1', 'destination': destino});
+  final destino = [
+    direccion,
+    concello,
+    provincia,
+  ].where((s) => s != null && s.trim().isNotEmpty).join(', ');
+  final uri = Uri.https('www.google.com', '/maps/dir/', {
+    'api': '1',
+    'destination': destino,
+  });
   await launchUrl(uri, mode: LaunchMode.externalApplication);
 }

@@ -16,13 +16,15 @@ class DispositivosPushRepository {
         .single()
         .then((row) => row['IdSistemaUsuario'] as String);
 
-    await _client.from('TSistemaDispositivosPush').upsert(
-      {'IdSistemaUsuario': idSistemaUsuario, 'Token': token},
-      onConflict: 'Token',
-    );
+    await _client.from('TSistemaDispositivosPush').upsert({
+      'IdSistemaUsuario': idSistemaUsuario,
+      'Token': token,
+    }, onConflict: 'Token');
   }
 }
 
-final dispositivosPushRepositoryProvider = Provider<DispositivosPushRepository>((ref) {
-  return DispositivosPushRepository(Supabase.instance.client);
-});
+final dispositivosPushRepositoryProvider = Provider<DispositivosPushRepository>(
+  (ref) {
+    return DispositivosPushRepository(Supabase.instance.client);
+  },
+);

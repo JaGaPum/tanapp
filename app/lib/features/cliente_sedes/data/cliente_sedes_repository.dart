@@ -15,7 +15,9 @@ class ClienteSedesRepository {
         .select()
         .eq('IdSistemaUsuario', idSistemaUsuario)
         .order('Nombre');
-    return (data as List).map((e) => ClienteSede.fromMap(e as Map<String, dynamic>)).toList();
+    return (data as List)
+        .map((e) => ClienteSede.fromMap(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<void> crearSede({
@@ -44,17 +46,23 @@ class ClienteSedesRepository {
     required String concello,
     required String direccion,
   }) async {
-    await _client.from('TClienteSedes').update({
-      'Codigo': codigo.trim(),
-      'Nombre': nombre.trim(),
-      'Provincia': provincia,
-      'Concello': concello,
-      'Direccion': direccion.trim(),
-    }).eq('IdClienteSede', idClienteSede);
+    await _client
+        .from('TClienteSedes')
+        .update({
+          'Codigo': codigo.trim(),
+          'Nombre': nombre.trim(),
+          'Provincia': provincia,
+          'Concello': concello,
+          'Direccion': direccion.trim(),
+        })
+        .eq('IdClienteSede', idClienteSede);
   }
 
   Future<void> eliminarSede(String idClienteSede) async {
-    await _client.from('TClienteSedes').delete().eq('IdClienteSede', idClienteSede);
+    await _client
+        .from('TClienteSedes')
+        .delete()
+        .eq('IdClienteSede', idClienteSede);
   }
 }
 

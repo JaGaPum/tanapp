@@ -10,8 +10,8 @@ class Concello {
   });
 
   factory Concello.fromMap(Map<String, dynamic> map) => Concello(
-        idConfiguracionConcello: map['IdConfiguracionConcello'] as String,
-        idConfiguracionProvincia: map['IdConfiguracionProvincia'] as String,
-        nombre: map['Nombre'] as String,
-      );
+    idConfiguracionConcello: map['IdConfiguracionConcello'] as String,
+    idConfiguracionProvincia: map['IdConfiguracionProvincia'] as String,
+    nombre: map['Nombre'] as String,
+  );
 }

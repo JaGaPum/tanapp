@@ -6,46 +6,85 @@ import '../data/publicacion_con_sede.dart';
 import '../data/publicaciones_por_mes.dart';
 import '../data/publicaciones_repository.dart';
 
-class PublicacionesTablonNotifier extends PaginatedNotifier<PublicacionConSede> {
+class PublicacionesTablonNotifier
+    extends PaginatedNotifier<PublicacionConSede> {
   @override
   Future<List<PublicacionConSede>> cargarPagina(int offset, int limit) {
-    return ref.read(publicacionesRepositoryProvider).listTodas(offset: offset, limit: limit);
+    return ref
+        .read(publicacionesRepositoryProvider)
+        .listTablonPersonalizado(offset: offset, limit: limit);
   }
 }
 
 final publicacionesTablonProvider =
-    NotifierProvider.autoDispose<PublicacionesTablonNotifier, PaginaResultado<PublicacionConSede>>(
-  PublicacionesTablonNotifier.new,
-);
+    NotifierProvider.autoDispose<
+      PublicacionesTablonNotifier,
+      PaginaResultado<PublicacionConSede>
+    >(PublicacionesTablonNotifier.new);
 
-final publicacionesPorSedeProvider =
-    FutureProvider.autoDispose.family<List<PublicacionConSede>, String>((ref, idClienteSede) {
-  return ref.watch(publicacionesRepositoryProvider).listPorSedes([idClienteSede]);
-});
+/// Búsqueda en todo el histórico (family por término): a diferencia de [publicacionesTablonProvider],
+/// no se limita a lo ya cargado en memoria.
+class BusquedaPublicacionesNotifier
+    extends PaginatedNotifier<PublicacionConSede> {
+  final String termino;
+  BusquedaPublicacionesNotifier(this.termino);
 
-final misPublicacionesProvider = FutureProvider.autoDispose<List<PublicacionConSede>>((ref) async {
-  final sedes = await ref.watch(misSedesProvider.future);
-  return ref.watch(publicacionesRepositoryProvider).listPorSedes(sedes.map((s) => s.idClienteSede).toList());
-});
-
-final misPublicacionesArchivadasIdsProvider = FutureProvider.autoDispose<Set<String>>((ref) {
-  return ref.watch(publicacionesRepositoryProvider).listMisArchivadasIds();
-});
-
-class PublicacionesArchivadasNotifier extends PaginatedNotifier<PublicacionConSede> {
   @override
   Future<List<PublicacionConSede>> cargarPagina(int offset, int limit) {
-    return ref.read(publicacionesRepositoryProvider).listMisArchivadas(offset: offset, limit: limit);
+    return ref
+        .read(publicacionesRepositoryProvider)
+        .buscarHistorico(termino: termino, offset: offset, limit: limit);
+  }
+}
+
+final busquedaPublicacionesProvider = NotifierProvider.autoDispose
+    .family<
+      BusquedaPublicacionesNotifier,
+      PaginaResultado<PublicacionConSede>,
+      String
+    >(BusquedaPublicacionesNotifier.new);
+
+final publicacionesPorSedeProvider = FutureProvider.autoDispose
+    .family<List<PublicacionConSede>, String>((ref, idClienteSede) {
+      return ref.watch(publicacionesRepositoryProvider).listPorSedes([
+        idClienteSede,
+      ]);
+    });
+
+final misPublicacionesProvider =
+    FutureProvider.autoDispose<List<PublicacionConSede>>((ref) async {
+      final sedes = await ref.watch(misSedesProvider.future);
+      return ref
+          .watch(publicacionesRepositoryProvider)
+          .listPorSedes(sedes.map((s) => s.idClienteSede).toList());
+    });
+
+final misPublicacionesArchivadasIdsProvider =
+    FutureProvider.autoDispose<Set<String>>((ref) {
+      return ref.watch(publicacionesRepositoryProvider).listMisArchivadasIds();
+    });
+
+class PublicacionesArchivadasNotifier
+    extends PaginatedNotifier<PublicacionConSede> {
+  @override
+  Future<List<PublicacionConSede>> cargarPagina(int offset, int limit) {
+    return ref
+        .read(publicacionesRepositoryProvider)
+        .listMisArchivadas(offset: offset, limit: limit);
   }
 }
 
 final misPublicacionesArchivadasProvider =
-    NotifierProvider.autoDispose<PublicacionesArchivadasNotifier, PaginaResultado<PublicacionConSede>>(
-  PublicacionesArchivadasNotifier.new,
-);
+    NotifierProvider.autoDispose<
+      PublicacionesArchivadasNotifier,
+      PaginaResultado<PublicacionConSede>
+    >(PublicacionesArchivadasNotifier.new);
 
 /// Actividad de publicaciones de los últimos meses, para la gráfica del Panel de Datos.
-final publicacionesPorMesProvider = FutureProvider.autoDispose<List<PublicacionesPorMes>>((ref) async {
-  final sedes = await ref.watch(misSedesProvider.future);
-  return ref.watch(publicacionesRepositoryProvider).listPublicacionesPorMes(sedes.map((s) => s.idClienteSede).toList());
-});
+final publicacionesPorMesProvider =
+    FutureProvider.autoDispose<List<PublicacionesPorMes>>((ref) async {
+      final sedes = await ref.watch(misSedesProvider.future);
+      return ref
+          .watch(publicacionesRepositoryProvider)
+          .listPublicacionesPorMes(sedes.map((s) => s.idClienteSede).toList());
+    });

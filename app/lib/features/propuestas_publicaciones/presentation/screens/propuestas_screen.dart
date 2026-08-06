@@ -29,18 +29,26 @@ class _PropuestasScreenState extends ConsumerState<PropuestasScreen> {
       builder: (_) => const _ImportandoDialog(),
     );
     try {
-      final resultado = await ref.read(importacionWebRepositoryProvider).ejecutarAhora();
+      final resultado = await ref
+          .read(importacionWebRepositoryProvider)
+          .ejecutarAhora();
       ref.invalidate(propuestasPendientesProvider);
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.propuestasImportarAhoraResultado(resultado.nuevas))),
+          SnackBar(
+            content: Text(
+              context.l10n.propuestasImportarAhoraResultado(resultado.nuevas),
+            ),
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.errorGenerico(e.toString()))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.errorGenerico(e.toString()))),
+        );
       }
     } finally {
       if (mounted) setState(() => _ejecutando = false);
@@ -65,17 +73,27 @@ class _PropuestasScreenState extends ConsumerState<PropuestasScreen> {
       body: propuestasAsync.when(
         data: (propuestas) {
           if (propuestas.isEmpty) {
-            return EmptyState(message: context.l10n.propuestasVacio, icon: Icons.fact_check_outlined);
+            return EmptyState(
+              message: context.l10n.propuestasVacio,
+              icon: Icons.fact_check_outlined,
+            );
           }
           return ListView.separated(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.fromLTRB(
+              16,
+              16,
+              16,
+              16 + MediaQuery.of(context).padding.bottom,
+            ),
             itemCount: propuestas.length,
             separatorBuilder: (_, _) => const SizedBox(height: 8),
-            itemBuilder: (context, index) => _PropuestaCard(propuesta: propuestas[index]),
+            itemBuilder: (context, index) =>
+                _PropuestaCard(propuesta: propuestas[index]),
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorGenerico(e.toString()))),
       ),
       floatingActionButton: FloatingActionButton.extended(
         icon: const Icon(Icons.play_arrow),
@@ -93,8 +111,12 @@ class _ImportandoDialog extends StatefulWidget {
   State<_ImportandoDialog> createState() => _ImportandoDialogState();
 }
 
-class _ImportandoDialogState extends State<_ImportandoDialog> with SingleTickerProviderStateMixin {
-  late final _controller = AnimationController(vsync: this, duration: const Duration(seconds: 1))..repeat();
+class _ImportandoDialogState extends State<_ImportandoDialog>
+    with SingleTickerProviderStateMixin {
+  late final _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 1),
+  )..repeat();
 
   @override
   void dispose() {
@@ -163,13 +185,17 @@ class _PropuestaCardState extends ConsumerState<_PropuestaCard> {
     final confirmado = await showConfirmDialog(
       context,
       title: context.l10n.propuestasConfirmarDescartarTitulo,
-      message: context.l10n.propuestasConfirmarDescartarMensaje(widget.propuesta.nombreFallecido),
+      message: context.l10n.propuestasConfirmarDescartarMensaje(
+        widget.propuesta.nombreFallecido,
+      ),
       confirmLabel: context.l10n.propuestasDescartar,
     );
     if (!confirmado) return;
     setState(() => _procesando = true);
     try {
-      await ref.read(propuestasRepositoryProvider).descartar(widget.propuesta.idClientePublicacionPropuesta);
+      await ref
+          .read(propuestasRepositoryProvider)
+          .descartar(widget.propuesta.idClientePublicacionPropuesta);
       ref.invalidate(propuestasPendientesProvider);
     } finally {
       if (mounted) setState(() => _procesando = false);
@@ -185,11 +211,18 @@ class _PropuestaCardState extends ConsumerState<_PropuestaCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(p.nombreFallecido, style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              p.nombreFallecido,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 4),
             Text(
-              context.l10n.propuestasDetectadaEl(DateFormat('dd/MM/yyyy').format(p.fechaAlta.toLocal())),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.outline),
+              context.l10n.propuestasDetectadaEl(
+                DateFormat('dd/MM/yyyy').format(p.fechaAlta.toLocal()),
+              ),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.outline,
+              ),
             ),
             const SizedBox(height: 12),
             Wrap(

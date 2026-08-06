@@ -15,7 +15,8 @@ class ComunicacionIdioma {
     required this.cuerpo,
   });
 
-  ComunicacionIdioma copyWith({String? asunto, String? cuerpo}) => ComunicacionIdioma(
+  ComunicacionIdioma copyWith({String? asunto, String? cuerpo}) =>
+      ComunicacionIdioma(
         idConfiguracionComunicacionIdioma: idConfiguracionComunicacionIdioma,
         idSistemaIdioma: idSistemaIdioma,
         codigoIdioma: codigoIdioma,
@@ -24,14 +25,19 @@ class ComunicacionIdioma {
         cuerpo: cuerpo ?? this.cuerpo,
       );
 
-  factory ComunicacionIdioma.fromMap(Map<String, dynamic> map) => ComunicacionIdioma(
-        idConfiguracionComunicacionIdioma: map['IdConfiguracionComunicacionIdioma'] as String,
-        idSistemaIdioma: map['IdSistemaIdioma'] as String,
-        codigoIdioma: (map['TSistemaIdiomas'] as Map<String, dynamic>)['Codigo'] as String,
-        nombreIdioma: (map['TSistemaIdiomas'] as Map<String, dynamic>)['Nombre'] as String,
-        asunto: map['Asunto'] as String?,
-        cuerpo: map['Cuerpo'] as String,
-      );
+  factory ComunicacionIdioma.fromMap(
+    Map<String, dynamic> map,
+  ) => ComunicacionIdioma(
+    idConfiguracionComunicacionIdioma:
+        map['IdConfiguracionComunicacionIdioma'] as String,
+    idSistemaIdioma: map['IdSistemaIdioma'] as String,
+    codigoIdioma:
+        (map['TSistemaIdiomas'] as Map<String, dynamic>)['Codigo'] as String,
+    nombreIdioma:
+        (map['TSistemaIdiomas'] as Map<String, dynamic>)['Nombre'] as String,
+    asunto: map['Asunto'] as String?,
+    cuerpo: map['Cuerpo'] as String,
+  );
 }
 
 class Comunicacion {
@@ -54,7 +60,9 @@ class Comunicacion {
   });
 
   factory Comunicacion.fromMap(Map<String, dynamic> map) {
-    final traduccionesRaw = map['TConfiguracionComunicacionesIdiomas'] as List<dynamic>? ?? const [];
+    final traduccionesRaw =
+        map['TConfiguracionComunicacionesIdiomas'] as List<dynamic>? ??
+        const [];
     return Comunicacion(
       idConfiguracionComunicacion: map['IdConfiguracionComunicacion'] as String,
       tipoComunicacion: map['TipoComunicacion'] as String,

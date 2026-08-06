@@ -19,18 +19,27 @@ class ConfiguracionClienteTiposScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.configuracionTiposClienteTitulo)),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/admin/configuracion/tipos-cliente/nueva'),
+        onPressed: () =>
+            context.push('/admin/configuracion/tipos-cliente/nueva'),
         child: const Icon(Icons.add),
       ),
       body: clienteTiposAsync.when(
         data: (clienteTipos) {
           if (clienteTipos.isEmpty) {
-            return EmptyState(message: context.l10n.noHayTiposClienteDadosDeAlta, icon: Icons.category_outlined);
+            return EmptyState(
+              message: context.l10n.noHayTiposClienteDadosDeAlta,
+              icon: Icons.category_outlined,
+            );
           }
           return RefreshIndicator(
             onRefresh: () => ref.refresh(clienteTiposListProvider.future),
             child: ListView.separated(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.fromLTRB(
+                16,
+                16,
+                16,
+                16 + MediaQuery.of(context).padding.bottom,
+              ),
               itemCount: clienteTipos.length,
               separatorBuilder: (_, _) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
@@ -64,12 +73,17 @@ class ConfiguracionClienteTiposScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorGenerico(e.toString()))),
       ),
     );
   }
 
-  Future<void> _eliminar(BuildContext context, WidgetRef ref, ClienteTipo clienteTipo) async {
+  Future<void> _eliminar(
+    BuildContext context,
+    WidgetRef ref,
+    ClienteTipo clienteTipo,
+  ) async {
     final confirmado = await showConfirmDialog(
       context,
       title: context.l10n.clienteTipoEliminarTitulo,
@@ -77,7 +91,9 @@ class ConfiguracionClienteTiposScreen extends ConsumerWidget {
       confirmLabel: context.l10n.eliminar,
     );
     if (!confirmado) return;
-    await ref.read(clienteTiposRepositoryProvider).eliminarClienteTipo(clienteTipo.idConfiguracionClienteTipo);
+    await ref
+        .read(clienteTiposRepositoryProvider)
+        .eliminarClienteTipo(clienteTipo.idConfiguracionClienteTipo);
     ref.invalidate(clienteTiposListProvider);
   }
 }

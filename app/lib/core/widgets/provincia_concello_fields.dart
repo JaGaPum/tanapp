@@ -22,10 +22,12 @@ class ProvinciaConcelloFields extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ProvinciaConcelloFields> createState() => _ProvinciaConcelloFieldsState();
+  ConsumerState<ProvinciaConcelloFields> createState() =>
+      _ProvinciaConcelloFieldsState();
 }
 
-class _ProvinciaConcelloFieldsState extends ConsumerState<ProvinciaConcelloFields> {
+class _ProvinciaConcelloFieldsState
+    extends ConsumerState<ProvinciaConcelloFields> {
   late String? _provinciaNombre = widget.provinciaInicial;
   late String? _concelloNombre = widget.concelloInicial;
 
@@ -35,7 +37,9 @@ class _ProvinciaConcelloFieldsState extends ConsumerState<ProvinciaConcelloField
 
     return provinciasAsync.when(
       data: (provincias) {
-        final provinciaValida = provincias.any((p) => p.nombre == _provinciaNombre);
+        final provinciaValida = provincias.any(
+          (p) => p.nombre == _provinciaNombre,
+        );
         final provinciaSeleccionada = provinciaValida
             ? provincias.firstWhere((p) => p.nombre == _provinciaNombre)
             : null;
@@ -45,10 +49,22 @@ class _ProvinciaConcelloFieldsState extends ConsumerState<ProvinciaConcelloField
           children: [
             DropdownButtonFormField<String>(
               initialValue: provinciaValida ? _provinciaNombre : null,
-              decoration: InputDecoration(labelText: context.l10n.fieldProvincia),
-              validator:
-                  widget.required ? (v) => v == null ? context.l10n.validatorProvinciaRequired : null : null,
-              items: provincias.map((p) => DropdownMenuItem(value: p.nombre, child: Text(p.nombre))).toList(),
+              decoration: InputDecoration(
+                labelText: context.l10n.fieldProvincia,
+              ),
+              validator: widget.required
+                  ? (v) => v == null
+                        ? context.l10n.validatorProvinciaRequired
+                        : null
+                  : null,
+              items: provincias
+                  .map(
+                    (p) => DropdownMenuItem(
+                      value: p.nombre,
+                      child: Text(p.nombre),
+                    ),
+                  )
+                  .toList(),
               onChanged: (value) {
                 setState(() {
                   _provinciaNombre = value;
@@ -78,15 +94,27 @@ class _ProvinciaConcelloFieldsState extends ConsumerState<ProvinciaConcelloField
       );
     }
 
-    final concellosAsync = ref.watch(concellosPorProvinciaProvider(provinciaSeleccionada.idConfiguracionProvincia));
+    final concellosAsync = ref.watch(
+      concellosPorProvinciaProvider(
+        provinciaSeleccionada.idConfiguracionProvincia,
+      ),
+    );
     return concellosAsync.when(
       data: (concellos) {
-        final concelloValido = concellos.any((c) => c.nombre == _concelloNombre);
+        final concelloValido = concellos.any(
+          (c) => c.nombre == _concelloNombre,
+        );
         return DropdownButtonFormField<String>(
           initialValue: concelloValido ? _concelloNombre : null,
           decoration: InputDecoration(labelText: context.l10n.fieldConcello),
-          validator: widget.required ? (v) => v == null ? context.l10n.validatorConcelloRequired : null : null,
-          items: concellos.map((c) => DropdownMenuItem(value: c.nombre, child: Text(c.nombre))).toList(),
+          validator: widget.required
+              ? (v) => v == null ? context.l10n.validatorConcelloRequired : null
+              : null,
+          items: concellos
+              .map(
+                (c) => DropdownMenuItem(value: c.nombre, child: Text(c.nombre)),
+              )
+              .toList(),
           onChanged: (value) {
             setState(() => _concelloNombre = value);
             widget.onConcelloChanged(value);

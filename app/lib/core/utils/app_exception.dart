@@ -23,14 +23,19 @@ AppException mapSupabaseError(Object error) {
     if (msg.contains('token has expired') || msg.contains('otp expired')) {
       return AppException('El código ha caducado, solicita uno nuevo');
     }
-    if (msg.contains('invalid otp') || msg.contains('invalid token') || msg.contains('token is invalid')) {
+    if (msg.contains('invalid otp') ||
+        msg.contains('invalid token') ||
+        msg.contains('token is invalid')) {
       return AppException('Código incorrecto');
     }
-    if (msg.contains('password should be at least') || msg.contains('password is too short')) {
+    if (msg.contains('password should be at least') ||
+        msg.contains('password is too short')) {
       return AppException('La contraseña es demasiado corta');
     }
     if (msg.contains('rate limit') || msg.contains('security purposes')) {
-      return AppException('Has hecho demasiados intentos, espera un momento antes de volver a intentarlo');
+      return AppException(
+        'Has hecho demasiados intentos, espera un momento antes de volver a intentarlo',
+      );
     }
     return AppException(error.message);
   }

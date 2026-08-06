@@ -16,11 +16,11 @@ class ClienteSede {
   });
 
   factory ClienteSede.fromMap(Map<String, dynamic> map) => ClienteSede(
-        idClienteSede: map['IdClienteSede'] as String,
-        codigo: map['Codigo'] as String? ?? '',
-        nombre: map['Nombre'] as String,
-        provincia: map['Provincia'] as String,
-        concello: map['Concello'] as String,
-        direccion: map['Direccion'] as String,
-      );
+    idClienteSede: map['IdClienteSede'] as String,
+    codigo: map['Codigo'] as String? ?? '',
+    nombre: map['Nombre'] as String,
+    provincia: map['Provincia'] as String,
+    concello: map['Concello'] as String,
+    direccion: map['Direccion'] as String,
+  );
 }

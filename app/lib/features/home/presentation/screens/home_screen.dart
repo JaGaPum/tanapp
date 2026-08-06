@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -19,6 +20,7 @@ import '../../../publicaciones/presentation/screens/mis_publicaciones_screen.dar
 import '../../../publicar/presentation/screens/publicar_screen.dart';
 import '../../../seguidos/presentation/screens/mis_seguidos_screen.dart';
 import '../../../seguidos/presentation/screens/seguidos_screen.dart';
+import '../../../suplantacion/presentation/widgets/banner_suplantacion.dart';
 import '../../../tablon/presentation/screens/tablon_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -28,7 +30,8 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObserver {
+class _HomeScreenState extends ConsumerState<HomeScreen>
+    with WidgetsBindingObserver {
   // Índice de la pestaña "Avisos" dentro de la barra inferior de un usuario ordinario/seguidor
   // (TablonScreen, SeguidosScreen, MisSeguidosScreen, ArchivoScreen, AvisosScreen): solo un
   // seguidor puede recibir un push de aviso (es a quien el trigger le crea el destinatario), así
@@ -36,6 +39,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
   static const _tabIndexAvisosSeguidor = 4;
 
   int _tabIndex = 0;
+  String? _idSesionAnterior;
 
   @override
   void initState() {
@@ -74,7 +78,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       FirebaseMessaging.onMessage.listen(_alRecibirEnPrimerPlano);
       // Notificación tocada con la app en segundo plano, o app abierta desde cero por ella.
       FirebaseMessaging.onMessageOpenedApp.listen(_abrirDesdeNotificacion);
-      final mensajeInicial = await FirebaseMessaging.instance.getInitialMessage();
+      final mensajeInicial = await FirebaseMessaging.instance
+          .getInitialMessage();
       if (mensajeInicial != null) _abrirDesdeNotificacion(mensajeInicial);
     } catch (_) {
       // Sin conexión o Firebase no disponible: no es crítico.
@@ -103,6 +108,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
       }
       return;
     }
+    final idClientesSolicitud = message.data['idClientesSolicitud'];
+    if (idClientesSolicitud != null && idClientesSolicitud.isNotEmpty) {
+      context.push('/admin/solicitudes/$idClientesSolicitud');
+      return;
+    }
     final idClienteSede = message.data['idClienteSede'];
     if (idClienteSede != null && idClienteSede.isNotEmpty) {
       context.push('/publicaciones/$idClienteSede');
@@ -116,6 +126,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     final esUsuarioOrdinario = ref.watch(esUsuarioOrdinarioProvider);
     final isAdmin = ref.watch(isAdminProvider);
     final avisosNoLeidos = ref.watch(avisosNoLeidosCountProvider).value ?? 0;
+    // Un admin suele tener también el rol USUARIO_ORDINARIO, así que al suplantar a otro
+    // usuario ordinario la rama de pestañas mostrada no cambia y el IndexedStack de abajo no se
+    // reconstruye por sí solo: sin esta key, TablonScreen/SeguidosScreen/etc. seguirían vivos
+    // con los datos ya cargados de la sesión anterior. Al cambiar la key con el id de sesión
+    // real, Flutter tira todo el subárbol y lo reconstruye desde cero con la sesión nueva.
+    ref.watch(authStateChangesProvider);
+    final idSesionActual = Supabase.instance.client.auth.currentUser?.id;
+    // La pestaña seleccionada no tiene por qué seguir teniendo sentido tras un cambio de
+    // identidad (suplantación o volver): se reinicia a la primera para no dejar al usuario
+    // suplantado en una pestaña que ni siquiera tiene (p. ej. "Panel de datos" de un cliente).
+    if (_idSesionAnterior != null && _idSesionAnterior != idSesionActual) {
+      _tabIndex = 0;
+    }
+    _idSesionAnterior = idSesionActual;
 
     // Un CLIENTE tiene también el rol USUARIO_ORDINARIO (se lo asigna el alta por defecto),
     // pero su navegación es la suya propia, no la de un usuario ordinario cualquiera.
@@ -125,8 +149,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     // "Avisos" suma las dos cosas: solicitudes de cliente pendientes de aprobar (solo ADMIN) y
     // avisos propios sin leer (solo si se ven las pestañas de seguidor; los clientes tienen su
     // propia pestaña "Avisos" con el histórico de enviados, sin badge de pendientes).
-    final pendientesSolicitudes = isAdmin ? ref.watch(solicitudesPendientesCountProvider).value ?? 0 : 0;
-    final pendientes = pendientesSolicitudes + (mostrarTabsOrdinario ? avisosNoLeidos : 0);
+    final pendientesSolicitudes = isAdmin
+        ? ref.watch(solicitudesPendientesCountProvider).value ?? 0
+        : 0;
+    final pendientes =
+        pendientesSolicitudes + (mostrarTabsOrdinario ? avisosNoLeidos : 0);
 
     return Scaffold(
       appBar: AppBar(
@@ -134,47 +161,67 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.local_florist_outlined, color: AppColors.white, size: 28),
+            const Icon(
+              Icons.local_florist_outlined,
+              color: AppColors.white,
+              size: 28,
+            ),
             const SizedBox(width: 8),
-            Text(context.l10n.appTitle, style: const TextStyle(color: AppColors.white)),
+            Text(
+              context.l10n.appTitle,
+              style: const TextStyle(color: AppColors.white),
+            ),
           ],
         ),
       ),
       drawer: const AppDrawer(),
-      body: mostrarTabsCliente
-          ? IndexedStack(
-              index: _tabIndex,
-              children: const [
-                PublicarScreen(),
-                MisPublicacionesScreen(),
-                AvisosEnviadosScreen(),
-                PanelDatosScreen(),
-              ],
-            )
-          : mostrarTabsOrdinario
-              ? IndexedStack(
-                  index: _tabIndex,
-                  children: const [
-                    TablonScreen(),
-                    SeguidosScreen(),
-                    MisSeguidosScreen(),
-                    ArchivoScreen(),
-                    AvisosScreen(),
-                  ],
-                )
-              : perfilAsync.when(
-                  data: (perfil) => ListView(
-                    padding: const EdgeInsets.all(24),
-                    children: [
-                      Text(
-                        context.l10n.holaNombre(perfil?.nombre ?? ''),
-                        style: Theme.of(context).textTheme.headlineSmall,
+      body: Column(
+        children: [
+          const BannerSuplantacion(),
+          Expanded(
+            child: KeyedSubtree(
+              key: ValueKey(idSesionActual),
+              child: mostrarTabsCliente
+                  ? IndexedStack(
+                      index: _tabIndex,
+                      children: const [
+                        PublicarScreen(),
+                        MisPublicacionesScreen(),
+                        AvisosEnviadosScreen(),
+                        PanelDatosScreen(),
+                      ],
+                    )
+                  : mostrarTabsOrdinario
+                  ? IndexedStack(
+                      index: _tabIndex,
+                      children: const [
+                        TablonScreen(),
+                        SeguidosScreen(),
+                        MisSeguidosScreen(),
+                        ArchivoScreen(),
+                        AvisosScreen(),
+                      ],
+                    )
+                  : perfilAsync.when(
+                      data: (perfil) => ListView(
+                        padding: const EdgeInsets.all(24),
+                        children: [
+                          Text(
+                            context.l10n.holaNombre(perfil?.nombre ?? ''),
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
-                ),
+                      loading: () =>
+                          const Center(child: CircularProgressIndicator()),
+                      error: (e, _) => Center(
+                        child: Text(context.l10n.errorGenerico(e.toString())),
+                      ),
+                    ),
+            ),
+          ),
+        ],
+      ),
       bottomNavigationBar: mostrarTabsCliente
           ? BottomNavigationBar(
               currentIndex: _tabIndex,
@@ -184,7 +231,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
               selectedItemColor: AppColors.white,
               unselectedItemColor: Colors.white70,
               items: [
-                BottomNavigationBarItem(icon: const Icon(Icons.campaign_outlined), label: context.l10n.tabPublicar),
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.campaign_outlined),
+                  label: context.l10n.tabPublicar,
+                ),
                 BottomNavigationBarItem(
                   icon: const Icon(Icons.feed_outlined),
                   label: context.l10n.tabPublicaciones,
@@ -200,32 +250,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
               ],
             )
           : !mostrarTabsOrdinario
-              ? null
-              : BottomNavigationBar(
-                  currentIndex: _tabIndex,
-                  onTap: (index) => setState(() => _tabIndex = index),
-                  backgroundColor: AppColors.black,
-                  type: BottomNavigationBarType.fixed,
-                  selectedItemColor: AppColors.white,
-                  unselectedItemColor: Colors.white70,
-                  items: [
-                    BottomNavigationBarItem(
-                      icon: const Icon(Icons.dynamic_feed_outlined),
-                      label: context.l10n.tablon,
-                    ),
-                    BottomNavigationBarItem(icon: const Icon(Icons.search), label: context.l10n.seguidos),
-                    BottomNavigationBarItem(icon: const Icon(Icons.hearing), label: context.l10n.siguiendoTab),
-                    BottomNavigationBarItem(icon: const Icon(Icons.bookmark_border), label: context.l10n.arquivo),
-                    BottomNavigationBarItem(
-                      icon: Badge(
-                        isLabelVisible: pendientes > 0,
-                        backgroundColor: const Color(0xFFD50000),
-                        child: const Icon(Icons.notifications_outlined),
-                      ),
-                      label: context.l10n.avisos,
-                    ),
-                  ],
+          ? null
+          : BottomNavigationBar(
+              currentIndex: _tabIndex,
+              onTap: (index) => setState(() => _tabIndex = index),
+              backgroundColor: AppColors.black,
+              type: BottomNavigationBarType.fixed,
+              selectedItemColor: AppColors.white,
+              unselectedItemColor: Colors.white70,
+              items: [
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.dynamic_feed_outlined),
+                  label: context.l10n.tablon,
                 ),
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.search),
+                  label: context.l10n.seguidos,
+                ),
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.hearing),
+                  label: context.l10n.siguiendoTab,
+                ),
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.bookmark_border),
+                  label: context.l10n.arquivo,
+                ),
+                BottomNavigationBarItem(
+                  icon: Badge(
+                    isLabelVisible: pendientes > 0,
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                    child: const Icon(Icons.notifications_outlined),
+                  ),
+                  label: context.l10n.avisos,
+                ),
+              ],
+            ),
     );
   }
 }

@@ -14,12 +14,17 @@ import '../../data/configuracion_repository.dart';
 
 class ConfiguracionConcellosScreen extends ConsumerWidget {
   final String idConfiguracionProvincia;
-  const ConfiguracionConcellosScreen({super.key, required this.idConfiguracionProvincia});
+  const ConfiguracionConcellosScreen({
+    super.key,
+    required this.idConfiguracionProvincia,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final provinciasAsync = ref.watch(provinciasProvider);
-    final concellosAsync = ref.watch(concellosPorProvinciaProvider(idConfiguracionProvincia));
+    final concellosAsync = ref.watch(
+      concellosPorProvinciaProvider(idConfiguracionProvincia),
+    );
     final nombreProvincia = provinciasAsync.maybeWhen(
       data: (provincias) => provincias
           .where((p) => p.idConfiguracionProvincia == idConfiguracionProvincia)
@@ -43,12 +48,22 @@ class ConfiguracionConcellosScreen extends ConsumerWidget {
       body: concellosAsync.when(
         data: (concellos) {
           if (concellos.isEmpty) {
-            return EmptyState(message: context.l10n.noHayConcellosDadosDeAlta, icon: Icons.location_city_outlined);
+            return EmptyState(
+              message: context.l10n.noHayConcellosDadosDeAlta,
+              icon: Icons.location_city_outlined,
+            );
           }
           return RefreshIndicator(
-            onRefresh: () => ref.refresh(concellosPorProvinciaProvider(idConfiguracionProvincia).future),
+            onRefresh: () => ref.refresh(
+              concellosPorProvinciaProvider(idConfiguracionProvincia).future,
+            ),
             child: ListView.separated(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.fromLTRB(
+                16,
+                16,
+                16,
+                16 + MediaQuery.of(context).padding.bottom,
+              ),
               itemCount: concellos.length,
               separatorBuilder: (_, _) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
@@ -62,7 +77,11 @@ class ConfiguracionConcellosScreen extends ConsumerWidget {
                         IconButton(
                           icon: const Icon(Icons.edit_outlined),
                           tooltip: context.l10n.editar,
-                          onPressed: () => _mostrarFormulario(context, ref, concello: concello),
+                          onPressed: () => _mostrarFormulario(
+                            context,
+                            ref,
+                            concello: concello,
+                          ),
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete_outline),
@@ -78,12 +97,17 @@ class ConfiguracionConcellosScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorGenerico(e.toString()))),
       ),
     );
   }
 
-  Future<void> _eliminar(BuildContext context, WidgetRef ref, Concello concello) async {
+  Future<void> _eliminar(
+    BuildContext context,
+    WidgetRef ref,
+    Concello concello,
+  ) async {
     final confirmado = await showConfirmDialog(
       context,
       title: context.l10n.concelloEliminarTitulo,
@@ -91,11 +115,17 @@ class ConfiguracionConcellosScreen extends ConsumerWidget {
       confirmLabel: context.l10n.eliminar,
     );
     if (!confirmado) return;
-    await ref.read(configuracionRepositoryProvider).eliminarConcello(concello.idConfiguracionConcello);
+    await ref
+        .read(configuracionRepositoryProvider)
+        .eliminarConcello(concello.idConfiguracionConcello);
     ref.invalidate(concellosPorProvinciaProvider(idConfiguracionProvincia));
   }
 
-  Future<void> _mostrarFormulario(BuildContext context, WidgetRef ref, {Concello? concello}) async {
+  Future<void> _mostrarFormulario(
+    BuildContext context,
+    WidgetRef ref, {
+    Concello? concello,
+  }) async {
     await showDialog<void>(
       context: context,
       builder: (context) => _ConcelloFormDialog(
@@ -110,15 +140,21 @@ class ConfiguracionConcellosScreen extends ConsumerWidget {
 class _ConcelloFormDialog extends ConsumerStatefulWidget {
   final String idConfiguracionProvincia;
   final Concello? concello;
-  const _ConcelloFormDialog({required this.idConfiguracionProvincia, this.concello});
+  const _ConcelloFormDialog({
+    required this.idConfiguracionProvincia,
+    this.concello,
+  });
 
   @override
-  ConsumerState<_ConcelloFormDialog> createState() => _ConcelloFormDialogState();
+  ConsumerState<_ConcelloFormDialog> createState() =>
+      _ConcelloFormDialogState();
 }
 
 class _ConcelloFormDialogState extends ConsumerState<_ConcelloFormDialog> {
   final _formKey = GlobalKey<FormState>();
-  late final _nombreController = TextEditingController(text: widget.concello?.nombre ?? '');
+  late final _nombreController = TextEditingController(
+    text: widget.concello?.nombre ?? '',
+  );
   bool _loading = false;
   String? _error;
 
@@ -137,7 +173,10 @@ class _ConcelloFormDialogState extends ConsumerState<_ConcelloFormDialog> {
     final repo = ref.read(configuracionRepositoryProvider);
     try {
       if (widget.concello == null) {
-        await repo.crearConcello(idConfiguracionProvincia: widget.idConfiguracionProvincia, nombre: _nombreController.text);
+        await repo.crearConcello(
+          idConfiguracionProvincia: widget.idConfiguracionProvincia,
+          nombre: _nombreController.text,
+        );
       } else {
         await repo.actualizarConcello(
           idConfiguracionConcello: widget.concello!.idConfiguracionConcello,
@@ -146,7 +185,11 @@ class _ConcelloFormDialogState extends ConsumerState<_ConcelloFormDialog> {
       }
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : 'Ha ocurrido un error inesperado');
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : 'Ha ocurrido un error inesperado',
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -155,7 +198,9 @@ class _ConcelloFormDialogState extends ConsumerState<_ConcelloFormDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.concello == null ? 'Nuevo concello' : 'Editar concello'),
+      title: Text(
+        widget.concello == null ? 'Nuevo concello' : 'Editar concello',
+      ),
       content: Form(
         key: _formKey,
         child: Column(
@@ -166,13 +211,18 @@ class _ConcelloFormDialogState extends ConsumerState<_ConcelloFormDialog> {
             AppTextField(
               controller: _nombreController,
               label: 'Nombre',
-              validator: (v) => v == null || v.trim().isEmpty ? 'El nombre es obligatorio' : null,
+              validator: (v) => v == null || v.trim().isEmpty
+                  ? 'El nombre es obligatorio'
+                  : null,
             ),
           ],
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancelar')),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
         AppButton(label: 'Guardar', loading: _loading, onPressed: _guardar),
       ],
     );

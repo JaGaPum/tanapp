@@ -7,7 +7,8 @@ class TerminosRepository {
   final SupabaseClient _client;
   TerminosRepository(this._client);
 
-  static const _select = 'IdSistemaTermino, Tipo, '
+  static const _select =
+      'IdSistemaTermino, Tipo, '
       'TSistemaTerminosIdiomas(Titulo, Cuerpo, TSistemaIdiomas(Codigo))';
 
   List<String> _tiposRequeridos(List<String> roles) {
@@ -16,9 +17,16 @@ class TerminosRepository {
     return const ['PRIVACIDAD'];
   }
 
-  Future<List<Termino>> _fetchActivos(List<String> tipos, String idiomaCodigo) async {
+  Future<List<Termino>> _fetchActivos(
+    List<String> tipos,
+    String idiomaCodigo,
+  ) async {
     if (tipos.isEmpty) return const [];
-    final data = await _client.from('TSistemaTerminos').select(_select).eq('Activo', true).inFilter('Tipo', tipos);
+    final data = await _client
+        .from('TSistemaTerminos')
+        .select(_select)
+        .eq('Activo', true)
+        .inFilter('Tipo', tipos);
     return data.map((m) => Termino.fromMap(m, idiomaCodigo)).toList();
   }
 
@@ -37,9 +45,13 @@ class TerminosRepository {
         .from('TSistemaTerminosAceptaciones')
         .select('IdSistemaTermino')
         .eq('IdSistemaUsuario', idSistemaUsuario);
-    final idsAceptados = aceptados.map((a) => a['IdSistemaTermino'] as String).toSet();
+    final idsAceptados = aceptados
+        .map((a) => a['IdSistemaTermino'] as String)
+        .toSet();
 
-    return activos.where((t) => !idsAceptados.contains(t.idSistemaTermino)).toList();
+    return activos
+        .where((t) => !idsAceptados.contains(t.idSistemaTermino))
+        .toList();
   }
 
   /// Documentos activos que le aplican a este usuario, aceptados o no (para consultarlos
@@ -48,9 +60,13 @@ class TerminosRepository {
     return _fetchActivos(_tiposRequeridos(roles), idiomaCodigo);
   }
 
-  Future<void> aceptar(String idSistemaUsuario, List<String> idsSistemaTermino) async {
+  Future<void> aceptar(
+    String idSistemaUsuario,
+    List<String> idsSistemaTermino,
+  ) async {
     await _client.from('TSistemaTerminosAceptaciones').insert([
-      for (final id in idsSistemaTermino) {'IdSistemaUsuario': idSistemaUsuario, 'IdSistemaTermino': id},
+      for (final id in idsSistemaTermino)
+        {'IdSistemaUsuario': idSistemaUsuario, 'IdSistemaTermino': id},
     ]);
   }
 }

@@ -15,10 +15,12 @@ class SolicitudClienteFormScreen extends ConsumerStatefulWidget {
   const SolicitudClienteFormScreen({super.key});
 
   @override
-  ConsumerState<SolicitudClienteFormScreen> createState() => _SolicitudClienteFormScreenState();
+  ConsumerState<SolicitudClienteFormScreen> createState() =>
+      _SolicitudClienteFormScreenState();
 }
 
-class _SolicitudClienteFormScreenState extends ConsumerState<SolicitudClienteFormScreen> {
+class _SolicitudClienteFormScreenState
+    extends ConsumerState<SolicitudClienteFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _razonSocialController = TextEditingController();
   final _nifCifController = TextEditingController();
@@ -52,7 +54,9 @@ class _SolicitudClienteFormScreenState extends ConsumerState<SolicitudClienteFor
       _error = null;
     });
     try {
-      await ref.read(solicitudesRepositoryProvider).crearSolicitud(
+      await ref
+          .read(solicitudesRepositoryProvider)
+          .crearSolicitud(
             razonSocial: _razonSocialController.text,
             nifCif: _nifCifController.text,
             nombreContacto: _nombreContactoController.text,
@@ -65,7 +69,11 @@ class _SolicitudClienteFormScreenState extends ConsumerState<SolicitudClienteFor
           );
       if (mounted) setState(() => _enviado = true);
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.errorInesperado);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.errorInesperado,
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -81,7 +89,9 @@ class _SolicitudClienteFormScreenState extends ConsumerState<SolicitudClienteFor
             padding: const EdgeInsets.all(24),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 480),
-              child: _enviado ? _buildConfirmacion(context) : _buildFormulario(context),
+              child: _enviado
+                  ? _buildConfirmacion(context)
+                  : _buildFormulario(context),
             ),
           ),
         ),
@@ -93,16 +103,24 @@ class _SolicitudClienteFormScreenState extends ConsumerState<SolicitudClienteFor
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Icons.mark_email_read_outlined, size: 56, color: Theme.of(context).colorScheme.primary),
+        Icon(
+          Icons.mark_email_read_outlined,
+          size: 56,
+          color: Theme.of(context).colorScheme.primary,
+        ),
         const SizedBox(height: 16),
-        Text(context.l10n.solicitudEnviadaTitulo, style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.center),
-        const SizedBox(height: 8),
         Text(
-          context.l10n.solicitudEnviadaMensaje,
+          context.l10n.solicitudEnviadaTitulo,
+          style: Theme.of(context).textTheme.headlineSmall,
           textAlign: TextAlign.center,
         ),
+        const SizedBox(height: 8),
+        Text(context.l10n.solicitudEnviadaMensaje, textAlign: TextAlign.center),
         const SizedBox(height: 24),
-        AppButton(label: context.l10n.volverAlInicio, onPressed: () => context.go('/login')),
+        AppButton(
+          label: context.l10n.volverAlInicio,
+          onPressed: () => context.go('/login'),
+        ),
       ],
     );
   }
@@ -122,7 +140,10 @@ class _SolicitudClienteFormScreenState extends ConsumerState<SolicitudClienteFor
           AppTextField(
             controller: _razonSocialController,
             label: context.l10n.fieldRazonSocial,
-            validator: Validators.required(context, context.l10n.fieldRazonSocial),
+            validator: Validators.required(
+              context,
+              context.l10n.fieldRazonSocial,
+            ),
           ),
           const SizedBox(height: 16),
           AppTextField(
@@ -134,7 +155,10 @@ class _SolicitudClienteFormScreenState extends ConsumerState<SolicitudClienteFor
           AppTextField(
             controller: _nombreContactoController,
             label: context.l10n.fieldNombreContacto,
-            validator: Validators.required(context, context.l10n.fieldNombreContacto),
+            validator: Validators.required(
+              context,
+              context.l10n.fieldNombreContacto,
+            ),
           ),
           const SizedBox(height: 16),
           AppTextField(
@@ -148,20 +172,28 @@ class _SolicitudClienteFormScreenState extends ConsumerState<SolicitudClienteFor
             controller: _telefonoContactoController,
             label: context.l10n.fieldTelefonoContacto,
             keyboardType: TextInputType.phone,
-            validator: Validators.required(context, context.l10n.fieldTelefonoContacto),
+            validator: Validators.required(
+              context,
+              context.l10n.fieldTelefonoContacto,
+            ),
           ),
           const SizedBox(height: 16),
           ProvinciaConcelloFields(
             provinciaInicial: _provinciaSeleccionada,
             concelloInicial: _concelloSeleccionado,
-            onProvinciaChanged: (value) => setState(() => _provinciaSeleccionada = value),
-            onConcelloChanged: (value) => setState(() => _concelloSeleccionado = value),
+            onProvinciaChanged: (value) =>
+                setState(() => _provinciaSeleccionada = value),
+            onConcelloChanged: (value) =>
+                setState(() => _concelloSeleccionado = value),
           ),
           const SizedBox(height: 16),
           AppTextField(
             controller: _direccionController,
             label: context.l10n.fieldDireccion,
-            validator: Validators.required(context, context.l10n.fieldDireccion),
+            validator: Validators.required(
+              context,
+              context.l10n.fieldDireccion,
+            ),
           ),
           const SizedBox(height: 16),
           AppTextField(
@@ -170,10 +202,17 @@ class _SolicitudClienteFormScreenState extends ConsumerState<SolicitudClienteFor
             maxLines: 4,
           ),
           const SizedBox(height: 24),
-          AppButton(label: context.l10n.enviarSolicitud, loading: _loading, onPressed: _submit),
+          AppButton(
+            label: context.l10n.enviarSolicitud,
+            loading: _loading,
+            onPressed: _submit,
+          ),
           const SizedBox(height: 16),
           Center(
-            child: TextButton(onPressed: () => context.pop(), child: Text(context.l10n.volver)),
+            child: TextButton(
+              onPressed: () => context.pop(),
+              child: Text(context.l10n.volver),
+            ),
           ),
         ],
       ),

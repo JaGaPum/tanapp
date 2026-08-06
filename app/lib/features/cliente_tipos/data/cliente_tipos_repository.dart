@@ -7,11 +7,17 @@ class ClienteTiposRepository {
   final SupabaseClient _client;
   ClienteTiposRepository(this._client);
 
-  static const _select = '*, TConfiguracionClienteTiposIdiomas(*, TSistemaIdiomas(IdSistemaIdioma, Codigo, Nombre))';
+  static const _select =
+      '*, TConfiguracionClienteTiposIdiomas(*, TSistemaIdiomas(IdSistemaIdioma, Codigo, Nombre))';
 
   Future<List<ClienteTipo>> listClienteTipos() async {
-    final data = await _client.from('TConfiguracionClienteTipos').select(_select).order('Nombre');
-    return (data as List).map((e) => ClienteTipo.fromMap(e as Map<String, dynamic>)).toList();
+    final data = await _client
+        .from('TConfiguracionClienteTipos')
+        .select(_select)
+        .order('Nombre');
+    return (data as List)
+        .map((e) => ClienteTipo.fromMap(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<ClienteTipo> fetchById(String id) async {
@@ -23,11 +29,15 @@ class ClienteTiposRepository {
     return ClienteTipo.fromMap(data);
   }
 
-  Future<String> crearClienteTipo({required String nombre, required bool activo}) async {
-    final data = await _client.from('TConfiguracionClienteTipos').insert({
-      'Nombre': nombre.trim(),
-      'Activo': activo,
-    }).select().single();
+  Future<String> crearClienteTipo({
+    required String nombre,
+    required bool activo,
+  }) async {
+    final data = await _client
+        .from('TConfiguracionClienteTipos')
+        .insert({'Nombre': nombre.trim(), 'Activo': activo})
+        .select()
+        .single();
     return data['IdConfiguracionClienteTipo'] as String;
   }
 
@@ -36,10 +46,10 @@ class ClienteTiposRepository {
     required String nombre,
     required bool activo,
   }) async {
-    await _client.from('TConfiguracionClienteTipos').update({
-      'Nombre': nombre.trim(),
-      'Activo': activo,
-    }).eq('IdConfiguracionClienteTipo', idConfiguracionClienteTipo);
+    await _client
+        .from('TConfiguracionClienteTipos')
+        .update({'Nombre': nombre.trim(), 'Activo': activo})
+        .eq('IdConfiguracionClienteTipo', idConfiguracionClienteTipo);
   }
 
   Future<void> eliminarClienteTipo(String idConfiguracionClienteTipo) async {
@@ -54,14 +64,11 @@ class ClienteTiposRepository {
     required String idSistemaIdioma,
     required String nombre,
   }) async {
-    await _client.from('TConfiguracionClienteTiposIdiomas').upsert(
-      {
-        'IdConfiguracionClienteTipo': idConfiguracionClienteTipo,
-        'IdSistemaIdioma': idSistemaIdioma,
-        'Nombre': nombre.trim(),
-      },
-      onConflict: 'IdConfiguracionClienteTipo,IdSistemaIdioma',
-    );
+    await _client.from('TConfiguracionClienteTiposIdiomas').upsert({
+      'IdConfiguracionClienteTipo': idConfiguracionClienteTipo,
+      'IdSistemaIdioma': idSistemaIdioma,
+      'Nombre': nombre.trim(),
+    }, onConflict: 'IdConfiguracionClienteTipo,IdSistemaIdioma');
   }
 }
 

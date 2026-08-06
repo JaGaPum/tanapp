@@ -10,21 +10,21 @@ import '../../application/solicitudes_providers.dart';
 import '../../data/solicitud_cliente.dart';
 
 String _estadoLabel(BuildContext context, String estado) => switch (estado) {
-      'PENDIENTE' => context.l10n.pendiente,
-      'APROBADA' => context.l10n.estadoAprobadaSingular,
-      'RECHAZADA' => context.l10n.estadoRechazadaSingular,
-      _ => estado,
-    };
+  'PENDIENTE' => context.l10n.pendiente,
+  'APROBADA' => context.l10n.estadoAprobadaSingular,
+  'RECHAZADA' => context.l10n.estadoRechazadaSingular,
+  _ => estado,
+};
 
 class SolicitudesListScreen extends ConsumerWidget {
   const SolicitudesListScreen({super.key});
 
   Map<String?, String> _estados(AppLocalizations l10n) => {
-        null: l10n.estadoTodas,
-        'PENDIENTE': l10n.estadoPendientes,
-        'APROBADA': l10n.estadoAprobadas,
-        'RECHAZADA': l10n.estadoRechazadas,
-      };
+    null: l10n.estadoTodas,
+    'PENDIENTE': l10n.estadoPendientes,
+    'APROBADA': l10n.estadoAprobadas,
+    'RECHAZADA': l10n.estadoRechazadas,
+  };
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -45,8 +45,9 @@ class SolicitudesListScreen extends ConsumerWidget {
                   label: Text(entry.value),
                   selected: selected,
                   labelStyle: TextStyle(color: AppColors.chipLabel(selected)),
-                  onSelected: (_) =>
-                      ref.read(solicitudesEstadoFiltroProvider.notifier).set(entry.key),
+                  onSelected: (_) => ref
+                      .read(solicitudesEstadoFiltroProvider.notifier)
+                      .set(entry.key),
                 );
               }).toList(),
             ),
@@ -63,15 +64,22 @@ class SolicitudesListScreen extends ConsumerWidget {
                 return RefreshIndicator(
                   onRefresh: () => ref.refresh(solicitudesListProvider.future),
                   child: ListView.separated(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.fromLTRB(
+                      16,
+                      16,
+                      16,
+                      16 + MediaQuery.of(context).padding.bottom,
+                    ),
                     itemCount: solicitudes.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 8),
-                    itemBuilder: (context, index) => _SolicitudTile(solicitud: solicitudes[index]),
+                    itemBuilder: (context, index) =>
+                        _SolicitudTile(solicitud: solicitudes[index]),
                   ),
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+              error: (e, _) =>
+                  Center(child: Text(context.l10n.errorGenerico(e.toString()))),
             ),
           ),
         ],
@@ -99,12 +107,21 @@ class _SolicitudTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        title: Text(solicitud.razonSocial, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: Text('${solicitud.nombreContacto} · ${solicitud.emailContacto}'),
-        trailing: Chip(
-          label: Text(_estadoLabel(context, solicitud.estado), style: TextStyle(color: _estadoColor(context, solicitud.estado))),
+        title: Text(
+          solicitud.razonSocial,
+          style: const TextStyle(fontWeight: FontWeight.w600),
         ),
-        onTap: () => context.push('/admin/solicitudes/${solicitud.idClientesSolicitud}'),
+        subtitle: Text(
+          '${solicitud.nombreContacto} · ${solicitud.emailContacto}',
+        ),
+        trailing: Chip(
+          label: Text(
+            _estadoLabel(context, solicitud.estado),
+            style: TextStyle(color: _estadoColor(context, solicitud.estado)),
+          ),
+        ),
+        onTap: () =>
+            context.push('/admin/solicitudes/${solicitud.idClientesSolicitud}'),
       ),
     );
   }

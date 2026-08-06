@@ -16,7 +16,11 @@ class OtpInputField extends StatelessWidget {
       keyboardType: TextInputType.number,
       textAlign: TextAlign.center,
       maxLength: 6,
-      style: const TextStyle(fontSize: 28, letterSpacing: 12, fontWeight: FontWeight.bold),
+      style: const TextStyle(
+        fontSize: 28,
+        letterSpacing: 12,
+        fontWeight: FontWeight.bold,
+      ),
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       decoration: const InputDecoration(counterText: '', hintText: '••••••'),
     );

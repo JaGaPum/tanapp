@@ -16,6 +16,7 @@ import '../../features/cliente_sedes/presentation/screens/mis_sedes_screen.dart'
 import '../../features/clientes_solicitudes/presentation/screens/solicitud_cliente_form_screen.dart';
 import '../../features/clientes_solicitudes/presentation/screens/solicitud_detail_screen.dart';
 import '../../features/clientes_solicitudes/presentation/screens/solicitudes_list_screen.dart';
+import '../../features/condolencias/presentation/screens/condolencias_screen.dart';
 import '../../features/configuracion/presentation/screens/cliente_tipo_detail_screen.dart';
 import '../../features/configuracion/presentation/screens/comunicacion_detail_screen.dart';
 import '../../features/configuracion/presentation/screens/configuracion_cliente_tipos_screen.dart';
@@ -24,6 +25,7 @@ import '../../features/configuracion/presentation/screens/configuracion_concello
 import '../../features/configuracion/presentation/screens/configuracion_ia_screen.dart';
 import '../../features/configuracion/presentation/screens/configuracion_provincias_screen.dart';
 import '../../features/configuracion/presentation/screens/configuracion_screen.dart';
+import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/importacion_web/presentation/screens/configurar_importacion_web_screen.dart';
 import '../../features/propuestas_publicaciones/presentation/screens/propuestas_screen.dart';
@@ -33,6 +35,9 @@ import '../../features/publicaciones/presentation/screens/publicaciones_list_scr
 import '../../features/seguidos/presentation/screens/seguidos_clientes_screen.dart';
 import '../../features/seguidos/presentation/screens/seguidos_concellos_screen.dart';
 import '../../features/seguidos/presentation/screens/seguidos_provincias_screen.dart';
+import '../../features/zonas_seguidas/presentation/screens/zona_concellos_screen.dart';
+import '../../features/seguidos/presentation/screens/buscar_cliente_screen.dart';
+import '../../features/zonas_seguidas/presentation/screens/zona_provincias_screen.dart';
 import '../../features/sesiones/application/sesion_policy_service.dart';
 import '../../features/sistema/presentation/screens/sistema_screen.dart';
 import '../../features/sistema_usuarios/data/usuarios_repository.dart';
@@ -83,11 +88,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         // cualquier otro evento) en cambio es la sesión persistida de un arranque en frío
         // normal, y sigue el camino de siempre.
         if (refreshStream.ultimoEvento == AuthChangeEvent.signedIn) {
-          final perfil = await ref.read(usuariosRepositoryProvider).fetchPerfilByAuthId(session.user.id);
+          final perfil = await ref
+              .read(usuariosRepositoryProvider)
+              .fetchPerfilByAuthId(session.user.id);
           if (perfil != null && perfil.activo) {
             await ref
                 .read(sesionPolicyServiceProvider)
-                .registrarLoginExplicito(idSistemaUsuario: perfil.idSistemaUsuario, recordar: true);
+                .registrarLoginExplicito(
+                  idSistemaUsuario: perfil.idSistemaUsuario,
+                  recordar: true,
+                );
           } else {
             // Mismo criterio silencioso que ejecutarBootstrap() para perfil nulo: sin perfil o
             // con la cuenta desactivada, se cierra sesión sin más. A diferencia del login por
@@ -113,14 +123,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // de la app (el resultado queda cacheado en el guard).
       if (guard.necesitaAceptarTerminos == null) {
         try {
-          final perfil = await ref.read(usuariosRepositoryProvider).fetchPerfilByAuthId(session.user.id);
+          final perfil = await ref
+              .read(usuariosRepositoryProvider)
+              .fetchPerfilByAuthId(session.user.id);
           if (perfil == null) {
             guard.necesitaAceptarTerminos = false;
           } else {
-            final idiomaCodigo = ref.read(appLocaleProvider).languageCode == 'gl' ? 'GL' : 'ES';
+            final idiomaCodigo =
+                ref.read(appLocaleProvider).languageCode == 'gl' ? 'GL' : 'ES';
             final pendientes = await ref
                 .read(terminosRepositoryProvider)
-                .fetchPendientes(perfil.idSistemaUsuario, perfil.roles, idiomaCodigo);
+                .fetchPendientes(
+                  perfil.idSistemaUsuario,
+                  perfil.roles,
+                  idiomaCodigo,
+                );
             guard.necesitaAceptarTerminos = pendientes.isNotEmpty;
           }
         } catch (e) {
@@ -149,9 +166,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
-      GoRoute(path: '/register', builder: (context, state) => const RegisterScreen()),
+      GoRoute(
+        path: '/register',
+        builder: (context, state) => const RegisterScreen(),
+      ),
       GoRoute(
         path: '/register/verify',
         builder: (context, state) => VerifyOtpScreen(
@@ -159,7 +182,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           purpose: OtpPurpose.signup,
         ),
       ),
-      GoRoute(path: '/forgot-password', builder: (context, state) => const ForgotPasswordScreen()),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (context, state) => const ForgotPasswordScreen(),
+      ),
       GoRoute(
         path: '/forgot-password/verify',
         builder: (context, state) => VerifyOtpScreen(
@@ -167,13 +193,31 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           purpose: OtpPurpose.recovery,
         ),
       ),
-      GoRoute(path: '/reset-password', builder: (context, state) => const ResetPasswordScreen()),
-      GoRoute(path: '/solicitud-cliente', builder: (context, state) => const SolicitudClienteFormScreen()),
+      GoRoute(
+        path: '/reset-password',
+        builder: (context, state) => const ResetPasswordScreen(),
+      ),
+      GoRoute(
+        path: '/solicitud-cliente',
+        builder: (context, state) => const SolicitudClienteFormScreen(),
+      ),
       GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
-      GoRoute(path: '/account', builder: (context, state) => const AccountScreen()),
-      GoRoute(path: '/aceptar-terminos', builder: (context, state) => const AceptarTerminosScreen()),
-      GoRoute(path: '/terminos', builder: (context, state) => const VerTerminosScreen()),
-      GoRoute(path: '/mis-sedes', builder: (context, state) => const MisSedesScreen()),
+      GoRoute(
+        path: '/account',
+        builder: (context, state) => const AccountScreen(),
+      ),
+      GoRoute(
+        path: '/aceptar-terminos',
+        builder: (context, state) => const AceptarTerminosScreen(),
+      ),
+      GoRoute(
+        path: '/terminos',
+        builder: (context, state) => const VerTerminosScreen(),
+      ),
+      GoRoute(
+        path: '/mis-sedes',
+        builder: (context, state) => const MisSedesScreen(),
+      ),
       GoRoute(
         path: '/publicar/manual',
         builder: (context, state) {
@@ -185,9 +229,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             idClientePublicacion: datos?['idClientePublicacion'],
             idClienteSedeInicial: datos?['idClienteSede'],
             nombreInicial: datos?['nombre'],
-            fechaFallecimientoInicial: fechaFallecimiento != null ? DateTime.parse(fechaFallecimiento) : null,
+            fechaFallecimientoInicial: fechaFallecimiento != null
+                ? DateTime.parse(fechaFallecimiento)
+                : null,
             edadInicial: edad != null ? int.tryParse(edad) : null,
-            fechaFuneralInicial: fechaFuneral != null ? DateTime.parse(fechaFuneral) : null,
+            fechaFuneralInicial: fechaFuneral != null
+                ? DateTime.parse(fechaFuneral)
+                : null,
             horaFuneralInicial: datos?['horaFuneral'],
             iglesiaInicial: datos?['iglesia'],
             lugarInicial: datos?['lugar'],
@@ -195,22 +243,54 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             salaInicial: datos?['sala'],
             observacionesInicial: datos?['observaciones'],
             avisoInicial: datos?['avisoOcr'],
-            idClientePublicacionPropuestaInicial: datos?['idClientePublicacionPropuesta'],
+            idClientePublicacionPropuestaInicial:
+                datos?['idClientePublicacionPropuesta'],
           );
         },
       ),
-      GoRoute(path: '/publicar/escanear', builder: (context, state) => const PublicacionEscanearScreen()),
-      GoRoute(path: '/publicar/importar-web', builder: (context, state) => const ConfigurarImportacionWebScreen()),
-      GoRoute(path: '/publicar/propuestas', builder: (context, state) => const PropuestasScreen()),
-      GoRoute(path: '/publicar/avisos', builder: (context, state) => const AvisoFormScreen()),
+      GoRoute(
+        path: '/publicar/escanear',
+        builder: (context, state) => const PublicacionEscanearScreen(),
+      ),
+      GoRoute(
+        path: '/publicar/importar-web',
+        builder: (context, state) => const ConfigurarImportacionWebScreen(),
+      ),
+      GoRoute(
+        path: '/publicar/propuestas',
+        builder: (context, state) => const PropuestasScreen(),
+      ),
+      GoRoute(
+        path: '/publicar/avisos',
+        builder: (context, state) => const AvisoFormScreen(),
+      ),
       GoRoute(
         path: '/publicaciones/:sedeId',
         builder: (context, state) => PublicacionesListScreen(
-          titulo: state.extra as String? ?? context.l10n.publicarNuevaPublicacion,
+          titulo:
+              state.extra as String? ?? context.l10n.publicarNuevaPublicacion,
           idClienteSede: state.pathParameters['sedeId']!,
         ),
       ),
-      GoRoute(path: '/admin', builder: (context, state) => const SistemaScreen()),
+      GoRoute(
+        path: '/publicacion/:idClientePublicacion/condolencias',
+        builder: (context, state) {
+          final datos = state.extra as Map<String, String?>?;
+          return CondolenciasScreen(
+            idClientePublicacion: state.pathParameters['idClientePublicacion']!,
+            nombreFallecido: datos?['nombreFallecido'] ?? '',
+            idClienteSede: datos?['idClienteSede'] ?? '',
+          );
+        },
+      ),
+      GoRoute(
+        path: '/admin',
+        builder: (context, state) => const SistemaScreen(),
+      ),
+      GoRoute(
+        path: '/admin/dashboard',
+        builder: (context, state) => const DashboardScreen(),
+      ),
       GoRoute(
         path: '/admin/configuracion',
         builder: (context, state) => const ConfiguracionScreen(),
@@ -221,14 +301,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: ':id',
-                builder: (context, state) =>
-                    ConfiguracionConcellosScreen(idConfiguracionProvincia: state.pathParameters['id']!),
+                builder: (context, state) => ConfiguracionConcellosScreen(
+                  idConfiguracionProvincia: state.pathParameters['id']!,
+                ),
               ),
             ],
           ),
           GoRoute(
             path: 'comunicaciones',
-            builder: (context, state) => const ConfiguracionComunicacionesScreen(),
+            builder: (context, state) =>
+                const ConfiguracionComunicacionesScreen(),
             routes: [
               GoRoute(
                 path: 'nueva',
@@ -236,14 +318,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               ),
               GoRoute(
                 path: ':id',
-                builder: (context, state) =>
-                    ComunicacionDetailScreen(idConfiguracionComunicacion: state.pathParameters['id']!),
+                builder: (context, state) => ComunicacionDetailScreen(
+                  idConfiguracionComunicacion: state.pathParameters['id']!,
+                ),
               ),
             ],
           ),
           GoRoute(
             path: 'tipos-cliente',
-            builder: (context, state) => const ConfiguracionClienteTiposScreen(),
+            builder: (context, state) =>
+                const ConfiguracionClienteTiposScreen(),
             routes: [
               GoRoute(
                 path: 'nueva',
@@ -251,8 +335,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               ),
               GoRoute(
                 path: ':id',
-                builder: (context, state) =>
-                    ClienteTipoDetailScreen(idConfiguracionClienteTipo: state.pathParameters['id']!),
+                builder: (context, state) => ClienteTipoDetailScreen(
+                  idConfiguracionClienteTipo: state.pathParameters['id']!,
+                ),
               ),
             ],
           ),
@@ -268,15 +353,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: ':id',
-            builder: (context, state) =>
-                UsuarioDetailScreen(idSistemaUsuario: state.pathParameters['id']!),
+            builder: (context, state) => UsuarioDetailScreen(
+              idSistemaUsuario: state.pathParameters['id']!,
+            ),
           ),
         ],
       ),
       GoRoute(
         path: '/seguidos/:tipoId/provincias',
-        builder: (context, state) =>
-            SeguidosProvinciasScreen(idConfiguracionClienteTipo: state.pathParameters['tipoId']!),
+        builder: (context, state) => SeguidosProvinciasScreen(
+          idConfiguracionClienteTipo: state.pathParameters['tipoId']!,
+        ),
         routes: [
           GoRoute(
             path: ':provinciaId/concellos',
@@ -289,11 +376,28 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: ':concelloId/clientes',
                 builder: (context, state) => SeguidosClientesScreen(
                   idConfiguracionClienteTipo: state.pathParameters['tipoId']!,
-                  idConfiguracionProvincia: state.pathParameters['provinciaId']!,
+                  idConfiguracionProvincia:
+                      state.pathParameters['provinciaId']!,
                   idConfiguracionConcello: state.pathParameters['concelloId']!,
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/seguidos-nuevo',
+        builder: (context, state) => const BuscarClienteScreen(),
+      ),
+      GoRoute(
+        path: '/seguidos-zona/provincias',
+        builder: (context, state) => const ZonaProvinciasScreen(),
+        routes: [
+          GoRoute(
+            path: ':provinciaId/concellos',
+            builder: (context, state) => ZonaConcellosScreen(
+              idConfiguracionProvincia: state.pathParameters['provinciaId']!,
+            ),
           ),
         ],
       ),
@@ -303,8 +407,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: ':id',
-            builder: (context, state) =>
-                SolicitudDetailScreen(idClientesSolicitud: state.pathParameters['id']!),
+            builder: (context, state) => SolicitudDetailScreen(
+              idClientesSolicitud: state.pathParameters['id']!,
+            ),
           ),
         ],
       ),

@@ -7,7 +7,12 @@ class BigChoiceCard extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const BigChoiceCard({super.key, required this.icon, required this.label, required this.onTap});
+  const BigChoiceCard({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {

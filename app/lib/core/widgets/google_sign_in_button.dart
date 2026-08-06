@@ -29,7 +29,10 @@ class GoogleSignInButton extends StatelessWidget {
         icon: const SizedBox(height: 20, width: 20, child: _GoogleLogo()),
         label: Text(
           label ?? context.l10n.googleContinuar,
-          style: const TextStyle(color: _grisTexto, fontWeight: FontWeight.w500),
+          style: const TextStyle(
+            color: _grisTexto,
+            fontWeight: FontWeight.w500,
+          ),
         ),
         onPressed: onPressed,
       ),
@@ -74,7 +77,12 @@ class _GoogleLogoPainter extends CustomPainter {
     canvas.drawCircle(centro, radio * 0.55, Paint()..color = Colors.white);
     // ...y la barra horizontal azul característica de la "G", con su hueco a la derecha.
     canvas.drawRect(
-      Rect.fromLTWH(centro.dx - radio * 0.05, centro.dy - radio * 0.14, radio * 0.95, radio * 0.28),
+      Rect.fromLTWH(
+        centro.dx - radio * 0.05,
+        centro.dy - radio * 0.14,
+        radio * 0.95,
+        radio * 0.28,
+      ),
       Paint()..color = const Color(0xFF4285F4),
     );
   }

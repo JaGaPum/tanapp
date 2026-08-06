@@ -43,7 +43,9 @@ class _UsuariosListScreenState extends ConsumerState<UsuariosListScreen> {
                 labelText: context.l10n.buscarPorNombreEmail,
                 prefixIcon: const Icon(Icons.search),
               ),
-              onChanged: (value) => ref.read(usuariosListParamsProvider.notifier).setBusqueda(value),
+              onChanged: (value) => ref
+                  .read(usuariosListParamsProvider.notifier)
+                  .setBusqueda(value),
             ),
           ),
           Padding(
@@ -55,7 +57,9 @@ class _UsuariosListScreenState extends ConsumerState<UsuariosListScreen> {
                 FilterChip(
                   label: Text(context.l10n.soloActivos),
                   selected: params.soloActivos == true,
-                  labelStyle: TextStyle(color: AppColors.chipLabel(params.soloActivos == true)),
+                  labelStyle: TextStyle(
+                    color: AppColors.chipLabel(params.soloActivos == true),
+                  ),
                   onSelected: (selected) => ref
                       .read(usuariosListParamsProvider.notifier)
                       .setSoloActivos(selected ? true : null),
@@ -63,8 +67,12 @@ class _UsuariosListScreenState extends ConsumerState<UsuariosListScreen> {
                 ChoiceChip(
                   label: Text(context.l10n.todosLosRoles),
                   selected: params.rolCodigo == null,
-                  labelStyle: TextStyle(color: AppColors.chipLabel(params.rolCodigo == null)),
-                  onSelected: (_) => ref.read(usuariosListParamsProvider.notifier).setRol(null),
+                  labelStyle: TextStyle(
+                    color: AppColors.chipLabel(params.rolCodigo == null),
+                  ),
+                  onSelected: (_) => ref
+                      .read(usuariosListParamsProvider.notifier)
+                      .setRol(null),
                 ),
                 ...rolesAsync.maybeWhen(
                   data: (roles) => roles.map((rol) {
@@ -72,8 +80,12 @@ class _UsuariosListScreenState extends ConsumerState<UsuariosListScreen> {
                     return ChoiceChip(
                       label: Text(rol.nombre),
                       selected: selected,
-                      labelStyle: TextStyle(color: AppColors.chipLabel(selected)),
-                      onSelected: (_) => ref.read(usuariosListParamsProvider.notifier).setRol(rol.codigo),
+                      labelStyle: TextStyle(
+                        color: AppColors.chipLabel(selected),
+                      ),
+                      onSelected: (_) => ref
+                          .read(usuariosListParamsProvider.notifier)
+                          .setRol(rol.codigo),
                     );
                   }),
                   orElse: () => const <Widget>[],
@@ -85,20 +97,30 @@ class _UsuariosListScreenState extends ConsumerState<UsuariosListScreen> {
             child: usuariosAsync.when(
               data: (usuarios) {
                 if (usuarios.isEmpty) {
-                  return EmptyState(message: context.l10n.noSeHanEncontradoUsuarios, icon: Icons.people_outline);
+                  return EmptyState(
+                    message: context.l10n.noSeHanEncontradoUsuarios,
+                    icon: Icons.people_outline,
+                  );
                 }
                 return RefreshIndicator(
                   onRefresh: () => ref.refresh(usuariosListProvider.future),
                   child: ListView.separated(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.fromLTRB(
+                      16,
+                      16,
+                      16,
+                      16 + MediaQuery.of(context).padding.bottom,
+                    ),
                     itemCount: usuarios.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 8),
-                    itemBuilder: (context, index) => _UsuarioTile(usuario: usuarios[index]),
+                    itemBuilder: (context, index) =>
+                        _UsuarioTile(usuario: usuarios[index]),
                   ),
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+              error: (e, _) =>
+                  Center(child: Text(context.l10n.errorGenerico(e.toString()))),
             ),
           ),
         ],
@@ -116,7 +138,8 @@ class _UsuarioTile extends StatelessWidget {
     final nombreCompleto = usuario.nombreCompleto;
     return Card(
       child: InkWell(
-        onTap: () => context.push('/admin/usuarios/${usuario.idSistemaUsuario}'),
+        onTap: () =>
+            context.push('/admin/usuarios/${usuario.idSistemaUsuario}'),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(
@@ -127,9 +150,15 @@ class _UsuarioTile extends StatelessWidget {
                     ? Theme.of(context).colorScheme.primary
                     : Theme.of(context).colorScheme.outline,
                 foregroundColor: Colors.white,
-                backgroundImage: usuario.fotoUrl != null ? NetworkImage(usuario.fotoUrl!) : null,
+                backgroundImage: usuario.fotoUrl != null
+                    ? NetworkImage(usuario.fotoUrl!)
+                    : null,
                 child: usuario.fotoUrl == null
-                    ? Text(usuario.nombre.isNotEmpty ? usuario.nombre[0].toUpperCase() : '?')
+                    ? Text(
+                        usuario.nombre.isNotEmpty
+                            ? usuario.nombre[0].toUpperCase()
+                            : '?',
+                      )
                     : null,
               ),
               const SizedBox(width: 12),
@@ -146,18 +175,31 @@ class _UsuarioTile extends StatelessWidget {
                     Row(
                       children: [
                         if (nombreCompleto.isNotEmpty)
-                          Expanded(child: Text(nombreCompleto, overflow: TextOverflow.ellipsis)),
+                          Expanded(
+                            child: Text(
+                              nombreCompleto,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         Icon(
-                          usuario.emailConfirmado ? Icons.verified_outlined : Icons.hourglass_empty,
+                          usuario.emailConfirmado
+                              ? Icons.verified_outlined
+                              : Icons.hourglass_empty,
                           size: 16,
-                          color: usuario.emailConfirmado ? AppColors.green : AppColors.gray,
+                          color: usuario.emailConfirmado
+                              ? AppColors.green
+                              : AppColors.gray,
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          usuario.emailConfirmado ? context.l10n.validado : context.l10n.pendiente,
+                          usuario.emailConfirmado
+                              ? context.l10n.validado
+                              : context.l10n.pendiente,
                           style: TextStyle(
                             fontSize: 12,
-                            color: usuario.emailConfirmado ? AppColors.green : AppColors.gray,
+                            color: usuario.emailConfirmado
+                                ? AppColors.green
+                                : AppColors.gray,
                           ),
                         ),
                       ],
@@ -166,7 +208,10 @@ class _UsuarioTile extends StatelessWidget {
                     Wrap(
                       spacing: 4,
                       runSpacing: 4,
-                      children: usuario.roles.take(2).map((codigo) => Chip(label: Text(codigo))).toList(),
+                      children: usuario.roles
+                          .take(2)
+                          .map((codigo) => Chip(label: Text(codigo)))
+                          .toList(),
                     ),
                   ],
                 ),

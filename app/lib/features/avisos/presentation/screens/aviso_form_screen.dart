@@ -35,25 +35,36 @@ class _AvisoFormScreenState extends ConsumerState<AvisoFormScreen> {
   }
 
   Future<void> _enviar() async {
-    if (!_formKey.currentState!.validate() || _idClienteSedeSeleccionada == null) return;
+    if (!_formKey.currentState!.validate() ||
+        _idClienteSedeSeleccionada == null) {
+      return;
+    }
 
     setState(() {
       _loading = true;
       _error = null;
     });
     try {
-      await ref.read(avisosRepositoryProvider).crearAviso(
+      await ref
+          .read(avisosRepositoryProvider)
+          .crearAviso(
             idClienteSede: _idClienteSedeSeleccionada!,
             titulo: _tituloController.text,
             texto: _textoController.text,
           );
       ref.invalidate(misAvisosEnviadosProvider);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.avisosEnviadoOk)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.l10n.avisosEnviadoOk)));
         Navigator.of(context).pop();
       }
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.errorInesperado);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.errorInesperado,
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -68,11 +79,19 @@ class _AvisoFormScreenState extends ConsumerState<AvisoFormScreen> {
       body: sedesAsync.when(
         data: (sedes) {
           if (sedes.isEmpty) {
-            return EmptyState(message: context.l10n.publicarSinSedes, icon: Icons.storefront_outlined);
+            return EmptyState(
+              message: context.l10n.publicarSinSedes,
+              icon: Icons.storefront_outlined,
+            );
           }
           _idClienteSedeSeleccionada ??= sedes.first.idClienteSede;
           return SingleChildScrollView(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.of(context).padding.bottom),
+            padding: EdgeInsets.fromLTRB(
+              16,
+              16,
+              16,
+              16 + MediaQuery.of(context).padding.bottom,
+            ),
             child: Form(
               key: _formKey,
               child: Column(
@@ -82,7 +101,9 @@ class _AvisoFormScreenState extends ConsumerState<AvisoFormScreen> {
                   if (sedes.length > 1) ...[
                     DropdownButtonFormField<String>(
                       initialValue: _idClienteSedeSeleccionada,
-                      decoration: InputDecoration(labelText: context.l10n.publicarSeleccionaSede),
+                      decoration: InputDecoration(
+                        labelText: context.l10n.publicarSeleccionaSede,
+                      ),
                       items: sedes
                           .map(
                             (sede) => DropdownMenuItem(
@@ -91,21 +112,28 @@ class _AvisoFormScreenState extends ConsumerState<AvisoFormScreen> {
                             ),
                           )
                           .toList(),
-                      onChanged: (value) => setState(() => _idClienteSedeSeleccionada = value),
+                      onChanged: (value) =>
+                          setState(() => _idClienteSedeSeleccionada = value),
                     ),
                     const SizedBox(height: 16),
                   ],
                   AppTextField(
                     controller: _tituloController,
                     label: context.l10n.avisosTituloLabel,
-                    validator: Validators.required(context, context.l10n.avisosTituloLabel),
+                    validator: Validators.required(
+                      context,
+                      context.l10n.avisosTituloLabel,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   AppTextField(
                     controller: _textoController,
                     label: context.l10n.avisosTextoLabel,
                     maxLines: 6,
-                    validator: Validators.required(context, context.l10n.avisosTextoLabel),
+                    validator: Validators.required(
+                      context,
+                      context.l10n.avisosTextoLabel,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   AppButton(
@@ -119,7 +147,8 @@ class _AvisoFormScreenState extends ConsumerState<AvisoFormScreen> {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorGenerico(e.toString()))),
       ),
     );
   }

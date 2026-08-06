@@ -11,7 +11,9 @@ final authStateChangesProvider = StreamProvider<AuthState>((ref) {
 
 /// Se apoya en [authStateChangesProvider] únicamente para recalcular cuando cambia la sesión;
 /// el usuario actual se lee de forma síncrona desde el cliente de Supabase.
-final currentUserProfileProvider = FutureProvider.autoDispose<UsuarioPerfil?>((ref) async {
+final currentUserProfileProvider = FutureProvider.autoDispose<UsuarioPerfil?>((
+  ref,
+) async {
   ref.watch(authStateChangesProvider);
   final user = ref.watch(authRepositoryProvider).currentUser;
   if (user == null) return null;
@@ -21,7 +23,10 @@ final currentUserProfileProvider = FutureProvider.autoDispose<UsuarioPerfil?>((r
 
 final isAdminProvider = Provider.autoDispose<bool>((ref) {
   final perfilAsync = ref.watch(currentUserProfileProvider);
-  return perfilAsync.maybeWhen(data: (p) => p?.roles.contains('ADMIN') ?? false, orElse: () => false);
+  return perfilAsync.maybeWhen(
+    data: (p) => p?.roles.contains('ADMIN') ?? false,
+    orElse: () => false,
+  );
 });
 
 final esUsuarioOrdinarioProvider = Provider.autoDispose<bool>((ref) {
@@ -34,5 +39,8 @@ final esUsuarioOrdinarioProvider = Provider.autoDispose<bool>((ref) {
 
 final isClienteProvider = Provider.autoDispose<bool>((ref) {
   final perfilAsync = ref.watch(currentUserProfileProvider);
-  return perfilAsync.maybeWhen(data: (p) => p?.roles.contains('CLIENTE') ?? false, orElse: () => false);
+  return perfilAsync.maybeWhen(
+    data: (p) => p?.roles.contains('CLIENTE') ?? false,
+    orElse: () => false,
+  );
 });

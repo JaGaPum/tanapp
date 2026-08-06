@@ -9,7 +9,10 @@ import '../widgets/provincia_shape_icon.dart';
 
 class SeguidosProvinciasScreen extends ConsumerWidget {
   final String idConfiguracionClienteTipo;
-  const SeguidosProvinciasScreen({super.key, required this.idConfiguracionClienteTipo});
+  const SeguidosProvinciasScreen({
+    super.key,
+    required this.idConfiguracionClienteTipo,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -37,7 +40,8 @@ class SeguidosProvinciasScreen extends ConsumerWidget {
                 .toList(),
           ),
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+          error: (e, _) =>
+              Center(child: Text(context.l10n.errorGenerico(e.toString()))),
         ),
       ),
     );

@@ -8,9 +8,11 @@ import '../../../../core/preferences/escala_texto_provider.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/cruz_icon.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../condolencias/presentation/widgets/condolencias_modal.dart';
 import '../../application/publicaciones_providers.dart';
 import '../../data/publicacion_con_sede.dart';
 import '../../data/publicaciones_repository.dart';
+import '../widgets/condolencias_indicador.dart';
 import '../widgets/publicacion_detalle.dart';
 
 class MisPublicacionesScreen extends ConsumerWidget {
@@ -23,17 +25,22 @@ class MisPublicacionesScreen extends ConsumerWidget {
     return publicacionesAsync.when(
       data: (publicaciones) {
         if (publicaciones.isEmpty) {
-          return EmptyState(message: context.l10n.publicarSinPublicaciones, icon: Icons.campaign_outlined);
+          return EmptyState(
+            message: context.l10n.publicarSinPublicaciones,
+            icon: Icons.campaign_outlined,
+          );
         }
         return ListView.separated(
           padding: const EdgeInsets.all(16),
           itemCount: publicaciones.length,
           separatorBuilder: (_, _) => const SizedBox(height: 8),
-          itemBuilder: (context, index) => _MiPublicacionCard(publicacion: publicaciones[index]),
+          itemBuilder: (context, index) =>
+              _MiPublicacionCard(publicacion: publicaciones[index]),
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+      error: (e, _) =>
+          Center(child: Text(context.l10n.errorGenerico(e.toString()))),
     );
   }
 }
@@ -74,16 +81,22 @@ class _MiPublicacionCardState extends ConsumerState<_MiPublicacionCard> {
     final confirmado = await showConfirmDialog(
       context,
       title: context.l10n.publicarEliminarTitulo,
-      message: context.l10n.publicarEliminarMensaje(widget.publicacion.nombreFallecido),
+      message: context.l10n.publicarEliminarMensaje(
+        widget.publicacion.nombreFallecido,
+      ),
       confirmLabel: context.l10n.eliminar,
     );
     if (!confirmado) return;
     setState(() => _eliminando = true);
     try {
-      await ref.read(publicacionesRepositoryProvider).eliminarPublicacion(widget.publicacion.idClientePublicacion);
+      await ref
+          .read(publicacionesRepositoryProvider)
+          .eliminarPublicacion(widget.publicacion.idClientePublicacion);
       ref.invalidate(misPublicacionesProvider);
       ref.invalidate(publicacionesTablonProvider);
-      ref.invalidate(publicacionesPorSedeProvider(widget.publicacion.idClienteSede));
+      ref.invalidate(
+        publicacionesPorSedeProvider(widget.publicacion.idClienteSede),
+      );
     } finally {
       if (mounted) setState(() => _eliminando = false);
     }
@@ -100,7 +113,9 @@ class _MiPublicacionCardState extends ConsumerState<_MiPublicacionCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             MediaQuery(
-              data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(escala)),
+              data: MediaQuery.of(
+                context,
+              ).copyWith(textScaler: TextScaler.linear(escala)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -110,21 +125,41 @@ class _MiPublicacionCardState extends ConsumerState<_MiPublicacionCard> {
                       CruzIcon(size: 20 * escala),
                       const SizedBox(width: 6),
                       Expanded(
-                        child: Text(publicacion.nombreFallecido, style: Theme.of(context).textTheme.titleLarge),
+                        child: Text(
+                          publicacion.nombreFallecido,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text(publicacion.concello, style: Theme.of(context).textTheme.titleSmall),
+                  Text(
+                    publicacion.concello,
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
                   const SizedBox(height: 8),
-                  PublicacionDetalle(publicacion: publicacion),
+                  PublicacionDetalle(
+                    publicacion: publicacion,
+                    trailingLugar: CondolenciasIndicador(
+                      numCondolencias: publicacion.numCondolencias,
+                      onTap: () => mostrarCondolenciasModal(
+                        context,
+                        idClientePublicacion: publicacion.idClientePublicacion,
+                        nombreFallecido: publicacion.nombreFallecido,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              DateFormat('dd/MM/yyyy HH:mm').format(publicacion.fechaAlta.toLocal()),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.outline),
+              DateFormat(
+                'dd/MM/yyyy HH:mm',
+              ).format(publicacion.fechaAlta.toLocal()),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.outline,
+              ),
             ),
             const SizedBox(height: 12),
             Wrap(
@@ -140,6 +175,16 @@ class _MiPublicacionCardState extends ConsumerState<_MiPublicacionCard> {
                   icon: const Icon(Icons.delete_outline),
                   label: Text(context.l10n.eliminar),
                   onPressed: _eliminando ? null : _eliminar,
+                ),
+                OutlinedButton(
+                  onPressed: () => context.push(
+                    '/publicacion/${publicacion.idClientePublicacion}/condolencias',
+                    extra: {
+                      'nombreFallecido': publicacion.nombreFallecido,
+                      'idClienteSede': publicacion.idClienteSede,
+                    },
+                  ),
+                  child: Text(context.l10n.publicarCondolencias),
                 ),
               ],
             ),

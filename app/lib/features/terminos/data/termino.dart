@@ -14,9 +14,12 @@ class Termino {
   /// [idiomaCodigo] es "ES" o "GL"; si el documento no tiene contenido en ese idioma
   /// (no debería pasar, pero por si acaso) se usa el primero disponible.
   factory Termino.fromMap(Map<String, dynamic> map, String idiomaCodigo) {
-    final idiomas = (map['TSistemaTerminosIdiomas'] as List<dynamic>).cast<Map<String, dynamic>>();
+    final idiomas = (map['TSistemaTerminosIdiomas'] as List<dynamic>)
+        .cast<Map<String, dynamic>>();
     final idioma = idiomas.firstWhere(
-      (i) => (i['TSistemaIdiomas'] as Map<String, dynamic>)['Codigo'] == idiomaCodigo,
+      (i) =>
+          (i['TSistemaIdiomas'] as Map<String, dynamic>)['Codigo'] ==
+          idiomaCodigo,
       orElse: () => idiomas.first,
     );
     return Termino(

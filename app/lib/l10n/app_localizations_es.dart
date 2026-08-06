@@ -139,6 +139,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get drawerMiCuenta => 'Mi cuenta';
 
   @override
+  String get drawerDashboard => 'Dashboard';
+
+  @override
   String get drawerSistema => 'Sistema';
 
   @override
@@ -379,6 +382,25 @@ class AppLocalizationsEs extends AppLocalizations {
   String get usuarioNoSePudoEliminar => 'No se pudo eliminar el usuario';
 
   @override
+  String get suplantarUsuario => 'Suplantar usuario';
+
+  @override
+  String suplantarMensaje(String nombre) {
+    return 'Vas a iniciar sesión como \"$nombre\" para ver la app tal cual la ve. Podrás volver a tu cuenta de administrador en cualquier momento. ¿Continuar?';
+  }
+
+  @override
+  String get suplantarConfirmar => 'Suplantar';
+
+  @override
+  String suplantacionBannerTexto(String nombre) {
+    return 'Estás viendo la app como $nombre';
+  }
+
+  @override
+  String get suplantacionVolver => 'Volver a mi cuenta';
+
+  @override
   String get usuarioIdiomaPreferido => 'Idioma preferido';
 
   @override
@@ -403,6 +425,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get usuarioImportacionWebActiva => 'Importación automática activa';
+
+  @override
+  String get usuarioEscaneoEsquelaIaTitulo => 'Escaneo de esquelas con IA';
+
+  @override
+  String get usuarioEscaneoEsquelaIaActiva =>
+      'Escaneo con IA activo para este usuario';
 
   @override
   String get validacionEmail => 'Validación de email';
@@ -593,6 +622,13 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get configuracionIaImportacionWebDescripcion =>
       'Si la desactivas, ningún cliente podrá activar la importación automática de su web ni ver propuestas, aunque ya la tuviera configurada.';
+
+  @override
+  String get configuracionIaEscaneoEsquelaLabel => 'Escaneo de esquelas con IA';
+
+  @override
+  String get configuracionIaEscaneoEsquelaDescripcion =>
+      'Si está activado, al escanear una esquela la foto se analiza con IA en vez del reconocimiento de texto local. Si la desactivas (o falla), se sigue usando el escaneo local de siempre.';
 
   @override
   String get noHayTiposClienteDadosDeAlta =>
@@ -901,7 +937,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get avisosCancelarSeleccion => 'Cancelar';
 
   @override
-  String get seguidosSeleccionaTipo => '¿A quién quiero seguir?';
+  String get seguidosSeleccionaTipo => 'Elige a quién seguir';
 
   @override
   String get seguidosSeleccionaProvincia => 'Elige la provincia';
@@ -930,6 +966,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get seguidosDejarDeSeguir => 'Dejar de seguir';
 
   @override
+  String get seguidosSiguiendoEtiqueta => 'Siguiendo';
+
+  @override
+  String get seguidosNoSiguiendoEtiqueta => 'No sigues';
+
+  @override
   String get siguiendoTab => 'Siguiendo';
 
   @override
@@ -939,25 +981,54 @@ class AppLocalizationsEs extends AppLocalizations {
   String get misSeguidosVacio => 'Todavía no sigues a ningún cliente';
 
   @override
-  String get drawerMisSedes => 'Mis sedes';
+  String get misSeguidosTabClientes => 'Clientes';
 
   @override
-  String get misSedesTitulo => 'Mis sedes';
+  String get misSeguidosTabZonas => 'Zonas';
 
   @override
-  String get misSedesVacio => 'Todavía no has dado de alta ninguna sede';
+  String get misSeguidosSeguirNuevo => 'Seguir un cliente nuevo';
 
   @override
-  String get misSedesNueva => 'Nueva sede';
+  String get zonaTitulo => 'Zona';
 
   @override
-  String get misSedesEditar => 'Editar sede';
+  String get zonaExplicacion =>
+      'Sigue un concello sin tener que buscar y seguir a cada cliente por separado: recibirás los avisos de cualquier cliente con sede ahí.';
 
   @override
-  String get misSedesNombreSede => 'Nombre de la sede';
+  String get zonaSeguir => 'Seguir';
 
   @override
-  String get misSedesEliminarTitulo => 'Eliminar sede';
+  String get zonaDejarDeSeguir => 'Dejar de seguir';
+
+  @override
+  String get zonaSeguirNueva => 'Seguir una zona nueva';
+
+  @override
+  String get misZonasVacio => 'Todavía no sigues ninguna zona';
+
+  @override
+  String get drawerMisSedes => 'Mis sedes/tanatorios';
+
+  @override
+  String get misSedesTitulo => 'Mis sedes/tanatorios';
+
+  @override
+  String get misSedesVacio =>
+      'Todavía no has dado de alta ninguna sede/tanatorio';
+
+  @override
+  String get misSedesNueva => 'Nueva sede/tanatorio';
+
+  @override
+  String get misSedesEditar => 'Editar sede/tanatorio';
+
+  @override
+  String get misSedesNombreSede => 'Nombre de la sede/tanatorio';
+
+  @override
+  String get misSedesEliminarTitulo => 'Eliminar sede/tanatorio';
 
   @override
   String misSedesEliminarMensaje(String nombre) {
@@ -966,7 +1037,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get misSedesUltimaSedeAviso =>
-      'Debe quedar al menos una sede. Para eliminar esta, primero da de alta otra.';
+      'Debe quedar al menos una sede/tanatorio. Para eliminar esta, primero da de alta otra.';
 
   @override
   String get misSedesCodigo => 'Código';
@@ -982,6 +1053,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get publicarManual => 'Manual';
+
+  @override
+  String get publicarDeceso => 'Deceso';
 
   @override
   String get publicarImportarWeb => 'Importación automática';
@@ -1043,11 +1117,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get publicarNuevaPublicacion => 'Nueva publicación';
 
   @override
-  String get publicarSeleccionaSede => 'Selecciona la sede';
+  String get publicarSeleccionaSede => 'Selecciona la sede/tanatorio';
 
   @override
   String get publicarSinSedes =>
-      'Todavía no tienes ninguna sede. Da de alta una sede en \"Miñas sedes\" antes de publicar.';
+      'Todavía no tienes ninguna sede/tanatorio. Da de alta una en \"Miñas sedes\" antes de publicar.';
 
   @override
   String get publicarAvisoDatosPersonales =>
@@ -1085,6 +1159,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get publicarSala => 'Sala';
 
   @override
+  String get publicarVelatorioLabel => 'Velatorio';
+
+  @override
+  String get publicarEntierroLabel => 'Entierro';
+
+  @override
   String get publicarObservaciones => 'Observaciones';
 
   @override
@@ -1092,6 +1172,67 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get publicarPararEscoita => 'Detener lectura';
+
+  @override
+  String get publicarCompartirEsquela => 'Enviar por WhatsApp';
+
+  @override
+  String get publicarCompartidoPor => 'Publicado por';
+
+  @override
+  String get publicarDescargaApp => 'Descarga TanApp:';
+
+  @override
+  String get publicarCondolencias => 'Enviar condolencias';
+
+  @override
+  String condolenciasCantidad(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n condolencias',
+      one: '1 condolencia',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String condolenciasTitulo(String nombre) {
+    return 'Condolencias de $nombre';
+  }
+
+  @override
+  String get condolenciasTuCondolencia => 'Tu condolencia';
+
+  @override
+  String get condolenciasEscribeAqui => 'Escribe aquí tu mensaje de pésame...';
+
+  @override
+  String get condolenciasTodas => 'Todas las condolencias';
+
+  @override
+  String get condolenciasVacio => 'Todavía no hay ninguna condolencia.';
+
+  @override
+  String get condolenciasEliminarTitulo => 'Eliminar condolencia';
+
+  @override
+  String get condolenciasEliminarMensaje =>
+      '¿Eliminar tu condolencia? Esta acción no se puede deshacer.';
+
+  @override
+  String get condolenciasDescargarPdf => 'Descargar condolencias en PDF';
+
+  @override
+  String condolenciasPdfTitulo(String nombre) {
+    return 'Condolencias de $nombre';
+  }
+
+  @override
+  String get condolenciasPdfSubtitulo => 'Libro de condolencias';
+
+  @override
+  String get condolenciasPdfPie => 'Descarga TanApp';
 
   @override
   String publicarFuneralVoz(String fecha, String hora) {
@@ -1189,10 +1330,27 @@ class AppLocalizationsEs extends AppLocalizations {
   String get panelDatosSeguidores => 'Seguidores';
 
   @override
+  String get panelDatosSeguidoresUnicos =>
+      'Seguidores únicos (si sigue varias sedes, cuenta una sola vez)';
+
+  @override
   String get panelDatosSinSeguidores => 'Todavía no tiene seguidores';
 
   @override
   String get panelDatosConcelloDesconocido => 'Sin concello indicado';
+
+  @override
+  String panelDatosZonaSeguidores(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other:
+          '+$n personas más reciben tus avisos por seguir la zona, sin seguirte a ti',
+      one:
+          '+1 persona más recibe tus avisos por seguir la zona, sin seguirte a ti',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get panelDatosPublicacionesPorMes => 'Publicaciones por mes';
@@ -1213,7 +1371,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tablonBuscar => 'Buscar por texto, cliente o concello';
 
   @override
-  String get misSeguidosBuscarYFiltrar => 'Buscar y filtrar';
+  String get tablonSinResultados =>
+      'No se ha encontrado ninguna esquela con ese texto.';
+
+  @override
+  String get tablonVacioSinSeguir =>
+      'Todavía no ves ninguna esquela aquí: sigue a un cliente o a una zona en \"Seguindo\" para que aparezcan sus publicaciones.';
+
+  @override
+  String get filtrar => 'Filtrar';
 
   @override
   String get proximamente => 'Próximamente';
@@ -1237,4 +1403,108 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get solicitudCrearCuentaBoton => 'Crear cuenta de cliente';
+
+  @override
+  String get dashboardTitulo => 'Dashboard';
+
+  @override
+  String get dashboardTabClientes => 'Clientes';
+
+  @override
+  String get dashboardTabUsuarios => 'Usuarios';
+
+  @override
+  String get dashboardTabIa => 'IA';
+
+  @override
+  String get dashboardSinDatos => 'Todavía no hay datos suficientes.';
+
+  @override
+  String get dashboardClientesActivos => 'Clientes activos';
+
+  @override
+  String get dashboardClientesInactivos => 'Clientes inactivos';
+
+  @override
+  String get dashboardSedesTotal => 'Sedes/Tanatorios';
+
+  @override
+  String get dashboardPublicacionesTotal => 'Publicaciones';
+
+  @override
+  String get dashboardAvisosTotal => 'Avisos';
+
+  @override
+  String get dashboardClientesPorTipo => 'Clientes por tipo';
+
+  @override
+  String get dashboardPublicacionesPorMes => 'Publicaciones por mes';
+
+  @override
+  String get dashboardAvisosPorMes => 'Avisos por mes';
+
+  @override
+  String get dashboardTopClientes => 'Clientes con más publicaciones';
+
+  @override
+  String get dashboardUsuariosActivos => 'Usuarios activos';
+
+  @override
+  String get dashboardUsuariosInactivos => 'Usuarios inactivos';
+
+  @override
+  String get dashboardUsuariosConPush => 'Con notificaciones activas';
+
+  @override
+  String get dashboardSeguimientosTotal => 'Seguimientos a clientes';
+
+  @override
+  String get dashboardZonasSeguidasTotal => 'Zonas seguidas';
+
+  @override
+  String get dashboardUsuariosPorIdioma => 'Usuarios por idioma';
+
+  @override
+  String get dashboardTopConcellos => 'Concellos con más usuarios';
+
+  @override
+  String get dashboardIaAviso =>
+      'Datos aproximados del escaneo de esquelas con IA (no incluye la importación automática desde web). El coste es una estimación propia a partir de los tokens de cada petición, no el saldo real de la cuenta de Anthropic.';
+
+  @override
+  String get dashboardIaPeticionesHoy => 'Peticiones hoy';
+
+  @override
+  String get dashboardIaCostoHoy => 'Coste estimado hoy';
+
+  @override
+  String get dashboardIaPeticionesMes => 'Peticiones este mes';
+
+  @override
+  String get dashboardIaCostoMes => 'Coste estimado este mes';
+
+  @override
+  String get dashboardIaPeticionesTotal => 'Peticiones totales';
+
+  @override
+  String get dashboardIaCostoTotal => 'Coste estimado total';
+
+  @override
+  String get dashboardIaTasaExito => 'Tasa de éxito';
+
+  @override
+  String get dashboardIaPeticionesPorDia =>
+      'Peticiones por día (últimos 30 días)';
+
+  @override
+  String get dashboardIaUsoPorUsuario => 'Uso por usuario este mes';
+
+  @override
+  String get dashboardIaColUsuario => 'Usuario';
+
+  @override
+  String get dashboardIaColPeticiones => 'Peticiones';
+
+  @override
+  String get dashboardIaColCosto => 'Coste estimado';
 }

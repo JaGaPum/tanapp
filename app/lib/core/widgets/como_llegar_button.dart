@@ -9,20 +9,43 @@ class ComoLlegarButton extends StatelessWidget {
   final String? concello;
   final String? provincia;
   final String? label;
+  final bool secondary;
 
-  const ComoLlegarButton({super.key, required this.direccion, this.concello, this.provincia, this.label});
+  const ComoLlegarButton({
+    super.key,
+    required this.direccion,
+    this.concello,
+    this.provincia,
+    this.label,
+    this.secondary = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    void onPressed() => abrirIndicacionesGoogleMaps(
+      direccion: direccion,
+      concello: concello,
+      provincia: provincia,
+    );
+    final texto = Text(label ?? context.l10n.comoLlegar);
+    const icono = Icon(Icons.directions_outlined);
+
+    if (secondary) {
+      return OutlinedButton.icon(
+        icon: icono,
+        label: texto,
+        onPressed: onPressed,
+      );
+    }
     return FilledButton.icon(
-      icon: const Icon(Icons.directions_outlined),
-      label: Text(label ?? context.l10n.comoLlegar),
+      icon: icono,
+      label: texto,
       style: FilledButton.styleFrom(
         backgroundColor: AppColors.black,
         foregroundColor: AppColors.white,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       ),
-      onPressed: () => abrirIndicacionesGoogleMaps(direccion: direccion, concello: concello, provincia: provincia),
+      onPressed: onPressed,
     );
   }
 }

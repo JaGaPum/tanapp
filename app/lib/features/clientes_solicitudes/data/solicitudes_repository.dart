@@ -37,12 +37,17 @@ class SolicitudesRepository {
       query = query.eq('Estado', estado);
     }
     final data = await query.order('FechaAlta', ascending: false);
-    return (data as List).map((e) => SolicitudCliente.fromMap(e as Map<String, dynamic>)).toList();
+    return (data as List)
+        .map((e) => SolicitudCliente.fromMap(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<SolicitudCliente> fetchById(String id) async {
-    final data =
-        await _client.from('TClienteSolicitudes').select().eq('IdClientesSolicitud', id).single();
+    final data = await _client
+        .from('TClienteSolicitudes')
+        .select()
+        .eq('IdClientesSolicitud', id)
+        .single();
     return SolicitudCliente.fromMap(data);
   }
 
@@ -62,11 +67,17 @@ class SolicitudesRepository {
     if (aprobar && idConfiguracionClienteTipo != null) {
       update['IdConfiguracionClienteTipo'] = idConfiguracionClienteTipo;
     }
-    await _client.from('TClienteSolicitudes').update(update).eq('IdClientesSolicitud', id);
+    await _client
+        .from('TClienteSolicitudes')
+        .update(update)
+        .eq('IdClientesSolicitud', id);
   }
 
   Future<void> eliminarSolicitud(String id) async {
-    await _client.from('TClienteSolicitudes').delete().eq('IdClientesSolicitud', id);
+    await _client
+        .from('TClienteSolicitudes')
+        .delete()
+        .eq('IdClientesSolicitud', id);
   }
 
   /// Invoca la Edge Function que crea la cuenta de Supabase Auth del cliente aprobado
@@ -79,7 +90,8 @@ class SolicitudesRepository {
     );
   }
 
-  String? _blankToNull(String? value) => (value == null || value.trim().isEmpty) ? null : value.trim();
+  String? _blankToNull(String? value) =>
+      (value == null || value.trim().isEmpty) ? null : value.trim();
 }
 
 final solicitudesRepositoryProvider = Provider<SolicitudesRepository>((ref) {

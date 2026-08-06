@@ -7,7 +7,12 @@ class ProvinciaShapeIcon extends StatelessWidget {
   final double size;
   final Color? color;
 
-  const ProvinciaShapeIcon({super.key, required this.provincia, this.size = 48, this.color});
+  const ProvinciaShapeIcon({
+    super.key,
+    required this.provincia,
+    this.size = 48,
+    this.color,
+  });
 
   static const _claves = {
     'a coruña': 'a_coruna',
@@ -27,7 +32,10 @@ class ProvinciaShapeIcon extends StatelessWidget {
       width: size,
       height: size,
       child: CustomPaint(
-        painter: _ProvinciaPainter(puntos: puntos, color: color ?? Theme.of(context).colorScheme.primary),
+        painter: _ProvinciaPainter(
+          puntos: puntos,
+          color: color ?? Theme.of(context).colorScheme.primary,
+        ),
       ),
     );
   }

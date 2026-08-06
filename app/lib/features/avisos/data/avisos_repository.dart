@@ -10,7 +10,8 @@ class AvisosRepository {
   AvisosRepository(this._client);
 
   static const _selectConSede = '*, TClienteSedes(Nombre)';
-  static const _selectRecibido = '*, TClienteAvisos(*, TClienteSedes(Nombre, TSistemaUsuarios(Nombre)))';
+  static const _selectRecibido =
+      '*, TClienteAvisos(*, TClienteSedes(Nombre, TSistemaUsuarios(Nombre)))';
 
   Future<void> crearAviso({
     required String idClienteSede,
@@ -40,7 +41,9 @@ class AvisosRepository {
         .eq('EliminadoCliente', false)
         .order('FechaAlta', ascending: false)
         .range(offset, offset + limit - 1);
-    return (data as List).map((e) => ClienteAviso.fromMap(e as Map<String, dynamic>)).toList();
+    return (data as List)
+        .map((e) => ClienteAviso.fromMap(e as Map<String, dynamic>))
+        .toList();
   }
 
   /// No borra "TClienteAvisos" de verdad (arrastraría por cascada el buzón de todos los
@@ -70,20 +73,26 @@ class AvisosRepository {
 
   /// Bandeja del usuario actual (la RLS ya solo deja ver los propios), para la pestaña "Avisos"
   /// de un seguidor.
-  Future<List<AvisoRecibido>> listMisAvisosRecibidos({int offset = 0, int limit = 20}) async {
+  Future<List<AvisoRecibido>> listMisAvisosRecibidos({
+    int offset = 0,
+    int limit = 20,
+  }) async {
     final data = await _client
         .from('TClienteAvisosDestinatarios')
         .select(_selectRecibido)
         .order('FechaAlta', ascending: false)
         .range(offset, offset + limit - 1);
-    return (data as List).map((e) => AvisoRecibido.fromMap(e as Map<String, dynamic>)).toList();
+    return (data as List)
+        .map((e) => AvisoRecibido.fromMap(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<int> contarAvisosNoLeidos() async {
-    final res = await _client.from('TClienteAvisosDestinatarios').select('IdClienteAvisoDestinatario').eq(
-      'Leido',
-      false,
-    ).count(CountOption.exact);
+    final res = await _client
+        .from('TClienteAvisosDestinatarios')
+        .select('IdClienteAvisoDestinatario')
+        .eq('Leido', false)
+        .count(CountOption.exact);
     return res.count;
   }
 
@@ -113,7 +122,10 @@ class AvisosRepository {
   /// DELETE (protección "safeupdate"); la RLS ya limita esto a los avisos propios, así que
   /// basta un filtro siempre verdadero sobre la clave primaria.
   Future<void> eliminarTodosAvisos() async {
-    await _client.from('TClienteAvisosDestinatarios').delete().not('IdClienteAvisoDestinatario', 'is', null);
+    await _client
+        .from('TClienteAvisosDestinatarios')
+        .delete()
+        .not('IdClienteAvisoDestinatario', 'is', null);
   }
 
   /// Recibidos/leídos de los últimos [limit] avisos enviados desde las sedes indicadas, para la

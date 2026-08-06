@@ -18,14 +18,17 @@ import '../../../cliente_sedes/presentation/widgets/sede_form_dialog.dart';
 import '../../../cliente_tipos/application/cliente_tipos_providers.dart';
 import '../../../importacion_web/application/importacion_web_providers.dart';
 import '../../../importacion_web/data/importacion_web_repository.dart';
+import '../../../auth/application/auth_providers.dart';
 import '../../../sesiones/application/sesiones_providers.dart';
+import '../../../suplantacion/application/suplantacion_providers.dart';
 import '../../application/usuarios_providers.dart';
 import '../../data/catalogos_repository.dart';
 import '../../data/usuario_perfil.dart';
 import '../../data/usuarios_repository.dart';
 
-TextStyle? _sectionTitleStyle(BuildContext context) =>
-    Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold);
+TextStyle? _sectionTitleStyle(BuildContext context) => Theme.of(
+  context,
+).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold);
 
 String _formatFecha(DateTime dt) {
   final local = dt.toLocal();
@@ -47,7 +50,8 @@ class UsuarioDetailScreen extends ConsumerWidget {
       body: perfilAsync.when(
         data: (perfil) => _UsuarioForm(perfil: perfil),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorGenerico(e.toString()))),
       ),
     );
   }
@@ -82,10 +86,18 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
   void initState() {
     super.initState();
     _nombreController = TextEditingController(text: widget.perfil.nombre);
-    _apellido1Controller = TextEditingController(text: widget.perfil.apellido1 ?? '');
-    _apellido2Controller = TextEditingController(text: widget.perfil.apellido2 ?? '');
-    _telefonoController = TextEditingController(text: widget.perfil.telefono ?? '');
-    _direccionController = TextEditingController(text: widget.perfil.direccion ?? '');
+    _apellido1Controller = TextEditingController(
+      text: widget.perfil.apellido1 ?? '',
+    );
+    _apellido2Controller = TextEditingController(
+      text: widget.perfil.apellido2 ?? '',
+    );
+    _telefonoController = TextEditingController(
+      text: widget.perfil.telefono ?? '',
+    );
+    _direccionController = TextEditingController(
+      text: widget.perfil.direccion ?? '',
+    );
     _emailController = TextEditingController(text: widget.perfil.email);
     _idiomaSeleccionado = widget.perfil.idSistemaIdiomaPreferido;
     _provinciaSeleccionada = widget.perfil.provincia;
@@ -117,7 +129,9 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
       _error = null;
     });
     try {
-      await ref.read(usuariosRepositoryProvider).updatePerfil(
+      await ref
+          .read(usuariosRepositoryProvider)
+          .updatePerfil(
             idSistemaUsuario: widget.perfil.idSistemaUsuario,
             nombre: _nombreController.text,
             apellido1: _apellido1Controller.text,
@@ -132,10 +146,16 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
           );
       _invalidateUsuario();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.usuarioCambiosGuardados)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.usuarioCambiosGuardados)),
+        );
       }
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.errorInesperado);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.errorInesperado,
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -143,13 +163,19 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
 
   Future<void> _agregarRol(RolCatalogo rol) async {
     try {
-      await ref.read(usuariosRepositoryProvider).asignarRol(
+      await ref
+          .read(usuariosRepositoryProvider)
+          .asignarRol(
             idSistemaUsuario: widget.perfil.idSistemaUsuario,
             idSistemaRol: rol.idSistemaRol,
           );
       _invalidateUsuario();
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.usuarioNoSePudoAsignarRol);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.usuarioNoSePudoAsignarRol,
+      );
     }
   }
 
@@ -162,24 +188,44 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
     );
     if (!confirmado) return;
     try {
-      await ref.read(usuariosRepositoryProvider).quitarRol(idSistemaUsuarioRol: rol.idSistemaUsuarioRol);
+      await ref
+          .read(usuariosRepositoryProvider)
+          .quitarRol(idSistemaUsuarioRol: rol.idSistemaUsuarioRol);
       _invalidateUsuario();
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.usuarioNoSePudoQuitarRol);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.usuarioNoSePudoQuitarRol,
+      );
     }
   }
 
   Future<void> _mostrarFormularioSede({ClienteSede? sede}) async {
+    final totalActuales =
+        ref
+            .read(sedesDeUsuarioProvider(widget.perfil.idSistemaUsuario))
+            .value
+            ?.length ??
+        0;
     await showDialog<void>(
       context: context,
-      builder: (context) => SedeFormDialog(idSistemaUsuario: widget.perfil.idSistemaUsuario, sede: sede),
+      builder: (context) => SedeFormDialog(
+        idSistemaUsuario: widget.perfil.idSistemaUsuario,
+        sede: sede,
+        codigoSugerido: sede == null
+            ? (totalActuales + 1).toString().padLeft(3, '0')
+            : null,
+      ),
     );
     ref.invalidate(sedesDeUsuarioProvider(widget.perfil.idSistemaUsuario));
   }
 
   Future<void> _eliminarSede(ClienteSede sede, int totalSedes) async {
     if (totalSedes <= 1) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.misSedesUltimaSedeAviso)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.misSedesUltimaSedeAviso)),
+      );
       return;
     }
     final confirmado = await showConfirmDialog(
@@ -189,23 +235,42 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
       confirmLabel: context.l10n.eliminar,
     );
     if (!confirmado) return;
-    await ref.read(clienteSedesRepositoryProvider).eliminarSede(sede.idClienteSede);
+    await ref
+        .read(clienteSedesRepositoryProvider)
+        .eliminarSede(sede.idClienteSede);
     ref.invalidate(sedesDeUsuarioProvider(widget.perfil.idSistemaUsuario));
   }
 
   Future<void> _toggleImportacionWeb(bool activo) async {
-    await ref.read(importacionWebRepositoryProvider).actualizarActivoAdmin(widget.perfil.idSistemaUsuario, activo);
-    ref.invalidate(importacionWebDeUsuarioProvider(widget.perfil.idSistemaUsuario));
+    await ref
+        .read(importacionWebRepositoryProvider)
+        .actualizarActivoAdmin(widget.perfil.idSistemaUsuario, activo);
+    ref.invalidate(
+      importacionWebDeUsuarioProvider(widget.perfil.idSistemaUsuario),
+    );
+  }
+
+  Future<void> _toggleEscaneoEsquelaIa(bool activo) async {
+    await ref
+        .read(usuariosRepositoryProvider)
+        .actualizarEscaneoEsquelaIaActiva(
+          widget.perfil.idSistemaUsuario,
+          activo,
+        );
+    _invalidateUsuario();
   }
 
   Future<void> _mostrarSelectorRoles() async {
     final catalogo = await ref.read(rolesCatalogoProvider.future);
     final asignados = widget.perfil.roles.toSet();
-    final disponibles = catalogo.where((r) => !asignados.contains(r.codigo)).toList();
+    final disponibles = catalogo
+        .where((r) => !asignados.contains(r.codigo))
+        .toList();
     if (!mounted) return;
     if (disponibles.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(context.l10n.usuarioYaTieneTodosLosRoles)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.usuarioYaTieneTodosLosRoles)),
+      );
       return;
     }
     final seleccionado = await showModalBottomSheet<RolCatalogo>(
@@ -214,7 +279,12 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: disponibles
-              .map((rol) => ListTile(title: Text(rol.nombre), onTap: () => Navigator.of(context).pop(rol)))
+              .map(
+                (rol) => ListTile(
+                  title: Text(rol.nombre),
+                  onTap: () => Navigator.of(context).pop(rol),
+                ),
+              )
               .toList(),
         ),
       ),
@@ -224,13 +294,49 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
 
   Future<void> _confirmarEmail() async {
     try {
-      await ref.read(usuariosRepositoryProvider).confirmarEmail(widget.perfil.idSistemaUsuario);
+      await ref
+          .read(usuariosRepositoryProvider)
+          .confirmarEmail(widget.perfil.idSistemaUsuario);
       _invalidateUsuario();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.usuarioEmailValidado)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.usuarioEmailValidado)),
+        );
       }
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.usuarioNoSePudoValidarEmail);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.usuarioNoSePudoValidarEmail,
+      );
+    }
+  }
+
+  Future<void> _suplantar() async {
+    final confirmado = await showConfirmDialog(
+      context,
+      title: context.l10n.suplantarUsuario,
+      message: context.l10n.suplantarMensaje(widget.perfil.nombreCompleto),
+      confirmLabel: context.l10n.suplantarConfirmar,
+    );
+    if (!confirmado) return;
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      await ref
+          .read(sesionAdminGuardadaProvider.notifier)
+          .suplantar(widget.perfil.idSistemaUsuario);
+      if (mounted) context.go('/home');
+    } catch (e) {
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.errorInesperado,
+      );
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -238,7 +344,9 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
     final confirmado = await showConfirmDialog(
       context,
       title: context.l10n.usuarioEliminarTitulo,
-      message: context.l10n.usuarioEliminarMensaje(widget.perfil.nombreCompleto),
+      message: context.l10n.usuarioEliminarMensaje(
+        widget.perfil.nombreCompleto,
+      ),
       confirmLabel: context.l10n.usuarioEliminar,
     );
     if (!confirmado) return;
@@ -248,19 +356,36 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
       ref.invalidate(usuariosListProvider);
       if (mounted) context.pop();
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.usuarioNoSePudoEliminar);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.usuarioNoSePudoEliminar,
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final idiomasAsync = ref.watch(idiomasCatalogoProvider);
+    final miPerfil = ref.watch(currentUserProfileProvider).value;
+    final puedeSuplantar =
+        !widget.perfil.roles.contains('ADMIN') &&
+        miPerfil?.idSistemaUsuario != widget.perfil.idSistemaUsuario;
     final esCliente = widget.perfil.roles.contains('CLIENTE');
-    final labelNombre = esCliente ? context.l10n.fieldNombreEmpresa : context.l10n.fieldNombre;
-    final labelApellido1 = esCliente ? context.l10n.campoPersonaContacto : context.l10n.fieldPrimerApellido;
+    final labelNombre = esCliente
+        ? context.l10n.fieldNombreEmpresa
+        : context.l10n.fieldNombre;
+    final labelApellido1 = esCliente
+        ? context.l10n.campoPersonaContacto
+        : context.l10n.fieldPrimerApellido;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.fromLTRB(
+        24,
+        24,
+        24,
+        24 + MediaQuery.of(context).padding.bottom,
+      ),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 560),
         child: Form(
@@ -269,7 +394,11 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               if (_error != null) ErrorBanner(message: _error!),
-              AppTextField(controller: _emailController, label: context.l10n.fieldEmail, enabled: false),
+              AppTextField(
+                controller: _emailController,
+                label: context.l10n.fieldEmail,
+                enabled: false,
+              ),
               const SizedBox(height: 16),
               AppTextField(
                 controller: _nombreController,
@@ -284,7 +413,10 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
               ),
               if (!esCliente) ...[
                 const SizedBox(height: 16),
-                AppTextField(controller: _apellido2Controller, label: context.l10n.fieldSegundoApellido),
+                AppTextField(
+                  controller: _apellido2Controller,
+                  label: context.l10n.fieldSegundoApellido,
+                ),
               ],
               const SizedBox(height: 16),
               AppTextField(
@@ -296,40 +428,69 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
               ProvinciaConcelloFields(
                 provinciaInicial: _provinciaSeleccionada,
                 concelloInicial: _concelloSeleccionado,
-                onProvinciaChanged: (value) => setState(() => _provinciaSeleccionada = value),
-                onConcelloChanged: (value) => setState(() => _concelloSeleccionado = value),
+                onProvinciaChanged: (value) =>
+                    setState(() => _provinciaSeleccionada = value),
+                onConcelloChanged: (value) =>
+                    setState(() => _concelloSeleccionado = value),
               ),
               const SizedBox(height: 16),
-              AppTextField(controller: _direccionController, label: context.l10n.fieldDireccion),
+              AppTextField(
+                controller: _direccionController,
+                label: context.l10n.fieldDireccion,
+              ),
               const SizedBox(height: 16),
               idiomasAsync.when(
                 data: (idiomas) => DropdownButtonFormField<String>(
                   initialValue: _idiomaSeleccionado,
-                  decoration: InputDecoration(labelText: context.l10n.usuarioIdiomaPreferido),
+                  decoration: InputDecoration(
+                    labelText: context.l10n.usuarioIdiomaPreferido,
+                  ),
                   items: idiomas
-                      .map((idioma) => DropdownMenuItem(value: idioma.idSistemaIdioma, child: Text(idioma.nombre)))
+                      .map(
+                        (idioma) => DropdownMenuItem(
+                          value: idioma.idSistemaIdioma,
+                          child: Text(idioma.nombre),
+                        ),
+                      )
                       .toList(),
-                  onChanged: (value) => setState(() => _idiomaSeleccionado = value),
+                  onChanged: (value) =>
+                      setState(() => _idiomaSeleccionado = value),
                 ),
                 loading: () => const LinearProgressIndicator(),
-                error: (e, _) => Text(context.l10n.errorCargarIdiomas(e.toString())),
+                error: (e, _) =>
+                    Text(context.l10n.errorCargarIdiomas(e.toString())),
               ),
               if (widget.perfil.roles.contains('CLIENTE')) ...[
                 const SizedBox(height: 16),
-                ref.watch(clienteTiposListProvider).when(
+                ref
+                    .watch(clienteTiposListProvider)
+                    .when(
                       data: (clienteTipos) => DropdownButtonFormField<String>(
                         initialValue: _tipoClienteSeleccionado,
-                        decoration: InputDecoration(labelText: context.l10n.usuarioTipoCliente),
+                        decoration: InputDecoration(
+                          labelText: context.l10n.usuarioTipoCliente,
+                        ),
                         items: clienteTipos
-                            .where((t) => t.activo || t.idConfiguracionClienteTipo == _tipoClienteSeleccionado)
+                            .where(
+                              (t) =>
+                                  t.activo ||
+                                  t.idConfiguracionClienteTipo ==
+                                      _tipoClienteSeleccionado,
+                            )
                             .map(
-                              (t) => DropdownMenuItem(value: t.idConfiguracionClienteTipo, child: Text(t.nombre)),
+                              (t) => DropdownMenuItem(
+                                value: t.idConfiguracionClienteTipo,
+                                child: Text(t.nombre),
+                              ),
                             )
                             .toList(),
-                        onChanged: (value) => setState(() => _tipoClienteSeleccionado = value),
+                        onChanged: (value) =>
+                            setState(() => _tipoClienteSeleccionado = value),
                       ),
                       loading: () => const LinearProgressIndicator(),
-                      error: (e, _) => Text(context.l10n.errorCargarTiposCliente(e.toString())),
+                      error: (e, _) => Text(
+                        context.l10n.errorCargarTiposCliente(e.toString()),
+                      ),
                     ),
               ],
               const SizedBox(height: 8),
@@ -340,17 +501,31 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                 contentPadding: EdgeInsets.zero,
               ),
               const SizedBox(height: 8),
-              AppButton(label: context.l10n.accountGuardarCambios, loading: _loading, onPressed: _guardar),
+              AppButton(
+                label: context.l10n.accountGuardarCambios,
+                loading: _loading,
+                onPressed: _guardar,
+              ),
               const SizedBox(height: 32),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(context.l10n.validacionEmail, style: _sectionTitleStyle(context)),
+                  Text(
+                    context.l10n.validacionEmail,
+                    style: _sectionTitleStyle(context),
+                  ),
                   if (!widget.perfil.emailConfirmado)
-                    TextButton(onPressed: _confirmarEmail, child: Text(context.l10n.marcarComoValidado))
+                    TextButton(
+                      onPressed: _confirmarEmail,
+                      child: Text(context.l10n.marcarComoValidado),
+                    )
                   else
                     Chip(
-                      avatar: const Icon(Icons.verified_outlined, color: AppColors.green, size: 18),
+                      avatar: const Icon(
+                        Icons.verified_outlined,
+                        color: AppColors.green,
+                        size: 18,
+                      ),
                       label: Text(context.l10n.validado),
                     ),
                 ],
@@ -371,7 +546,12 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                 spacing: 8,
                 runSpacing: 8,
                 children: widget.perfil.rolesAsignados
-                    .map((rol) => InputChip(label: Text(rol.nombre), onDeleted: () => _quitarRol(rol)))
+                    .map(
+                      (rol) => InputChip(
+                        label: Text(rol.nombre),
+                        onDeleted: () => _quitarRol(rol),
+                      ),
+                    )
                     .toList(),
               ),
               if (esCliente) ...[
@@ -379,7 +559,10 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(context.l10n.misSedesTitulo, style: _sectionTitleStyle(context)),
+                    Text(
+                      context.l10n.misSedesTitulo,
+                      style: _sectionTitleStyle(context),
+                    ),
                     IconButton(
                       icon: const Icon(Icons.add_circle_outline),
                       tooltip: context.l10n.misSedesNueva,
@@ -387,7 +570,11 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                     ),
                   ],
                 ),
-                ref.watch(sedesDeUsuarioProvider(widget.perfil.idSistemaUsuario)).when(
+                ref
+                    .watch(
+                      sedesDeUsuarioProvider(widget.perfil.idSistemaUsuario),
+                    )
+                    .when(
                       data: (sedes) {
                         if (sedes.isEmpty) {
                           return Padding(
@@ -400,20 +587,30 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                               .map(
                                 (sede) => Card(
                                   child: ListTile(
-                                    title: Text('${sede.codigo} · ${sede.nombre}'),
-                                    subtitle: Text('${sede.direccion}, ${sede.concello}'),
+                                    title: Text(
+                                      '${sede.codigo} · ${sede.nombre}',
+                                    ),
+                                    subtitle: Text(
+                                      '${sede.direccion}, ${sede.concello}',
+                                    ),
                                     trailing: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         IconButton(
                                           icon: const Icon(Icons.edit_outlined),
                                           tooltip: context.l10n.editar,
-                                          onPressed: () => _mostrarFormularioSede(sede: sede),
+                                          onPressed: () =>
+                                              _mostrarFormularioSede(
+                                                sede: sede,
+                                              ),
                                         ),
                                         IconButton(
-                                          icon: const Icon(Icons.delete_outline),
+                                          icon: const Icon(
+                                            Icons.delete_outline,
+                                          ),
                                           tooltip: context.l10n.eliminar,
-                                          onPressed: () => _eliminarSede(sede, sedes.length),
+                                          onPressed: () =>
+                                              _eliminarSede(sede, sedes.length),
                                         ),
                                       ],
                                     ),
@@ -427,16 +624,28 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                         padding: EdgeInsets.only(top: 8),
                         child: LinearProgressIndicator(),
                       ),
-                      error: (e, _) => Text(context.l10n.errorGenerico(e.toString())),
+                      error: (e, _) =>
+                          Text(context.l10n.errorGenerico(e.toString())),
                     ),
                 const SizedBox(height: 32),
-                Text(context.l10n.importacionWebTitulo, style: _sectionTitleStyle(context)),
-                ref.watch(importacionWebDeUsuarioProvider(widget.perfil.idSistemaUsuario)).when(
+                Text(
+                  context.l10n.importacionWebTitulo,
+                  style: _sectionTitleStyle(context),
+                ),
+                ref
+                    .watch(
+                      importacionWebDeUsuarioProvider(
+                        widget.perfil.idSistemaUsuario,
+                      ),
+                    )
+                    .when(
                       data: (config) {
                         if (config == null) {
                           return Padding(
                             padding: const EdgeInsets.only(top: 8),
-                            child: Text(context.l10n.usuarioImportacionWebSinConfigurar),
+                            child: Text(
+                              context.l10n.usuarioImportacionWebSinConfigurar,
+                            ),
                           );
                         }
                         return Column(
@@ -444,10 +653,15 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                           children: [
                             Padding(
                               padding: const EdgeInsets.only(top: 8),
-                              child: Text(config.url, style: Theme.of(context).textTheme.bodyMedium),
+                              child: Text(
+                                config.url,
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
                             ),
                             SwitchListTile(
-                              title: Text(context.l10n.usuarioImportacionWebActiva),
+                              title: Text(
+                                context.l10n.usuarioImportacionWebActiva,
+                              ),
                               value: config.activo,
                               onChanged: _toggleImportacionWeb,
                               contentPadding: EdgeInsets.zero,
@@ -459,23 +673,49 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                         padding: EdgeInsets.only(top: 8),
                         child: LinearProgressIndicator(),
                       ),
-                      error: (e, _) => Text(context.l10n.errorGenerico(e.toString())),
+                      error: (e, _) =>
+                          Text(context.l10n.errorGenerico(e.toString())),
                     ),
+                const SizedBox(height: 32),
+                Text(
+                  context.l10n.usuarioEscaneoEsquelaIaTitulo,
+                  style: _sectionTitleStyle(context),
+                ),
+                SwitchListTile(
+                  title: Text(context.l10n.usuarioEscaneoEsquelaIaActiva),
+                  value: widget.perfil.escaneoEsquelaIaActiva,
+                  onChanged: _toggleEscaneoEsquelaIa,
+                  contentPadding: EdgeInsets.zero,
+                ),
               ],
               const SizedBox(height: 32),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(context.l10n.sesiones, style: _sectionTitleStyle(context)),
+                  Text(
+                    context.l10n.sesiones,
+                    style: _sectionTitleStyle(context),
+                  ),
                   TextButton.icon(
-                    icon: Icon(_mostrarSesiones ? Icons.expand_less : Icons.expand_more),
-                    label: Text(_mostrarSesiones ? context.l10n.ocultarSesiones : context.l10n.verSesiones),
-                    onPressed: () => setState(() => _mostrarSesiones = !_mostrarSesiones),
+                    icon: Icon(
+                      _mostrarSesiones ? Icons.expand_less : Icons.expand_more,
+                    ),
+                    label: Text(
+                      _mostrarSesiones
+                          ? context.l10n.ocultarSesiones
+                          : context.l10n.verSesiones,
+                    ),
+                    onPressed: () =>
+                        setState(() => _mostrarSesiones = !_mostrarSesiones),
                   ),
                 ],
               ),
               if (_mostrarSesiones)
-                ref.watch(usuarioSesionesProvider(widget.perfil.idSistemaUsuario)).when(
+                ref
+                    .watch(
+                      usuarioSesionesProvider(widget.perfil.idSistemaUsuario),
+                    )
+                    .when(
                       data: (sesiones) => sesiones.isEmpty
                           ? Padding(
                               padding: const EdgeInsets.only(top: 8),
@@ -485,25 +725,51 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                               scrollDirection: Axis.horizontal,
                               child: DataTable(
                                 columns: [
-                                  DataColumn(label: Text(context.l10n.sesionColInicio)),
-                                  DataColumn(label: Text(context.l10n.sesionColFin)),
-                                  DataColumn(label: Text(context.l10n.sesionColEstado)),
-                                  DataColumn(label: Text(context.l10n.sesionColRecordar)),
+                                  DataColumn(
+                                    label: Text(context.l10n.sesionColInicio),
+                                  ),
+                                  DataColumn(
+                                    label: Text(context.l10n.sesionColFin),
+                                  ),
+                                  DataColumn(
+                                    label: Text(context.l10n.sesionColEstado),
+                                  ),
+                                  DataColumn(
+                                    label: Text(context.l10n.sesionColRecordar),
+                                  ),
                                 ],
                                 rows: sesiones
                                     .map(
                                       (sesion) => DataRow(
                                         cells: [
-                                          DataCell(Text(_formatFecha(sesion.fechaInicio))),
-                                          DataCell(Text(
-                                            sesion.fechaFin != null
-                                                ? _formatFecha(sesion.fechaFin!)
-                                                : context.l10n.sesionEnCurso,
-                                          )),
-                                          DataCell(Text(
-                                            sesion.abierta ? context.l10n.sesionAbierta : context.l10n.sesionCerrada,
-                                          )),
-                                          DataCell(Text(sesion.recordar ? context.l10n.si : context.l10n.no)),
+                                          DataCell(
+                                            Text(
+                                              _formatFecha(sesion.fechaInicio),
+                                            ),
+                                          ),
+                                          DataCell(
+                                            Text(
+                                              sesion.fechaFin != null
+                                                  ? _formatFecha(
+                                                      sesion.fechaFin!,
+                                                    )
+                                                  : context.l10n.sesionEnCurso,
+                                            ),
+                                          ),
+                                          DataCell(
+                                            Text(
+                                              sesion.abierta
+                                                  ? context.l10n.sesionAbierta
+                                                  : context.l10n.sesionCerrada,
+                                            ),
+                                          ),
+                                          DataCell(
+                                            Text(
+                                              sesion.recordar
+                                                  ? context.l10n.si
+                                                  : context.l10n.no,
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     )
@@ -514,13 +780,30 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                         padding: EdgeInsets.only(top: 8),
                         child: LinearProgressIndicator(),
                       ),
-                      error: (e, _) => Text(context.l10n.errorCargarSesiones(e.toString())),
+                      error: (e, _) =>
+                          Text(context.l10n.errorCargarSesiones(e.toString())),
                     ),
+              if (puedeSuplantar) ...[
+                const SizedBox(height: 40),
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.visibility_outlined),
+                  label: Text(context.l10n.suplantarUsuario),
+                  onPressed: _loading ? null : _suplantar,
+                ),
+              ],
               const SizedBox(height: 40),
               OutlinedButton.icon(
-                icon: const Icon(Icons.delete_outline, color: Colors.red),
-                label: Text(context.l10n.usuarioEliminar, style: const TextStyle(color: Colors.red)),
-                style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.red)),
+                icon: Icon(
+                  Icons.delete_outline,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                label: Text(
+                  context.l10n.usuarioEliminar,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: Theme.of(context).colorScheme.error),
+                ),
                 onPressed: _eliminarUsuario,
               ),
             ],

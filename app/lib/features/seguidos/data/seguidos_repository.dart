@@ -12,11 +12,15 @@ class SeguidosRepository {
   /// "select_clientes_activos_TClienteSedes" ya solo deja ver sedes de clientes activos; el
   /// filtro por tipo de cliente y por si sigue activo se aplica aquí en Dart en vez de con un
   /// filtro de PostgREST sobre el recurso embebido (más simple y no depende de esa sintaxis).
+  ///
+  /// [idConfiguracionClienteTipo] puede traer varios ids separados por coma (p.ej. cuando
+  /// "Buscar" fusiona Tanatorio y Funeraria en una sola tarjeta): coincide con cualquiera.
   Future<List<ClienteSeguible>> listClientesPorFiltro({
     required String idConfiguracionClienteTipo,
     required String provincia,
     required String concello,
   }) async {
+    final idsTipo = idConfiguracionClienteTipo.split(',').toSet();
     final data = await _client
         .from('TClienteSedes')
         .select('*, TSistemaUsuarios(*)')
@@ -29,34 +33,48 @@ class SeguidosRepository {
           final cliente = sede['TSistemaUsuarios'] as Map<String, dynamic>?;
           return cliente != null &&
               cliente['Activo'] == true &&
-              cliente['IdConfiguracionClienteTipo'] == idConfiguracionClienteTipo;
+              idsTipo.contains(cliente['IdConfiguracionClienteTipo']);
         })
         .map(ClienteSeguible.fromSedeMap)
         .toList();
   }
 
   Future<Set<String>> listMisSeguidosIds() async {
-    final data = await _client.from('TClienteSeguimientos').select('IdClienteSede');
-    return (data as List).map((e) => (e as Map<String, dynamic>)['IdClienteSede'] as String).toSet();
+    final data = await _client
+        .from('TClienteSeguimientos')
+        .select('IdClienteSede');
+    return (data as List)
+        .map((e) => (e as Map<String, dynamic>)['IdClienteSede'] as String)
+        .toSet();
   }
 
   /// Sedes que sigue el usuario actual, con el cliente dueño embebido para poder mostrar su
   /// nombre/teléfono/avatar junto a los datos propios de la sede. Paginada para el scroll
   /// infinito: [offset]/[limit] son la página pedida.
-  Future<List<ClienteSeguible>> listMisSeguidosClientes({int offset = 0, int limit = 20}) async {
+  Future<List<ClienteSeguible>> listMisSeguidosClientes({
+    int offset = 0,
+    int limit = 20,
+  }) async {
     final data = await _client
         .from('TClienteSeguimientos')
         .select('*, TClienteSedes(*, TSistemaUsuarios(*))')
         .order('FechaAlta', ascending: false)
         .range(offset, offset + limit - 1);
     return (data as List)
-        .map((e) => ClienteSeguible.fromSedeMap((e as Map<String, dynamic>)['TClienteSedes'] as Map<String, dynamic>))
+        .map(
+          (e) => ClienteSeguible.fromSedeMap(
+            (e as Map<String, dynamic>)['TClienteSedes']
+                as Map<String, dynamic>,
+          ),
+        )
         .toList();
   }
 
   /// Un seguimiento por fila (a qué sede propia sigue + concello del propio seguidor, no el de
   /// la sede), para poder desglosar el número de seguidores de cada sede por concello.
-  Future<List<SeguimientoSedeInfo>> listSeguidoresPorSedes(List<String> idsClienteSede) async {
+  Future<List<SeguimientoSedeInfo>> listSeguidoresPorSedes(
+    List<String> idsClienteSede,
+  ) async {
     if (idsClienteSede.isEmpty) return [];
     final data = await _client
         .from('TClienteSeguimientos')
@@ -73,14 +91,20 @@ class SeguidosRepository {
     }).toList();
   }
 
-  Future<void> seguir({required String idSistemaUsuario, required String idClienteSede}) async {
+  Future<void> seguir({
+    required String idSistemaUsuario,
+    required String idClienteSede,
+  }) async {
     await _client.from('TClienteSeguimientos').insert({
       'IdSistemaUsuario': idSistemaUsuario,
       'IdClienteSede': idClienteSede,
     });
   }
 
-  Future<void> dejarDeSeguir({required String idSistemaUsuario, required String idClienteSede}) async {
+  Future<void> dejarDeSeguir({
+    required String idSistemaUsuario,
+    required String idClienteSede,
+  }) async {
     await _client
         .from('TClienteSeguimientos')
         .delete()

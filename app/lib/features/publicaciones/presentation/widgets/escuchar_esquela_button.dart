@@ -19,17 +19,35 @@ class EscucharEsquelaButton extends ConsumerWidget {
     final frases = <String>[p.nombreFallecido];
 
     if (p.fechaFallecimiento != null) {
-      frases.add(context.l10n.publicarFallecioEl(DateFormat('dd/MM/yyyy').format(p.fechaFallecimiento!)));
+      frases.add(
+        context.l10n.publicarFallecioEl(
+          DateFormat('dd/MM/yyyy').format(p.fechaFallecimiento!),
+        ),
+      );
     }
     if (p.edad != null) {
       frases.add(context.l10n.publicarAnosDeEdad(p.edad!));
     }
+    // Mismo orden que PublicacionDetalle: primero el velorio, luego el entierro.
+    if (p.capillaArdiente != null) {
+      frases.add(
+        '${context.l10n.publicarVelatorioLabel}: ${p.capillaArdiente}',
+      );
+    }
+    if (p.sala != null) {
+      frases.add('${context.l10n.publicarSala} ${p.sala}');
+    }
     if (p.fechaFuneral != null && p.horaFuneral != null) {
       frases.add(
-        context.l10n.publicarFuneralVoz(DateFormat('dd/MM/yyyy').format(p.fechaFuneral!), p.horaFuneral!),
+        context.l10n.publicarFuneralVoz(
+          DateFormat('dd/MM/yyyy').format(p.fechaFuneral!),
+          p.horaFuneral!,
+        ),
       );
     } else if (p.fechaFuneral != null) {
-      frases.add('${context.l10n.publicarFechaFuneral} ${DateFormat('dd/MM/yyyy').format(p.fechaFuneral!)}');
+      frases.add(
+        '${context.l10n.publicarFechaFuneral} ${DateFormat('dd/MM/yyyy').format(p.fechaFuneral!)}',
+      );
     } else if (p.horaFuneral != null) {
       frases.add('${context.l10n.publicarHoraFuneral} ${p.horaFuneral}');
     }
@@ -39,13 +57,6 @@ class EscucharEsquelaButton extends ConsumerWidget {
     if (p.lugar != null) {
       frases.add('${context.l10n.publicarLugar} ${p.lugar}');
     }
-    if (p.capillaArdiente != null) {
-      final etiqueta = context.l10n.publicarCapillaArdiente.split(' / ').first;
-      frases.add('$etiqueta: ${p.capillaArdiente}');
-    }
-    if (p.sala != null) {
-      frases.add('${context.l10n.publicarSala} ${p.sala}');
-    }
     if (p.observaciones != null) {
       frases.add(p.observaciones!);
     }
@@ -54,16 +65,28 @@ class EscucharEsquelaButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sonando = ref.watch(reproduccionEsquelaProvider) == publicacion.idClientePublicacion;
-    final idioma = ref.watch(appLocaleProvider).languageCode == 'gl' ? 'gl-ES' : 'es-ES';
+    final sonando =
+        ref.watch(reproduccionEsquelaProvider) ==
+        publicacion.idClientePublicacion;
+    final idioma = ref.watch(appLocaleProvider).languageCode == 'gl'
+        ? 'gl-ES'
+        : 'es-ES';
 
     return IconButton(
-      icon: Icon(sonando ? Icons.stop_circle_outlined : Icons.volume_up_outlined),
-      tooltip: sonando ? context.l10n.publicarPararEscoita : context.l10n.publicarEscoitarEsquela,
+      icon: Icon(
+        sonando ? Icons.stop_circle_outlined : Icons.volume_up_outlined,
+      ),
+      tooltip: sonando
+          ? context.l10n.publicarPararEscoita
+          : context.l10n.publicarEscoitarEsquela,
       onPressed: () {
         ref
             .read(reproduccionEsquelaProvider.notifier)
-            .alternar(publicacion.idClientePublicacion, _textoParaVoz(context), idioma);
+            .alternar(
+              publicacion.idClientePublicacion,
+              _textoParaVoz(context),
+              idioma,
+            );
       },
     );
   }

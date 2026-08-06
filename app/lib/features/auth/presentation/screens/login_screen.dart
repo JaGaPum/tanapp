@@ -83,7 +83,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         );
       }
     } catch (e) {
-      if (mounted) setState(() => _error = e is AppException ? e.message : context.l10n.errorInesperado);
+      if (mounted) {
+        setState(
+          () => _error = e is AppException
+              ? e.message
+              : context.l10n.errorInesperado,
+        );
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -98,7 +104,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       await authRepo.signInWithGoogle();
     } catch (e) {
-      if (mounted) setState(() => _error = e is AppException ? e.message : context.l10n.errorInesperado);
+      if (mounted) {
+        setState(
+          () => _error = e is AppException
+              ? e.message
+              : context.l10n.errorInesperado,
+        );
+      }
     } finally {
       if (mounted) setState(() => _loadingGoogle = false);
     }
@@ -118,7 +130,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Icon(Icons.local_florist_outlined, size: 56, color: Theme.of(context).colorScheme.primary),
+                    Icon(
+                      Icons.local_florist_outlined,
+                      size: 56,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                     const SizedBox(height: 16),
                     Text(
                       context.l10n.appTitle,
@@ -141,7 +157,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const SizedBox(height: 16),
                     PasswordField(
                       controller: _passwordController,
-                      validator: Validators.required(context, context.l10n.fieldContrasena),
+                      validator: Validators.required(
+                        context,
+                        context.l10n.fieldContrasena,
+                      ),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -151,7 +170,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Checkbox(value: _recordar, onChanged: (v) => setState(() => _recordar = v ?? false)),
+                              Checkbox(
+                                value: _recordar,
+                                onChanged: (v) =>
+                                    setState(() => _recordar = v ?? false),
+                              ),
                               Text(context.l10n.loginRecordarme),
                             ],
                           ),
@@ -163,21 +186,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    AppButton(label: context.l10n.loginIniciarSesion, loading: _loading, onPressed: _submit),
+                    AppButton(
+                      label: context.l10n.loginIniciarSesion,
+                      loading: _loading,
+                      onPressed: _submit,
+                    ),
                     const SizedBox(height: 16),
                     Row(
                       children: [
                         const Expanded(child: Divider()),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Text(context.l10n.o, style: Theme.of(context).textTheme.bodySmall),
+                          child: Text(
+                            context.l10n.o,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
                         ),
                         const Expanded(child: Divider()),
                       ],
                     ),
                     const SizedBox(height: 16),
                     GoogleSignInButton(
-                      label: _loadingGoogle ? context.l10n.googleConectando : context.l10n.googleContinuar,
+                      label: _loadingGoogle
+                          ? context.l10n.googleConectando
+                          : context.l10n.googleContinuar,
                       onPressed: _loadingGoogle ? null : _submitGoogle,
                     ),
                     const SizedBox(height: 24),

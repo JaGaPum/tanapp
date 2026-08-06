@@ -26,7 +26,11 @@ class XagaLabsLogo extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 6),
-            Icon(Icons.code, color: dark ? Colors.blue.shade300 : Colors.blue.shade700, size: 20),
+            Icon(
+              Icons.code,
+              color: dark ? Colors.blue.shade300 : Colors.blue.shade700,
+              size: 20,
+            ),
           ],
         ),
         const SizedBox(height: 2),

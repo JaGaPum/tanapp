@@ -11,7 +11,8 @@ class ClienteImportacionWeb {
     required this.fechaAutorizacion,
   });
 
-  factory ClienteImportacionWeb.fromMap(Map<String, dynamic> map) => ClienteImportacionWeb(
+  factory ClienteImportacionWeb.fromMap(Map<String, dynamic> map) =>
+      ClienteImportacionWeb(
         idClienteImportacionWeb: map['IdClienteImportacionWeb'] as String,
         url: map['Url'] as String,
         activo: map['Activo'] as bool,

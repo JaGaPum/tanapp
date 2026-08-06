@@ -18,7 +18,11 @@ class VerifyOtpScreen extends ConsumerStatefulWidget {
   final String email;
   final OtpPurpose purpose;
 
-  const VerifyOtpScreen({super.key, required this.email, required this.purpose});
+  const VerifyOtpScreen({
+    super.key,
+    required this.email,
+    required this.purpose,
+  });
 
   @override
   ConsumerState<VerifyOtpScreen> createState() => _VerifyOtpScreenState();
@@ -69,10 +73,16 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
       }
       _startCooldown();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.verifyOtpCodigoReenviado)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.verifyOtpCodigoReenviado)),
+        );
       }
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.verifyOtpNoSePudoReenviar);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.verifyOtpNoSePudoReenviar,
+      );
     }
   }
 
@@ -85,14 +95,24 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
     try {
       final repo = ref.read(authRepositoryProvider);
       if (widget.purpose == OtpPurpose.signup) {
-        await repo.verifySignupOtp(email: widget.email, token: _otpController.text);
+        await repo.verifySignupOtp(
+          email: widget.email,
+          token: _otpController.text,
+        );
         if (mounted) context.go('/login');
       } else {
-        await repo.verifyRecoveryOtp(email: widget.email, token: _otpController.text);
+        await repo.verifyRecoveryOtp(
+          email: widget.email,
+          token: _otpController.text,
+        );
         if (mounted) context.go('/reset-password');
       }
     } catch (e) {
-      setState(() => _error = e is AppException ? e.message : context.l10n.verifyOtpCodigoIncorrecto);
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.verifyOtpCodigoIncorrecto,
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -120,16 +140,25 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
                     ),
                     const SizedBox(height: 24),
                     if (_error != null) ErrorBanner(message: _error!),
-                    OtpInputField(controller: _otpController, validator: Validators.otp(context)),
+                    OtpInputField(
+                      controller: _otpController,
+                      validator: Validators.otp(context),
+                    ),
                     const SizedBox(height: 16),
-                    AppButton(label: context.l10n.verifyOtpVerificar, loading: _loading, onPressed: _submit),
+                    AppButton(
+                      label: context.l10n.verifyOtpVerificar,
+                      loading: _loading,
+                      onPressed: _submit,
+                    ),
                     const SizedBox(height: 16),
                     Center(
                       child: TextButton(
                         onPressed: _cooldown > 0 ? null : _resend,
                         child: Text(
                           _cooldown > 0
-                              ? context.l10n.verifyOtpReenviarCooldown(_cooldown)
+                              ? context.l10n.verifyOtpReenviarCooldown(
+                                  _cooldown,
+                                )
                               : context.l10n.verifyOtpReenviar,
                         ),
                       ),

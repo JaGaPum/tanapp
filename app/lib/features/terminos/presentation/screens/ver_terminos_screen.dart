@@ -17,7 +17,12 @@ class VerTerminosScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(context.l10n.terminosVerEnCuenta)),
       body: activosAsync.when(
         data: (activos) => ListView.separated(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.fromLTRB(
+            16,
+            16,
+            16,
+            16 + MediaQuery.of(context).padding.bottom,
+          ),
           itemCount: activos.length,
           separatorBuilder: (_, _) => const SizedBox(height: 16),
           itemBuilder: (context, index) {
@@ -28,9 +33,15 @@ class VerTerminosScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(termino.titulo, style: Theme.of(context).textTheme.titleLarge),
+                    Text(
+                      termino.titulo,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
                     const SizedBox(height: 8),
-                    Text(termino.cuerpo, style: Theme.of(context).textTheme.bodyMedium),
+                    Text(
+                      termino.cuerpo,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                   ],
                 ),
               ),
@@ -38,7 +49,8 @@ class VerTerminosScreen extends ConsumerWidget {
           },
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorGenerico(e.toString()))),
       ),
     );
   }

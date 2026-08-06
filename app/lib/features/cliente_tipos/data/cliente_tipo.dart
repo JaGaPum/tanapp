@@ -13,13 +13,18 @@ class ClienteTipoIdioma {
     required this.nombre,
   });
 
-  factory ClienteTipoIdioma.fromMap(Map<String, dynamic> map) => ClienteTipoIdioma(
-        idConfiguracionClienteTipoIdioma: map['IdConfiguracionClienteTipoIdioma'] as String,
-        idSistemaIdioma: map['IdSistemaIdioma'] as String,
-        codigoIdioma: (map['TSistemaIdiomas'] as Map<String, dynamic>)['Codigo'] as String,
-        nombreIdioma: (map['TSistemaIdiomas'] as Map<String, dynamic>)['Nombre'] as String,
-        nombre: map['Nombre'] as String,
-      );
+  factory ClienteTipoIdioma.fromMap(
+    Map<String, dynamic> map,
+  ) => ClienteTipoIdioma(
+    idConfiguracionClienteTipoIdioma:
+        map['IdConfiguracionClienteTipoIdioma'] as String,
+    idSistemaIdioma: map['IdSistemaIdioma'] as String,
+    codigoIdioma:
+        (map['TSistemaIdiomas'] as Map<String, dynamic>)['Codigo'] as String,
+    nombreIdioma:
+        (map['TSistemaIdiomas'] as Map<String, dynamic>)['Nombre'] as String,
+    nombre: map['Nombre'] as String,
+  );
 }
 
 class ClienteTipo {
@@ -36,13 +41,15 @@ class ClienteTipo {
   });
 
   factory ClienteTipo.fromMap(Map<String, dynamic> map) {
-    final traduccionesRaw = map['TConfiguracionClienteTiposIdiomas'] as List<dynamic>? ?? const [];
+    final traduccionesRaw =
+        map['TConfiguracionClienteTiposIdiomas'] as List<dynamic>? ?? const [];
     return ClienteTipo(
       idConfiguracionClienteTipo: map['IdConfiguracionClienteTipo'] as String,
       nombre: map['Nombre'] as String,
       activo: map['Activo'] as bool? ?? true,
-      traducciones:
-          traduccionesRaw.map((e) => ClienteTipoIdioma.fromMap(e as Map<String, dynamic>)).toList(),
+      traducciones: traduccionesRaw
+          .map((e) => ClienteTipoIdioma.fromMap(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }

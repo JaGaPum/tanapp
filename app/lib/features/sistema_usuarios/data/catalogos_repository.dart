@@ -6,13 +6,17 @@ class RolCatalogo {
   final String codigo;
   final String nombre;
 
-  const RolCatalogo({required this.idSistemaRol, required this.codigo, required this.nombre});
+  const RolCatalogo({
+    required this.idSistemaRol,
+    required this.codigo,
+    required this.nombre,
+  });
 
   factory RolCatalogo.fromMap(Map<String, dynamic> map) => RolCatalogo(
-        idSistemaRol: map['IdSistemaRol'] as String,
-        codigo: map['Codigo'] as String,
-        nombre: map['Nombre'] as String,
-      );
+    idSistemaRol: map['IdSistemaRol'] as String,
+    codigo: map['Codigo'] as String,
+    nombre: map['Nombre'] as String,
+  );
 }
 
 class IdiomaCatalogo {
@@ -20,13 +24,17 @@ class IdiomaCatalogo {
   final String codigo;
   final String nombre;
 
-  const IdiomaCatalogo({required this.idSistemaIdioma, required this.codigo, required this.nombre});
+  const IdiomaCatalogo({
+    required this.idSistemaIdioma,
+    required this.codigo,
+    required this.nombre,
+  });
 
   factory IdiomaCatalogo.fromMap(Map<String, dynamic> map) => IdiomaCatalogo(
-        idSistemaIdioma: map['IdSistemaIdioma'] as String,
-        codigo: map['Codigo'] as String,
-        nombre: map['Nombre'] as String,
-      );
+    idSistemaIdioma: map['IdSistemaIdioma'] as String,
+    codigo: map['Codigo'] as String,
+    nombre: map['Nombre'] as String,
+  );
 }
 
 class CatalogosRepository {
@@ -35,12 +43,16 @@ class CatalogosRepository {
 
   Future<List<RolCatalogo>> listRoles() async {
     final data = await _client.from('TSistemaRoles').select().order('Nombre');
-    return (data as List).map((e) => RolCatalogo.fromMap(e as Map<String, dynamic>)).toList();
+    return (data as List)
+        .map((e) => RolCatalogo.fromMap(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<List<IdiomaCatalogo>> listIdiomas() async {
     final data = await _client.from('TSistemaIdiomas').select().order('Nombre');
-    return (data as List).map((e) => IdiomaCatalogo.fromMap(e as Map<String, dynamic>)).toList();
+    return (data as List)
+        .map((e) => IdiomaCatalogo.fromMap(e as Map<String, dynamic>))
+        .toList();
   }
 }
 

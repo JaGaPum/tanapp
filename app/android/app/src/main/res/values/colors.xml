@@ -2,5 +2,5 @@
 <resources>
     <!-- Mismo negro que AppColors.black en Flutter (app_theme.dart), para que la pantalla de
          splash nativa no dé un salto de color al entrar en la app. -->
-    <color name="splash_background">#1A1A1A</color>
+    <color name="splash_background">#1A1420</color>
 </resources>

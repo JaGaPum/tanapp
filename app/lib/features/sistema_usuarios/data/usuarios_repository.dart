@@ -51,7 +51,9 @@ class UsuariosRepository {
     }
 
     final data = await query.order('Nombre');
-    var lista = (data as List).map((e) => UsuarioPerfil.fromMap(e as Map<String, dynamic>)).toList();
+    var lista = (data as List)
+        .map((e) => UsuarioPerfil.fromMap(e as Map<String, dynamic>))
+        .toList();
 
     if (rolCodigo != null && rolCodigo.isNotEmpty) {
       lista = lista.where((u) => u.roles.contains(rolCodigo)).toList();
@@ -73,21 +75,26 @@ class UsuariosRepository {
     required bool activo,
     bool? notificacionesPushActivas,
   }) async {
-    String? normalizado(String? valor) => (valor == null || valor.trim().isEmpty) ? null : valor.trim();
+    String? normalizado(String? valor) =>
+        (valor == null || valor.trim().isEmpty) ? null : valor.trim();
 
-    await _client.from('TSistemaUsuarios').update({
-      'Nombre': nombre.trim(),
-      'Apellido1': apellido1.trim(),
-      'Apellido2': normalizado(apellido2),
-      'Telefono': normalizado(telefono),
-      'Concello': normalizado(concello),
-      'Provincia': normalizado(provincia),
-      'Direccion': normalizado(direccion),
-      'IdSistemaIdiomaPreferido': idSistemaIdiomaPreferido,
-      'IdConfiguracionClienteTipo': idConfiguracionClienteTipo,
-      'Activo': activo,
-      if (notificacionesPushActivas != null) 'NotificacionesPushActivas': notificacionesPushActivas,
-    }).eq('IdSistemaUsuario', idSistemaUsuario);
+    await _client
+        .from('TSistemaUsuarios')
+        .update({
+          'Nombre': nombre.trim(),
+          'Apellido1': apellido1.trim(),
+          'Apellido2': normalizado(apellido2),
+          'Telefono': normalizado(telefono),
+          'Concello': normalizado(concello),
+          'Provincia': normalizado(provincia),
+          'Direccion': normalizado(direccion),
+          'IdSistemaIdiomaPreferido': idSistemaIdiomaPreferido,
+          'IdConfiguracionClienteTipo': idConfiguracionClienteTipo,
+          'Activo': activo,
+          if (notificacionesPushActivas != null)
+            'NotificacionesPushActivas': notificacionesPushActivas,
+        })
+        .eq('IdSistemaUsuario', idSistemaUsuario);
   }
 
   Future<String> subirFoto({
@@ -98,21 +105,26 @@ class UsuariosRepository {
     required String contentType,
   }) async {
     final path = '$authId/avatar.$extension';
-    await _client.storage.from('avatares').uploadBinary(
+    await _client.storage
+        .from('avatares')
+        .uploadBinary(
           path,
           bytes,
           fileOptions: FileOptions(upsert: true, contentType: contentType),
         );
     final publicUrl = _client.storage.from('avatares').getPublicUrl(path);
     final urlConCache = '$publicUrl?v=${DateTime.now().millisecondsSinceEpoch}';
-    await _client.from('TSistemaUsuarios').update({'FotoUrl': urlConCache}).eq(
-          'IdSistemaUsuario',
-          idSistemaUsuario,
-        );
+    await _client
+        .from('TSistemaUsuarios')
+        .update({'FotoUrl': urlConCache})
+        .eq('IdSistemaUsuario', idSistemaUsuario);
     return urlConCache;
   }
 
-  Future<void> asignarRol({required String idSistemaUsuario, required String idSistemaRol}) async {
+  Future<void> asignarRol({
+    required String idSistemaUsuario,
+    required String idSistemaRol,
+  }) async {
     await _client.from('TSistemaUsuariosRoles').insert({
       'IdSistemaUsuario': idSistemaUsuario,
       'IdSistemaRol': idSistemaRol,
@@ -120,16 +132,40 @@ class UsuariosRepository {
   }
 
   Future<void> quitarRol({required String idSistemaUsuarioRol}) async {
-    await _client.from('TSistemaUsuariosRoles').delete().eq('IdSistemaUsuarioRol', idSistemaUsuarioRol);
+    await _client
+        .from('TSistemaUsuariosRoles')
+        .delete()
+        .eq('IdSistemaUsuarioRol', idSistemaUsuarioRol);
+  }
+
+  /// Interruptor por usuario (migración 042) del escaneo de esquelas con IA: independiente del
+  /// interruptor global de Configuración > IA, permite cortarle el acceso a un cliente concreto.
+  Future<void> actualizarEscaneoEsquelaIaActiva(
+    String idSistemaUsuario,
+    bool activa,
+  ) async {
+    await _client
+        .from('TSistemaUsuarios')
+        .update({'EscaneoEsquelaIaActiva': activa})
+        .eq('IdSistemaUsuario', idSistemaUsuario);
   }
 
   Future<void> confirmarEmail(String idSistemaUsuario) async {
-    await _client.rpc('FSistemaAdminConfirmarEmail', params: {'id_sistema_usuario': idSistemaUsuario});
+    await _client.rpc(
+      'FSistemaAdminConfirmarEmail',
+      params: {'id_sistema_usuario': idSistemaUsuario},
+    );
   }
 
   Future<void> eliminarUsuario(String idSistemaUsuario) async {
-    await _client.from('TSistemaUsuariosRoles').delete().eq('IdSistemaUsuario', idSistemaUsuario);
-    await _client.from('TSistemaUsuarios').delete().eq('IdSistemaUsuario', idSistemaUsuario);
+    await _client
+        .from('TSistemaUsuariosRoles')
+        .delete()
+        .eq('IdSistemaUsuario', idSistemaUsuario);
+    await _client
+        .from('TSistemaUsuarios')
+        .delete()
+        .eq('IdSistemaUsuario', idSistemaUsuario);
   }
 }
 

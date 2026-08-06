@@ -25,7 +25,9 @@ class Sesion {
       idSistemaUsuario: map['IdSistemaUsuario'] as String,
       fechaInicio: DateTime.parse(map['FechaInicio'] as String),
       fechaUltimoAcceso: DateTime.parse(map['FechaUltimoAcceso'] as String),
-      fechaFin: map['FechaFin'] == null ? null : DateTime.parse(map['FechaFin'] as String),
+      fechaFin: map['FechaFin'] == null
+          ? null
+          : DateTime.parse(map['FechaFin'] as String),
       recordar: map['Recordar'] as bool? ?? false,
       estado: map['Estado'] as String,
     );

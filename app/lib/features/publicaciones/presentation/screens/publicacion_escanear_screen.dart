@@ -5,9 +5,12 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/l10n/l10n_extensions.dart';
+import '../../../../core/l10n/locale_provider.dart';
 import '../../../../core/utils/text_format.dart';
 import '../../../auth/application/auth_providers.dart';
 import '../../../cliente_tipos/application/cliente_tipos_providers.dart';
+import '../../../configuracion/application/configuracion_providers.dart';
+import '../../data/publicaciones_repository.dart';
 
 /// Quita acentos y pasa a minúsculas, para que la detección de palabras clave no dependa de que
 /// el OCR haya reconocido bien las tildes (algo que falla a menudo).
@@ -26,19 +29,58 @@ String _normalizar(String texto) {
 /// contenga se descarta del prellenado, para no arrastrar datos personales de familiares al
 /// formulario.
 const _palabrasFamiliares = {
-  'hijo', 'hija', 'hijos', 'hijas',
-  'fillo', 'filla', 'fillos', 'fillas',
-  'nieto', 'nieta', 'nietos', 'nietas',
-  'neto', 'neta', 'netos', 'netas',
-  'hermano', 'hermana', 'hermanos', 'hermanas',
-  'irman', 'irma', 'irmans',
-  'sobrino', 'sobrina', 'sobrinos', 'sobrinas',
-  'primo', 'prima', 'primos', 'primas',
-  'curman', 'curma', 'curmans',
-  'esposo', 'esposa', 'viudo', 'viuda',
-  'padre', 'madre', 'padres',
-  'pai', 'nai', 'pais',
-  'ahijado', 'ahijada', 'cunado', 'cunada', 'yerno', 'nuera', 'politicos', 'politica',
+  'hijo',
+  'hija',
+  'hijos',
+  'hijas',
+  'fillo',
+  'filla',
+  'fillos',
+  'fillas',
+  'nieto',
+  'nieta',
+  'nietos',
+  'nietas',
+  'neto',
+  'neta',
+  'netos',
+  'netas',
+  'hermano',
+  'hermana',
+  'hermanos',
+  'hermanas',
+  'irman',
+  'irma',
+  'irmans',
+  'sobrino',
+  'sobrina',
+  'sobrinos',
+  'sobrinas',
+  'primo',
+  'prima',
+  'primos',
+  'primas',
+  'curman',
+  'curma',
+  'curmans',
+  'esposo',
+  'esposa',
+  'viudo',
+  'viuda',
+  'padre',
+  'madre',
+  'padres',
+  'pai',
+  'nai',
+  'pais',
+  'ahijado',
+  'ahijada',
+  'cunado',
+  'cunada',
+  'yerno',
+  'nuera',
+  'politicos',
+  'politica',
 };
 
 /// Frases que solo aparecen en el texto importante de la esquela (fecha/edad, convocatoria del
@@ -46,12 +88,24 @@ const _palabrasFamiliares = {
 /// conserva siempre, aunque también roce alguna palabra de la lista de familiares (p. ej. "su
 /// esposa" dentro de la propia convocatoria).
 const _anclasImportantes = [
-  'fallecio', 'faleceu', 'falleceu', 'finou', 'morreu', 'murio',
-  'ruegan', 'rogan', 'pregan',
-  'capilla ardiente', 'capela ardente',
-  'auxilios espirituales', 'auxilios espirituais',
-  'complexo funerario', 'complejo funerario', 'tanatorio',
-  'd.e.p', 'q.e.p.d',
+  'fallecio',
+  'faleceu',
+  'falleceu',
+  'finou',
+  'morreu',
+  'murio',
+  'ruegan',
+  'rogan',
+  'pregan',
+  'capilla ardiente',
+  'capela ardente',
+  'auxilios espirituales',
+  'auxilios espirituais',
+  'complexo funerario',
+  'complejo funerario',
+  'tanatorio',
+  'd.e.p',
+  'q.e.p.d',
 ];
 
 bool _tieneAnclaImportante(String textoBloque) {
@@ -70,7 +124,11 @@ bool _esBloqueFamiliar(String textoBloque) {
 /// filigrana del borde decorativo mal leída como texto: ruido que conviene descartar siempre.
 const _frasesRuido = ['servicios de defuncion', 'todas las companias', 'www.'];
 
-bool _esBloqueRuido(String textoBloque, {String? nombreCliente, String? telefonoCliente}) {
+bool _esBloqueRuido(
+  String textoBloque, {
+  String? nombreCliente,
+  String? telefonoCliente,
+}) {
   final normalizado = _normalizar(textoBloque.trim());
   if (RegExp(r'^\d{1,3}\.?$').hasMatch(normalizado)) return true;
   if (_frasesRuido.any(normalizado.contains)) return true;
@@ -79,7 +137,10 @@ bool _esBloqueRuido(String textoBloque, {String? nombreCliente, String? telefono
   // precisión su propio pie publicitario, sin depender de una lista genérica de palabras.
   if (nombreCliente != null) {
     final nombreNormalizado = _normalizar(nombreCliente.trim());
-    if (nombreNormalizado.length >= 4 && normalizado.contains(nombreNormalizado)) return true;
+    if (nombreNormalizado.length >= 4 &&
+        normalizado.contains(nombreNormalizado)) {
+      return true;
+    }
   }
   if (telefonoCliente != null) {
     final digitosTelefono = telefonoCliente.replaceAll(RegExp(r'\D'), '');
@@ -104,8 +165,16 @@ String _limpiarBloque(String textoBloque) {
 }
 
 const _prefijosHonorificos = [
-  'don ', 'doña ', 'dona ', 'd. ', 'dña. ', "d.ª ",
-  'el señor ', 'la señora ', 'o señor ', 'a señora ',
+  'don ',
+  'doña ',
+  'dona ',
+  'd. ',
+  'dña. ',
+  "d.ª ",
+  'el señor ',
+  'la señora ',
+  'o señor ',
+  'a señora ',
 ];
 
 String _limpiarNombre(String linea) {
@@ -129,18 +198,28 @@ String _limpiarNombre(String linea) {
 
 /// Mes (nombre en castellano o gallego, sin tilde) → número de mes.
 const _meses = {
-  'enero': 1, 'xaneiro': 1,
-  'febrero': 2, 'febreiro': 2,
+  'enero': 1,
+  'xaneiro': 1,
+  'febrero': 2,
+  'febreiro': 2,
   'marzo': 3,
   'abril': 4,
-  'mayo': 5, 'maio': 5,
-  'junio': 6, 'xuno': 6,
-  'julio': 7, 'xullo': 7,
+  'mayo': 5,
+  'maio': 5,
+  'junio': 6,
+  'xuno': 6,
+  'julio': 7,
+  'xullo': 7,
   'agosto': 8,
-  'septiembre': 9, 'setiembre': 9, 'setembro': 9,
-  'octubre': 10, 'outubro': 10,
-  'noviembre': 11, 'novembro': 11,
-  'diciembre': 12, 'decembro': 12,
+  'septiembre': 9,
+  'setiembre': 9,
+  'setembro': 9,
+  'octubre': 10,
+  'outubro': 10,
+  'noviembre': 11,
+  'novembro': 11,
+  'diciembre': 12,
+  'decembro': 12,
 };
 
 /// Fecha de fallecimiento con el mes escrito en letra ("...o día 15 de xullo de 2026").
@@ -157,7 +236,10 @@ final _regexFechaFallecimientoNumerica = RegExp(
 );
 
 /// Edad con ancla explícita delante ("a los 82 años" / "aos 82 anos" / "ós 82 anos").
-final _regexEdad = RegExp(r'(?:a\s+los|aos|[oó]s)\s+(\d{1,3})\s+a[nñ]os', caseSensitive: false);
+final _regexEdad = RegExp(
+  r'(?:a\s+los|aos|[oó]s)\s+(\d{1,3})\s+a[nñ]os',
+  caseSensitive: false,
+);
 
 /// Fallback más permisivo: la edad casi siempre aparece justo después de la fecha de
 /// fallecimiento, como un número pegado a "años"/"anos" sin que el ancla previa se reconozca
@@ -166,11 +248,15 @@ final _regexEdadGenerica = RegExp(r'(\d{1,3})\s*a[nñ]os', caseSensitive: false)
 
 /// Día de la semana (nombre en castellano o gallego, sin tilde) → `DateTime.weekday`.
 const _diasSemana = {
-  'lunes': DateTime.monday, 'luns': DateTime.monday,
+  'lunes': DateTime.monday,
+  'luns': DateTime.monday,
   'martes': DateTime.tuesday,
-  'miercoles': DateTime.wednesday, 'mercores': DateTime.wednesday,
-  'jueves': DateTime.thursday, 'xoves': DateTime.thursday,
-  'viernes': DateTime.friday, 'venres': DateTime.friday,
+  'miercoles': DateTime.wednesday,
+  'mercores': DateTime.wednesday,
+  'jueves': DateTime.thursday,
+  'xoves': DateTime.thursday,
+  'viernes': DateTime.friday,
+  'venres': DateTime.friday,
   'sabado': DateTime.saturday,
   'domingo': DateTime.sunday,
 };
@@ -194,16 +280,23 @@ DateTime _proximoDiaSemana(DateTime referencia, int diaSemanaObjetivo) {
 
 /// Número de hora escrito en letra (castellano o gallego, sin tilde) → 1-12.
 const _numerosHora = {
-  'una': 1, 'unha': 1,
-  'dos': 2, 'duas': 2,
+  'una': 1,
+  'unha': 1,
+  'dos': 2,
+  'duas': 2,
   'tres': 3,
-  'cuatro': 4, 'catro': 4,
+  'cuatro': 4,
+  'catro': 4,
   'cinco': 5,
   'seis': 6,
-  'siete': 7, 'sete': 7,
-  'ocho': 8, 'oito': 8,
-  'nueve': 9, 'nove': 9,
-  'diez': 10, 'dez': 10,
+  'siete': 7,
+  'sete': 7,
+  'ocho': 8,
+  'oito': 8,
+  'nueve': 9,
+  'nove': 9,
+  'diez': 10,
+  'dez': 10,
   'once': 11,
   'doce': 12,
 };
@@ -266,7 +359,9 @@ final _regexCapillaArdiente = RegExp(
 /// propio también).
 final _regexCapillaArdienteNegocio = RegExp(
   r'((?:complexo|complejo)\s+funerario|tanatorio)\s+([^(;.]+?)'
-  r'(?=\s*\(|[;.]|' + _terminadorIglesia + r'|,?\s*sala\b|$)',
+          r'(?=\s*\(|[;.]|' +
+      _terminadorIglesia +
+      r'|,?\s*sala\b|$)',
   caseSensitive: false,
 );
 
@@ -317,7 +412,9 @@ _CamposExtraidos _extraerCampos(String texto) {
   }
   if (fechaFallecimiento == null) {
     // La esquela trae la fecha en formato numérico (15/07/2026) en vez de con el mes en letra.
-    final matchFechaNumerica = _regexFechaFallecimientoNumerica.firstMatch(texto);
+    final matchFechaNumerica = _regexFechaFallecimientoNumerica.firstMatch(
+      texto,
+    );
     if (matchFechaNumerica != null) {
       final dia = int.tryParse(matchFechaNumerica.group(1)!);
       final mes = int.tryParse(matchFechaNumerica.group(2)!);
@@ -337,7 +434,10 @@ _CamposExtraidos _extraerCampos(String texto) {
   if (matchDia != null) {
     final diaObjetivo = _diasSemana[_normalizar(matchDia.group(0)!)];
     if (diaObjetivo != null) {
-      fechaFuneral = _proximoDiaSemana(fechaFallecimiento ?? DateTime.now(), diaObjetivo);
+      fechaFuneral = _proximoDiaSemana(
+        fechaFallecimiento ?? DateTime.now(),
+        diaObjetivo,
+      );
     }
   }
 
@@ -346,9 +446,13 @@ _CamposExtraidos _extraerCampos(String texto) {
 
   final matchIglesiaLugar = _regexIglesiaLugar.firstMatch(texto);
   final iglesiaCruda = matchIglesiaLugar?.group(1)?.trim();
-  final iglesia = iglesiaCruda != null && iglesiaCruda.isNotEmpty ? formatearTitulo(iglesiaCruda) : null;
+  final iglesia = iglesiaCruda != null && iglesiaCruda.isNotEmpty
+      ? formatearTitulo(iglesiaCruda)
+      : null;
   final lugarCrudo = matchIglesiaLugar?.group(2)?.trim();
-  final lugar = lugarCrudo != null && lugarCrudo.isNotEmpty ? formatearTitulo(lugarCrudo) : null;
+  final lugar = lugarCrudo != null && lugarCrudo.isNotEmpty
+      ? formatearTitulo(lugarCrudo)
+      : null;
 
   // Group(1), no group(0): se descarta la propia etiqueta ("Capilla Ardiente: "/"Sala
   // velatoria: "), solo interesa el nombre del tanatorio y la sala.
@@ -362,11 +466,15 @@ _CamposExtraidos _extraerCampos(String texto) {
       capillaCruda = '${matchNegocio.group(1)} ${matchNegocio.group(2)}'.trim();
     }
   }
-  final capillaArdiente = capillaCruda != null && capillaCruda.isNotEmpty ? formatearTitulo(capillaCruda) : null;
+  final capillaArdiente = capillaCruda != null && capillaCruda.isNotEmpty
+      ? formatearTitulo(capillaCruda)
+      : null;
 
   final matchSala = _regexSala.firstMatch(texto);
   final salaCruda = matchSala?.group(1)?.trim();
-  final sala = salaCruda != null && salaCruda.isNotEmpty ? formatearTitulo(salaCruda) : null;
+  final sala = salaCruda != null && salaCruda.isNotEmpty
+      ? formatearTitulo(salaCruda)
+      : null;
 
   return _CamposExtraidos(
     fechaFallecimiento: fechaFallecimiento,
@@ -388,10 +496,12 @@ class PublicacionEscanearScreen extends ConsumerStatefulWidget {
   const PublicacionEscanearScreen({super.key});
 
   @override
-  ConsumerState<PublicacionEscanearScreen> createState() => _PublicacionEscanearScreenState();
+  ConsumerState<PublicacionEscanearScreen> createState() =>
+      _PublicacionEscanearScreenState();
 }
 
-class _PublicacionEscanearScreenState extends ConsumerState<PublicacionEscanearScreen> {
+class _PublicacionEscanearScreenState
+    extends ConsumerState<PublicacionEscanearScreen> {
   @override
   void initState() {
     super.initState();
@@ -401,13 +511,53 @@ class _PublicacionEscanearScreenState extends ConsumerState<PublicacionEscanearS
   Future<void> _escanear() async {
     XFile? picked;
     try {
-      picked = await ImagePicker().pickImage(source: ImageSource.camera, imageQuality: 90);
+      picked = await ImagePicker().pickImage(
+        source: ImageSource.camera,
+        imageQuality: 90,
+      );
     } catch (_) {
       picked = null;
     }
     if (picked == null) {
       if (mounted) context.pop();
       return;
+    }
+
+    // Si el escaneo con IA está activado globalmente (Configuración > IA), se intenta primero:
+    // la foto entera va a la Edge Function "escanear-esquela-imagen" (Claude con visión), mucho
+    // más fiable que el OCR local con cualquier plantilla de esquela. Si falla por lo que sea
+    // (desactivado, sin conexión, error puntual de la IA...) se sigue sin más con el OCR de
+    // siempre, que nunca deja de funcionar.
+    try {
+      final iaActiva = await ref.read(escaneoEsquelaIaActivaProvider.future);
+      if (iaActiva) {
+        final idioma = ref.read(appLocaleProvider).languageCode;
+        final bytes = await picked.readAsBytes();
+        final esquela = await ref
+            .read(publicacionesRepositoryProvider)
+            .escanearConIa(bytesImagen: bytes, idioma: idioma);
+        if (esquela != null) {
+          if (!mounted) return;
+          context.pushReplacement(
+            '/publicar/manual',
+            extra: {
+              'nombre': esquela.nombreFallecido,
+              'fechaFallecimiento': esquela.fechaFallecimiento,
+              'edad': esquela.edad?.toString(),
+              'fechaFuneral': esquela.fechaFuneral,
+              'horaFuneral': esquela.horaFuneral,
+              'iglesia': esquela.iglesia,
+              'lugar': esquela.lugar,
+              'capillaArdiente': esquela.capillaArdiente,
+              'sala': esquela.sala,
+              'observaciones': esquela.observaciones,
+            },
+          );
+          return;
+        }
+      }
+    } catch (_) {
+      // Sigue con el OCR local más abajo.
     }
 
     // El nombre/teléfono del propio cliente (ya en su perfil) ayuda a identificar con precisión
@@ -420,14 +570,20 @@ class _PublicacionEscanearScreenState extends ConsumerState<PublicacionEscanearS
     String? detalleError;
     try {
       final recognizer = TextRecognizer(script: TextRecognitionScript.latin);
-      final recognizedText = await recognizer.processImage(InputImage.fromFilePath(picked.path));
+      final recognizedText = await recognizer.processImage(
+        InputImage.fromFilePath(picked.path),
+      );
       await recognizer.close();
 
-      final lineas = [for (final block in recognizedText.blocks) ...block.lines];
+      final lineas = [
+        for (final block in recognizedText.blocks) ...block.lines,
+      ];
       if (lineas.isEmpty) {
         ocrFallo = true;
       } else {
-        final masGrande = lineas.reduce((a, b) => a.boundingBox.height >= b.boundingBox.height ? a : b);
+        final masGrande = lineas.reduce(
+          (a, b) => a.boundingBox.height >= b.boundingBox.height ? a : b,
+        );
         nombreGuess = formatearTitulo(_limpiarNombre(masGrande.text));
 
         // El orden en el que ML Kit devuelve los bloques no siempre sigue el orden visual de
@@ -442,12 +598,18 @@ class _PublicacionEscanearScreenState extends ConsumerState<PublicacionEscanearS
           // descartan, ni como ruido ni como bloque familiar: p. ej. la sala del velatorio puede
           // coincidir con el nombre del propio tanatorio-cliente sin ser su pie publicitario.
           if (_tieneAnclaImportante(b.text)) return true;
-          if (_esBloqueRuido(b.text, nombreCliente: perfil?.nombre, telefonoCliente: perfil?.telefono)) {
+          if (_esBloqueRuido(
+            b.text,
+            nombreCliente: perfil?.nombre,
+            telefonoCliente: perfil?.telefono,
+          )) {
             return false;
           }
           return !_esBloqueFamiliar(b.text);
         });
-        final textoCompleto = bloquesValidos.map((b) => _limpiarBloque(b.text)).join(' ');
+        final textoCompleto = bloquesValidos
+            .map((b) => _limpiarBloque(b.text))
+            .join(' ');
         campos = _extraerCampos(textoCompleto);
       }
     } catch (e) {
@@ -457,11 +619,16 @@ class _PublicacionEscanearScreenState extends ConsumerState<PublicacionEscanearS
 
     // Si no se ha encontrado ninguna capilla ardiente y el propio cliente que escanea es de
     // tipo "Tanatorio", casi siempre el velatorio es su propio local: se rellena con su nombre.
-    if ((campos.capillaArdiente == null || campos.capillaArdiente!.isEmpty) && perfil != null) {
+    if ((campos.capillaArdiente == null || campos.capillaArdiente!.isEmpty) &&
+        perfil != null) {
       try {
         final tipos = await ref.read(clienteTiposListProvider.future);
         final tipoNombre = tipos
-            .where((t) => t.idConfiguracionClienteTipo == perfil.idConfiguracionClienteTipo)
+            .where(
+              (t) =>
+                  t.idConfiguracionClienteTipo ==
+                  perfil.idConfiguracionClienteTipo,
+            )
             .map((t) => t.nombre)
             .firstOrNull;
         if (tipoNombre == 'Tanatorio') {

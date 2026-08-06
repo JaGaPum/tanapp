@@ -8,7 +8,11 @@ class ReproduccionEsquelaNotifier extends Notifier<String?> {
   @override
   String? build() => null;
 
-  Future<void> alternar(String idClientePublicacion, String texto, String idioma) async {
+  Future<void> alternar(
+    String idClientePublicacion,
+    String texto,
+    String idioma,
+  ) async {
     final tts = ref.read(ttsServiceProvider);
     final yaSonando = state == idClientePublicacion;
     await tts.detener();
@@ -24,6 +28,7 @@ class ReproduccionEsquelaNotifier extends Notifier<String?> {
   }
 }
 
-final reproduccionEsquelaProvider = NotifierProvider<ReproduccionEsquelaNotifier, String?>(
-  ReproduccionEsquelaNotifier.new,
-);
+final reproduccionEsquelaProvider =
+    NotifierProvider<ReproduccionEsquelaNotifier, String?>(
+      ReproduccionEsquelaNotifier.new,
+    );

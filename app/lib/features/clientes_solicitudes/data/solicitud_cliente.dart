@@ -35,7 +35,8 @@ class SolicitudCliente {
 
   bool get tieneUsuarioCliente => idSistemaUsuarioCliente != null;
 
-  factory SolicitudCliente.fromMap(Map<String, dynamic> map) => SolicitudCliente(
+  factory SolicitudCliente.fromMap(Map<String, dynamic> map) =>
+      SolicitudCliente(
         idClientesSolicitud: map['IdClientesSolicitud'] as String,
         razonSocial: map['RazonSocial'] as String,
         nifCif: map['NifCif'] as String,
@@ -50,6 +51,7 @@ class SolicitudCliente {
         observacionesResolucion: map['ObservacionesResolucion'] as String?,
         fechaAlta: DateTime.parse(map['FechaAlta'] as String),
         idSistemaUsuarioCliente: map['IdSistemaUsuarioCliente'] as String?,
-        idConfiguracionClienteTipo: map['IdConfiguracionClienteTipo'] as String?,
+        idConfiguracionClienteTipo:
+            map['IdConfiguracionClienteTipo'] as String?,
       );
 }

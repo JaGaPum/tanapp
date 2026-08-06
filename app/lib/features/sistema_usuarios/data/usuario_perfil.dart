@@ -29,6 +29,7 @@ class UsuarioPerfil {
   final bool activo;
   final bool emailConfirmado;
   final bool notificacionesPushActivas;
+  final bool escaneoEsquelaIaActiva;
   final List<RolAsignado> rolesAsignados;
 
   const UsuarioPerfil({
@@ -48,13 +49,23 @@ class UsuarioPerfil {
     required this.activo,
     required this.emailConfirmado,
     required this.notificacionesPushActivas,
+    required this.escaneoEsquelaIaActiva,
     required this.rolesAsignados,
   });
 
   List<String> get roles => rolesAsignados.map((r) => r.codigo).toList();
 
-  String get nombreCompleto =>
-      [nombre, apellido1, apellido2].where((s) => s != null && s.trim().isNotEmpty).join(' ');
+  String get nombreCompleto => [
+    nombre,
+    apellido1,
+    apellido2,
+  ].where((s) => s != null && s.trim().isNotEmpty).join(' ');
+
+  /// Para un CLIENTE, "nombre" es la razón social y "apellido1"/"apellido2" guardan el nombre
+  /// de la persona de contacto (ver UsuarioDetailScreen): en sitios de cara al propio cliente
+  /// (drawer, franja de suplantación) solo debe verse la razón social, nunca el de contacto.
+  String get nombrePublico =>
+      roles.contains('CLIENTE') ? nombre : nombreCompleto;
 
   factory UsuarioPerfil.fromMap(Map<String, dynamic> map) {
     final rolesRaw = map['TSistemaUsuariosRoles'] as List<dynamic>? ?? const [];
@@ -88,7 +99,9 @@ class UsuarioPerfil {
       idConfiguracionClienteTipo: map['IdConfiguracionClienteTipo'] as String?,
       activo: map['Activo'] as bool? ?? true,
       emailConfirmado: map['EmailConfirmado'] as bool? ?? false,
-      notificacionesPushActivas: map['NotificacionesPushActivas'] as bool? ?? true,
+      notificacionesPushActivas:
+          map['NotificacionesPushActivas'] as bool? ?? true,
+      escaneoEsquelaIaActiva: map['EscaneoEsquelaIaActiva'] as bool? ?? true,
       rolesAsignados: roles,
     );
   }

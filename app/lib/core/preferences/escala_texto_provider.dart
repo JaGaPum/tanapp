@@ -27,10 +27,17 @@ class EscalaTextoNotifier extends Notifier<double> {
 
   void _cambiar(int paso) {
     final indiceActual = valores.indexOf(state);
-    final indiceNuevo = (indiceActual == -1 ? 1 : indiceActual + paso).clamp(0, valores.length - 1);
+    final indiceNuevo = (indiceActual == -1 ? 1 : indiceActual + paso).clamp(
+      0,
+      valores.length - 1,
+    );
     state = valores[indiceNuevo];
-    SharedPreferences.getInstance().then((prefs) => prefs.setDouble(_clave, state));
+    SharedPreferences.getInstance().then(
+      (prefs) => prefs.setDouble(_clave, state),
+    );
   }
 }
 
-final escalaTextoProvider = NotifierProvider<EscalaTextoNotifier, double>(EscalaTextoNotifier.new);
+final escalaTextoProvider = NotifierProvider<EscalaTextoNotifier, double>(
+  EscalaTextoNotifier.new,
+);

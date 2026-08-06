@@ -30,13 +30,15 @@ class PropuestasRepository {
   Future<void> descartar(String idClientePublicacionPropuesta) async {
     await _client
         .from('TClientePublicacionesPropuestas')
-        .update({'Estado': 'DESCARTADA'}).eq('IdClientePublicacionPropuesta', idClientePublicacionPropuesta);
+        .update({'Estado': 'DESCARTADA'})
+        .eq('IdClientePublicacionPropuesta', idClientePublicacionPropuesta);
   }
 
   Future<void> marcarPublicada(String idClientePublicacionPropuesta) async {
     await _client
         .from('TClientePublicacionesPropuestas')
-        .update({'Estado': 'PUBLICADA'}).eq('IdClientePublicacionPropuesta', idClientePublicacionPropuesta);
+        .update({'Estado': 'PUBLICADA'})
+        .eq('IdClientePublicacionPropuesta', idClientePublicacionPropuesta);
   }
 }
 

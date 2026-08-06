@@ -17,20 +17,31 @@ class ConfiguracionComunicacionesScreen extends ConsumerWidget {
     final comunicacionesAsync = ref.watch(comunicacionesListProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.configuracionComunicacionesTitulo)),
+      appBar: AppBar(
+        title: Text(context.l10n.configuracionComunicacionesTitulo),
+      ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/admin/configuracion/comunicaciones/nueva'),
+        onPressed: () =>
+            context.push('/admin/configuracion/comunicaciones/nueva'),
         child: const Icon(Icons.add),
       ),
       body: comunicacionesAsync.when(
         data: (comunicaciones) {
           if (comunicaciones.isEmpty) {
-            return EmptyState(message: context.l10n.noHayComunicacionesDadasDeAlta, icon: Icons.mail_outline);
+            return EmptyState(
+              message: context.l10n.noHayComunicacionesDadasDeAlta,
+              icon: Icons.mail_outline,
+            );
           }
           return RefreshIndicator(
             onRefresh: () => ref.refresh(comunicacionesListProvider.future),
             child: ListView.separated(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.fromLTRB(
+                16,
+                16,
+                16,
+                16 + MediaQuery.of(context).padding.bottom,
+              ),
               itemCount: comunicaciones.length,
               separatorBuilder: (_, _) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
@@ -39,7 +50,9 @@ class ConfiguracionComunicacionesScreen extends ConsumerWidget {
                   child: ListTile(
                     leading: Icon(_iconoTipo(comunicacion.tipoComunicacion)),
                     title: Text(comunicacion.nombreComunicacion),
-                    subtitle: Text('${comunicacion.codComunicacion} · ${comunicacion.tipoComunicacion}'),
+                    subtitle: Text(
+                      '${comunicacion.codComunicacion} · ${comunicacion.tipoComunicacion}',
+                    ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -51,7 +64,8 @@ class ConfiguracionComunicacionesScreen extends ConsumerWidget {
                         IconButton(
                           icon: const Icon(Icons.delete_outline),
                           tooltip: context.l10n.eliminar,
-                          onPressed: () => _eliminar(context, ref, comunicacion),
+                          onPressed: () =>
+                              _eliminar(context, ref, comunicacion),
                         ),
                       ],
                     ),
@@ -65,26 +79,35 @@ class ConfiguracionComunicacionesScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorGenerico(e.toString()))),
       ),
     );
   }
 
   IconData _iconoTipo(String tipo) => switch (tipo) {
-        'EMAIL' => Icons.email_outlined,
-        'MENSAJE' => Icons.sms_outlined,
-        _ => Icons.notifications_outlined,
-      };
+    'EMAIL' => Icons.email_outlined,
+    'MENSAJE' => Icons.sms_outlined,
+    _ => Icons.notifications_outlined,
+  };
 
-  Future<void> _eliminar(BuildContext context, WidgetRef ref, Comunicacion comunicacion) async {
+  Future<void> _eliminar(
+    BuildContext context,
+    WidgetRef ref,
+    Comunicacion comunicacion,
+  ) async {
     final confirmado = await showConfirmDialog(
       context,
       title: context.l10n.comunicacionEliminarTitulo,
-      message: context.l10n.comunicacionEliminarMensaje(comunicacion.nombreComunicacion),
+      message: context.l10n.comunicacionEliminarMensaje(
+        comunicacion.nombreComunicacion,
+      ),
       confirmLabel: context.l10n.eliminar,
     );
     if (!confirmado) return;
-    await ref.read(comunicacionesRepositoryProvider).eliminarComunicacion(comunicacion.idConfiguracionComunicacion);
+    await ref
+        .read(comunicacionesRepositoryProvider)
+        .eliminarComunicacion(comunicacion.idConfiguracionComunicacion);
     ref.invalidate(comunicacionesListProvider);
   }
 }

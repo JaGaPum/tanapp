@@ -13,30 +13,45 @@ class PublicacionesListScreen extends ConsumerWidget {
   final String titulo;
   final String? idClienteSede;
 
-  const PublicacionesListScreen({super.key, required this.titulo, this.idClienteSede});
+  const PublicacionesListScreen({
+    super.key,
+    required this.titulo,
+    this.idClienteSede,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final sede = idClienteSede;
-    final publicacionesAsync =
-        sede != null ? ref.watch(publicacionesPorSedeProvider(sede)) : ref.watch(misPublicacionesProvider);
+    final publicacionesAsync = sede != null
+        ? ref.watch(publicacionesPorSedeProvider(sede))
+        : ref.watch(misPublicacionesProvider);
 
     return Scaffold(
       appBar: AppBar(title: Text(titulo)),
       body: publicacionesAsync.when(
         data: (publicaciones) {
           if (publicaciones.isEmpty) {
-            return EmptyState(message: context.l10n.publicarSinPublicaciones, icon: Icons.campaign_outlined);
+            return EmptyState(
+              message: context.l10n.publicarSinPublicaciones,
+              icon: Icons.campaign_outlined,
+            );
           }
           return ListView.separated(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.fromLTRB(
+              16,
+              16,
+              16,
+              16 + MediaQuery.of(context).padding.bottom,
+            ),
             itemCount: publicaciones.length,
             separatorBuilder: (_, _) => const SizedBox(height: 8),
-            itemBuilder: (context, index) => PublicacionCard(publicacion: publicaciones[index]),
+            itemBuilder: (context, index) =>
+                PublicacionCard(publicacion: publicaciones[index]),
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text(context.l10n.errorGenerico(e.toString()))),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorGenerico(e.toString()))),
       ),
     );
   }

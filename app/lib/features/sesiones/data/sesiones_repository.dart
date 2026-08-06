@@ -20,7 +20,10 @@ class SesionesRepository {
     return Sesion.fromMap(data);
   }
 
-  Future<Sesion> crearSesion({required String idSistemaUsuario, required bool recordar}) async {
+  Future<Sesion> crearSesion({
+    required String idSistemaUsuario,
+    required bool recordar,
+  }) async {
     final data = await _client
         .from('TSistemaSesiones')
         .insert({'IdSistemaUsuario': idSistemaUsuario, 'Recordar': recordar})
@@ -37,17 +40,24 @@ class SesionesRepository {
   }
 
   Future<void> cerrarSesion(String idSistemaSesion) async {
-    await _client.from('TSistemaSesiones').update({
-      'Estado': 'CERRADA',
-      'FechaFin': DateTime.now().toUtc().toIso8601String(),
-    }).eq('IdSistemaSesion', idSistemaSesion);
+    await _client
+        .from('TSistemaSesiones')
+        .update({
+          'Estado': 'CERRADA',
+          'FechaFin': DateTime.now().toUtc().toIso8601String(),
+        })
+        .eq('IdSistemaSesion', idSistemaSesion);
   }
 
   Future<void> cerrarSesionesAbiertas(String idSistemaUsuario) async {
-    await _client.from('TSistemaSesiones').update({
-      'Estado': 'CERRADA',
-      'FechaFin': DateTime.now().toUtc().toIso8601String(),
-    }).eq('IdSistemaUsuario', idSistemaUsuario).eq('Estado', 'ABIERTA');
+    await _client
+        .from('TSistemaSesiones')
+        .update({
+          'Estado': 'CERRADA',
+          'FechaFin': DateTime.now().toUtc().toIso8601String(),
+        })
+        .eq('IdSistemaUsuario', idSistemaUsuario)
+        .eq('Estado', 'ABIERTA');
   }
 
   Future<List<Sesion>> listSesionesUsuario(String idSistemaUsuario) async {
@@ -56,7 +66,9 @@ class SesionesRepository {
         .select()
         .eq('IdSistemaUsuario', idSistemaUsuario)
         .order('FechaInicio', ascending: false);
-    return (data as List).map((e) => Sesion.fromMap(e as Map<String, dynamic>)).toList();
+    return (data as List)
+        .map((e) => Sesion.fromMap(e as Map<String, dynamic>))
+        .toList();
   }
 }
 
