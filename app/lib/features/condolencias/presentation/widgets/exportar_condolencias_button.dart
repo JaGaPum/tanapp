@@ -44,6 +44,7 @@ class _ExportarCondolenciasButtonState
     final subtituloTexto = context.l10n.condolenciasPdfSubtitulo;
     final vacioTexto = context.l10n.condolenciasVacio;
     final pieTexto = context.l10n.condolenciasPdfPie;
+    final anonimoTexto = context.l10n.condolenciasAnonimo;
 
     setState(() => _generando = true);
     try {
@@ -150,7 +151,7 @@ class _ExportarCondolenciasButtonState
                       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                       children: [
                         pw.Text(
-                          condolencia.nombreAutor,
+                          condolencia.nombreAutor ?? anonimoTexto,
                           style: pw.TextStyle(
                             fontSize: 12,
                             fontWeight: pw.FontWeight.bold,

@@ -11,8 +11,11 @@ class PublicacionesRepository {
   final SupabaseClient _client;
   PublicacionesRepository(this._client);
 
+  // "numCondolencias" es un "computed field" de PostgREST (049): llama a
+  // FSistemaContarCondolencias, que cuenta TODAS las condolencias (anónimas y privadas
+  // incluidas) sin aplicar su RLS, a diferencia del antiguo embed "...Condolencias(count)".
   static const _selectConSede =
-      '*, TClienteSedes(Nombre, Concello, Provincia, TSistemaUsuarios(Nombre)), TClientePublicacionesCondolencias(count)';
+      '*, TClienteSedes(Nombre, Concello, Provincia, TSistemaUsuarios(Nombre)), numCondolencias:FSistemaContarCondolencias';
 
   Future<void> crearPublicacion({
     required String idClienteSede,

@@ -6,6 +6,7 @@ class ClientesStats {
   final int totalSedes;
   final int totalPublicaciones;
   final int totalAvisos;
+  final int totalCondolencias;
   final List<MapEntry<String, int>> porTipo;
   final List<ConteoPorPeriodo> publicacionesPorMes;
   final List<ConteoPorPeriodo> avisosPorMes;
@@ -17,6 +18,7 @@ class ClientesStats {
     required this.totalSedes,
     required this.totalPublicaciones,
     required this.totalAvisos,
+    required this.totalCondolencias,
     required this.porTipo,
     required this.publicacionesPorMes,
     required this.avisosPorMes,

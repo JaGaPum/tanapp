@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../features/account/presentation/screens/account_screen.dart';
+import '../../features/auth/presentation/screens/bienvenida_screen.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
@@ -13,6 +14,7 @@ import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/auth/presentation/screens/verify_otp_screen.dart';
 import '../../features/avisos/presentation/screens/aviso_form_screen.dart';
 import '../../features/cliente_sedes/presentation/screens/mis_sedes_screen.dart';
+import '../../features/cliente_sedes/data/cliente_sedes_repository.dart';
 import '../../features/clientes_solicitudes/presentation/screens/solicitud_cliente_form_screen.dart';
 import '../../features/clientes_solicitudes/presentation/screens/solicitud_detail_screen.dart';
 import '../../features/clientes_solicitudes/presentation/screens/solicitudes_list_screen.dart';
@@ -39,6 +41,10 @@ import '../../features/zonas_seguidas/presentation/screens/zona_concellos_screen
 import '../../features/seguidos/presentation/screens/buscar_cliente_screen.dart';
 import '../../features/zonas_seguidas/presentation/screens/zona_provincias_screen.dart';
 import '../../features/sesiones/application/sesion_policy_service.dart';
+import '../../features/sesiones/data/device_sesion_store.dart';
+import '../../features/sesiones/data/sesiones_repository.dart';
+import '../../features/sesiones/presentation/screens/elegir_idioma_screen.dart';
+import '../../features/sesiones/presentation/screens/elegir_sede_screen.dart';
 import '../../features/sistema/presentation/screens/sistema_screen.dart';
 import '../../features/sistema_usuarios/data/usuarios_repository.dart';
 import '../../features/sistema_usuarios/presentation/screens/usuario_detail_screen.dart';
@@ -51,11 +57,14 @@ import '../l10n/l10n_extensions.dart';
 import '../l10n/locale_provider.dart';
 
 const _publicLocations = {
+  '/bienvenida',
   '/login',
+  '/login-cliente',
   '/register',
   '/register/verify',
   '/forgot-password',
   '/forgot-password/verify',
+  '/tengo-codigo',
   '/reset-password',
   '/solicitud-cliente',
 };
@@ -84,10 +93,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         // Google (signInWithOAuth) no puede hacer eso de antemano -no hay forma de saber cuándo
         // volverá el navegador-, así que es aquí, al ver un "signedIn" recién llegado que nadie
         // ha registrado todavía, donde se hace el equivalente a
-        // "sesionPolicy.registrarLoginExplicito(...)" del login manual. Un "initialSession" (o
-        // cualquier otro evento) en cambio es la sesión persistida de un arranque en frío
-        // normal, y sigue el camino de siempre.
-        if (refreshStream.ultimoEvento == AuthChangeEvent.signedIn) {
+        // "sesionPolicy.registrarLoginExplicito(...)" del login manual. "passwordRecovery" es el
+        // mismo caso: lo dispara "verifyRecoveryOtp" (ver reset_password_screen.dart) al validar
+        // el código, y es la primera vez que este dispositivo abre sesión para ese usuario -si se
+        // tratase como un arranque en frío normal, "ejecutarBootstrap()" no encontraría ninguna
+        // "TSistemaSesiones" previa suya y cerraría la sesión que se acaba de abrir, dejando sin
+        // sesión la pantalla de fijar la contraseña nueva. Un "initialSession" (o cualquier otro
+        // evento) sí es la sesión persistida de un arranque en frío normal, y sigue el camino de
+        // siempre.
+        if (refreshStream.ultimoEvento == AuthChangeEvent.signedIn ||
+            refreshStream.ultimoEvento == AuthChangeEvent.passwordRecovery) {
           final perfil = await ref
               .read(usuariosRepositoryProvider)
               .fetchPerfilByAuthId(session.user.id);
@@ -97,6 +112,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 .registrarLoginExplicito(
                   idSistemaUsuario: perfil.idSistemaUsuario,
                   recordar: true,
+                  roles: perfil.roles,
                 );
           } else {
             // Mismo criterio silencioso que ejecutarBootstrap() para perfil nulo: sin perfil o
@@ -111,7 +127,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       }
 
       if (session == null) {
-        return isPublic ? null : '/login';
+        // El guard es un Provider normal (sin autoDispose): sobrevive a un cierre de sesión
+        // dentro del mismo proceso de la app. Sin este reset, si en la misma sesión de la app se
+        // prueba primero con un usuario (p. ej. ADMIN, exento de términos) y después con otro
+        // tras cerrar sesión (p. ej. un cliente recién aprobado), el valor cacheado del primero
+        // se queda pegado y nunca se recalcula para el segundo — que puede acabar entrando sin
+        // pasar por "/aceptar-terminos" aunque le tocase.
+        guard.completado = false;
+        guard.necesitaAceptarTerminos = null;
+        guard.necesitaElegirIdioma = null;
+        guard.necesitaElegirSede = null;
+        return isPublic ? null : '/bienvenida';
       }
 
       if (isPublic && location != '/reset-password') {
@@ -149,10 +175,80 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       }
 
       final necesitaAceptarTerminos = guard.necesitaAceptarTerminos ?? false;
-      if (necesitaAceptarTerminos && location != '/aceptar-terminos') {
+      // "/reset-password" queda fuera a propósito: con el auto-login tras cambiar la contraseña
+      // (ver reset_password_screen.dart), quien acaba de validar su código todavía está en esa
+      // pantalla terminando de fijarla; forzar aquí el salto a "/aceptar-terminos" le cortaría el
+      // paso a mitad. Se comprueba igualmente en la siguiente navegación (a "/home"), así que
+      // nadie se salta el aviso, solo se pospone hasta que termine de poner su contraseña.
+      if (necesitaAceptarTerminos &&
+          location != '/aceptar-terminos' &&
+          location != '/reset-password') {
         return '/aceptar-terminos';
       }
       if (!necesitaAceptarTerminos && location == '/aceptar-terminos') {
+        return '/home';
+      }
+
+      // Justo después de términos: cualquier usuario (salvo ADMIN, exento igual que de
+      // términos) tiene que elegir explícitamente su idioma una vez, en vez de quedarse sin
+      // más con el gallego por defecto (047) sin haberlo decidido él.
+      if (!necesitaAceptarTerminos && guard.necesitaElegirIdioma == null) {
+        try {
+          final perfil = await ref
+              .read(usuariosRepositoryProvider)
+              .fetchPerfilByAuthId(session.user.id);
+          guard.necesitaElegirIdioma =
+              perfil != null &&
+              !perfil.roles.contains('ADMIN') &&
+              !perfil.idiomaConfirmado;
+        } catch (e) {
+          debugPrint('No se pudo comprobar el idioma confirmado: $e');
+        }
+      }
+
+      final necesitaElegirIdioma = guard.necesitaElegirIdioma ?? false;
+      if (necesitaElegirIdioma && location != '/elegir-idioma') {
+        return '/elegir-idioma';
+      }
+      if (!necesitaElegirIdioma && location == '/elegir-idioma') {
+        return '/home';
+      }
+
+      // Igual que los términos: solo hace falta preguntar cuando hay más de una sede entre las
+      // que elegir (con una sola, SesionPolicyService ya se la asigna sola al iniciar sesión).
+      if (!necesitaAceptarTerminos && guard.necesitaElegirSede == null) {
+        try {
+          final perfil = await ref
+              .read(usuariosRepositoryProvider)
+              .fetchPerfilByAuthId(session.user.id);
+          if (perfil != null && perfil.roles.contains('CLIENTE')) {
+            final sedes = await ref
+                .read(clienteSedesRepositoryProvider)
+                .listSedesDeUsuario(perfil.idSistemaUsuario);
+            if (sedes.length > 1) {
+              final idLocal = await ref.read(deviceSesionStoreProvider).leer();
+              final sesionActual = idLocal == null
+                  ? null
+                  : await ref
+                        .read(sesionesRepositoryProvider)
+                        .fetchPorId(idLocal);
+              guard.necesitaElegirSede = sesionActual?.idClienteSede == null;
+            } else {
+              guard.necesitaElegirSede = false;
+            }
+          } else {
+            guard.necesitaElegirSede = false;
+          }
+        } catch (e) {
+          debugPrint('No se pudo comprobar la sede asignada: $e');
+        }
+      }
+
+      final necesitaElegirSede = guard.necesitaElegirSede ?? false;
+      if (necesitaElegirSede && location != '/elegir-sede') {
+        return '/elegir-sede';
+      }
+      if (!necesitaElegirSede && location == '/elegir-sede') {
         return '/home';
       }
 
@@ -170,7 +266,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/splash',
         builder: (context, state) => const SplashScreen(),
       ),
+      GoRoute(
+        path: '/bienvenida',
+        builder: (context, state) => const BienvenidaScreen(),
+      ),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      GoRoute(
+        path: '/login-cliente',
+        builder: (context, state) => const LoginScreen(esCliente: true),
+      ),
       GoRoute(
         path: '/register',
         builder: (context, state) => const RegisterScreen(),
@@ -194,6 +298,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
+        path: '/tengo-codigo',
+        builder: (context, state) =>
+            const ForgotPasswordScreen(enviarCodigoNuevo: false),
+      ),
+      GoRoute(
         path: '/reset-password',
         builder: (context, state) => const ResetPasswordScreen(),
       ),
@@ -209,6 +318,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/aceptar-terminos',
         builder: (context, state) => const AceptarTerminosScreen(),
+      ),
+      GoRoute(
+        path: '/elegir-sede',
+        builder: (context, state) => const ElegirSedeScreen(),
+      ),
+      GoRoute(
+        path: '/elegir-idioma',
+        builder: (context, state) => const ElegirIdiomaScreen(),
       ),
       GoRoute(
         path: '/terminos',

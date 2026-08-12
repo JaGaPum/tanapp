@@ -66,7 +66,8 @@ class _CondolenciasModal extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              condolencia.nombreAutor,
+                              condolencia.nombreAutor ??
+                                  context.l10n.condolenciasAnonimo,
                               style: Theme.of(context).textTheme.titleSmall,
                             ),
                             const SizedBox(height: 4),

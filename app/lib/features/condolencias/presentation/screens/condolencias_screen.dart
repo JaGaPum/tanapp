@@ -43,7 +43,7 @@ class CondolenciasScreen extends ConsumerWidget {
       body: _Cuerpo(
         idClientePublicacion: idClientePublicacion,
         nombreFallecido: nombreFallecido,
-        mostrarExportar: esDueno,
+        esDueno: esDueno,
       ),
     );
   }
@@ -52,11 +52,11 @@ class CondolenciasScreen extends ConsumerWidget {
 class _Cuerpo extends ConsumerStatefulWidget {
   final String idClientePublicacion;
   final String nombreFallecido;
-  final bool mostrarExportar;
+  final bool esDueno;
   const _Cuerpo({
     required this.idClientePublicacion,
     required this.nombreFallecido,
-    required this.mostrarExportar,
+    required this.esDueno,
   });
 
   @override
@@ -67,6 +67,12 @@ class _CuerpoState extends ConsumerState<_Cuerpo> {
   final _textoController = TextEditingController();
   bool _editando = false;
   bool _guardando = false;
+  bool _anonima = false;
+  bool _privada = false;
+  // Evita que el sincronizado inicial de abajo (texto/anónima/privada desde el servidor) se
+  // repita en cada "build" -p. ej. al marcar un checkbox, que hace setState- y deshaga lo que
+  // se acaba de escribir o marcar: solo hace falta la primera vez que llega "propia".
+  bool _cargado = false;
 
   @override
   void dispose() {
@@ -90,11 +96,15 @@ class _CuerpoState extends ConsumerState<_Cuerpo> {
           idClientePublicacionCondolencia:
               propia.idClientePublicacionCondolencia,
           texto: texto,
+          anonima: _anonima,
+          privada: _privada,
         );
       } else {
         await repo.crearCondolencia(
           idClientePublicacion: widget.idClientePublicacion,
           texto: texto,
+          anonima: _anonima,
+          privada: _privada,
         );
       }
       await _refrescar();
@@ -118,10 +128,72 @@ class _CuerpoState extends ConsumerState<_Cuerpo> {
           .read(condolenciasRepositoryProvider)
           .eliminarCondolencia(propia.idClientePublicacionCondolencia);
       _textoController.clear();
+      _anonima = false;
+      _privada = false;
       await _refrescar();
     } finally {
       if (mounted) setState(() => _guardando = false);
     }
+  }
+
+  /// Moderación del dueño de la esquela sobre una condolencia ajena: borrado lógico, con aviso
+  /// para quien la escribió (ver la vista "VClientePublicacionesCondolencias" en 050).
+  Future<void> _moderarEliminar(Condolencia condolencia) async {
+    final confirmado = await showConfirmDialog(
+      context,
+      title: context.l10n.condolenciasModerarEliminarTitulo,
+      message: context.l10n.condolenciasModerarEliminarMensaje,
+      confirmLabel: context.l10n.eliminar,
+    );
+    if (!confirmado) return;
+    await ref
+        .read(condolenciasRepositoryProvider)
+        .moderarEliminar(condolencia.idClientePublicacionCondolencia);
+    await _refrescar();
+  }
+
+  /// Moderación del dueño de la esquela: reescribe el texto de una condolencia ajena (p. ej.
+  /// para quitar una parte inapropiada sin borrarla entera).
+  Future<void> _moderarEditar(Condolencia condolencia) async {
+    final controller = TextEditingController(text: condolencia.texto);
+    final nuevoTexto = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.l10n.condolenciasModerarEditarTitulo),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              context.l10n.condolenciasModerarEditarAyuda,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 12),
+            TextField(controller: controller, maxLines: 4, autofocus: true),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(context.l10n.confirmDialogCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(controller.text.trim()),
+            child: Text(context.l10n.guardar),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (nuevoTexto == null || nuevoTexto.isEmpty) return;
+    await ref
+        .read(condolenciasRepositoryProvider)
+        .moderarEditar(
+          idClientePublicacionCondolencia:
+              condolencia.idClientePublicacionCondolencia,
+          texto: nuevoTexto,
+        );
+    await _refrescar();
   }
 
   @override
@@ -138,7 +210,7 @@ class _CuerpoState extends ConsumerState<_Cuerpo> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (widget.mostrarExportar) ...[
+          if (widget.esDueno) ...[
             ExportarCondolenciasButton(
               idClientePublicacion: widget.idClientePublicacion,
               nombreFallecido: widget.nombreFallecido,
@@ -147,18 +219,27 @@ class _CuerpoState extends ConsumerState<_Cuerpo> {
           ],
           miCondolenciaAsync.when(
             data: (propia) {
-              if (!_editando) {
+              if (!_cargado) {
+                _cargado = true;
                 _textoController.text = propia?.texto ?? '';
+                _anonima = propia?.anonima ?? false;
+                _privada = propia?.privada ?? false;
               }
               return _MiCondolencia(
                 propia: propia,
                 editando: _editando,
                 guardando: _guardando,
                 controller: _textoController,
+                anonima: _anonima,
+                privada: _privada,
+                onAnonimaChanged: (v) => setState(() => _anonima = v),
+                onPrivadaChanged: (v) => setState(() => _privada = v),
                 onEditar: () => setState(() => _editando = true),
                 onCancelar: () => setState(() {
                   _editando = false;
                   _textoController.text = propia?.texto ?? '';
+                  _anonima = propia?.anonima ?? false;
+                  _privada = propia?.privada ?? false;
                 }),
                 onGuardar: () => _guardar(propia),
                 onEliminar: propia == null ? null : () => _eliminar(propia),
@@ -177,6 +258,9 @@ class _CuerpoState extends ConsumerState<_Cuerpo> {
             resultado: resultado,
             idMiCondolencia:
                 miCondolenciaAsync.value?.idClientePublicacionCondolencia,
+            esDueno: widget.esDueno,
+            onModerarEliminar: _moderarEliminar,
+            onModerarEditar: _moderarEditar,
             onCargarMas: () => ref
                 .read(
                   condolenciasProvider(widget.idClientePublicacion).notifier,
@@ -194,6 +278,10 @@ class _MiCondolencia extends StatelessWidget {
   final bool editando;
   final bool guardando;
   final TextEditingController controller;
+  final bool anonima;
+  final bool privada;
+  final ValueChanged<bool> onAnonimaChanged;
+  final ValueChanged<bool> onPrivadaChanged;
   final VoidCallback onEditar;
   final VoidCallback onCancelar;
   final VoidCallback onGuardar;
@@ -204,6 +292,10 @@ class _MiCondolencia extends StatelessWidget {
     required this.editando,
     required this.guardando,
     required this.controller,
+    required this.anonima,
+    required this.privada,
+    required this.onAnonimaChanged,
+    required this.onPrivadaChanged,
     required this.onEditar,
     required this.onCancelar,
     required this.onGuardar,
@@ -212,6 +304,17 @@ class _MiCondolencia extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (propia != null && propia!.moderadaOculta) {
+      return Card(
+        color: Theme.of(context).colorScheme.errorContainer,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: _AvisoModeracion(
+            texto: context.l10n.condolenciasAvisoEliminada,
+          ),
+        ),
+      );
+    }
     final mostrarFormulario = editando || propia == null;
     return Card(
       color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.08),
@@ -224,6 +327,10 @@ class _MiCondolencia extends StatelessWidget {
               context.l10n.condolenciasTuCondolencia,
               style: Theme.of(context).textTheme.titleSmall,
             ),
+            if (!mostrarFormulario && propia!.moderadaEditada) ...[
+              const SizedBox(height: 8),
+              _AvisoModeracion(texto: context.l10n.condolenciasAvisoEditada),
+            ],
             const SizedBox(height: 8),
             if (mostrarFormulario) ...[
               TextField(
@@ -232,6 +339,22 @@ class _MiCondolencia extends StatelessWidget {
                 decoration: InputDecoration(
                   hintText: context.l10n.condolenciasEscribeAqui,
                 ),
+              ),
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                controlAffinity: ListTileControlAffinity.leading,
+                value: anonima,
+                onChanged: (v) => onAnonimaChanged(v ?? false),
+                title: Text(context.l10n.condolenciasAnonimaTitulo),
+                subtitle: Text(context.l10n.condolenciasAnonimaAyuda),
+              ),
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                controlAffinity: ListTileControlAffinity.leading,
+                value: privada,
+                onChanged: (v) => onPrivadaChanged(v ?? false),
+                title: Text(context.l10n.condolenciasPrivadaTitulo),
+                subtitle: Text(context.l10n.condolenciasPrivadaAyuda),
               ),
               const SizedBox(height: 12),
               Row(
@@ -257,6 +380,18 @@ class _MiCondolencia extends StatelessWidget {
               ),
             ] else ...[
               Text(propia!.texto, style: Theme.of(context).textTheme.bodyLarge),
+              if (propia!.anonima || propia!.privada) ...[
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    if (propia!.anonima)
+                      Chip(label: Text(context.l10n.condolenciasAnonimaTitulo)),
+                    if (propia!.privada)
+                      Chip(label: Text(context.l10n.condolenciasPrivadaTitulo)),
+                  ],
+                ),
+              ],
               const SizedBox(height: 12),
               Row(
                 children: [
@@ -281,14 +416,42 @@ class _MiCondolencia extends StatelessWidget {
   }
 }
 
+/// Aviso de que el cliente dueño de la esquela ha eliminado o editado una condolencia por
+/// moderación: solo lo ve el propio autor, en su sección "Tu condolencia".
+class _AvisoModeracion extends StatelessWidget {
+  final String texto;
+  const _AvisoModeracion({required this.texto});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Theme.of(context).colorScheme.onErrorContainer;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(Icons.info_outline, size: 20, color: color),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(texto, style: TextStyle(color: color)),
+        ),
+      ],
+    );
+  }
+}
+
 class _ListaCondolencias extends StatelessWidget {
   final PaginaResultado<Condolencia> resultado;
   final String? idMiCondolencia;
+  final bool esDueno;
+  final ValueChanged<Condolencia> onModerarEliminar;
+  final ValueChanged<Condolencia> onModerarEditar;
   final VoidCallback onCargarMas;
 
   const _ListaCondolencias({
     required this.resultado,
     required this.idMiCondolencia,
+    required this.esDueno,
+    required this.onModerarEliminar,
+    required this.onModerarEditar,
     required this.onCargarMas,
   });
 
@@ -328,7 +491,7 @@ class _ListaCondolencias extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  condolencia.nombreAutor,
+                  condolencia.nombreAutor ?? context.l10n.condolenciasAnonimo,
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
                 const SizedBox(height: 4),
@@ -345,6 +508,26 @@ class _ListaCondolencias extends StatelessWidget {
                     color: Theme.of(context).colorScheme.outline,
                   ),
                 ),
+                // Moderación: solo el dueño de la esquela puede editar/retirar condolencias
+                // ajenas (ver 050_moderacion_condolencias.sql).
+                if (esDueno) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit_outlined),
+                        tooltip: context.l10n.editar,
+                        onPressed: () => onModerarEditar(condolencia),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline),
+                        tooltip: context.l10n.eliminar,
+                        onPressed: () => onModerarEliminar(condolencia),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),

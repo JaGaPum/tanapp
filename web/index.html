@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TanApp para funerarias, tanatorios y parroquias</title>
+    <meta
+      name="description"
+      content="TanApp es la app para que funerarias, tanatorios y parroquias de Galicia publiquen esquelas en minutos y lleguen directamente a quien las sigue."
+    />
+    <link rel="icon" href="assets/logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a class="brand" href="#top">
+          <img src="assets/logo.png" alt="" />
+          <span>TanApp</span>
+        </a>
+        <nav class="site-nav">
+          <a href="#ventajas">Ventajas</a>
+          <a href="#como-funciona">Cómo funciona</a>
+          <a href="#planes">Planes</a>
+          <a href="#contacto">Contacto</a>
+          <a class="btn btn-primary" href="#cta">Solicitar alta</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="container">
+          <span class="eyebrow"
+            >Para funerarias · tanatorios · parroquias</span
+          >
+          <h1>Publica esquelas en minutos. Llega directo a quien las espera.</h1>
+          <p class="lead">
+            TanApp sustituye las llamadas, los carteles y la espera al
+            periódico: publicas desde el móvil y quien sigue tu funeraria se
+            entera al instante.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#cta">Solicitar alta</a>
+            <a class="btn btn-secondary" href="#como-funciona"
+              >Ver cómo funciona</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <section id="ventajas">
+        <div class="container">
+          <div class="section-head">
+            <h2>Por qué trabajar con TanApp</h2>
+            <p>
+              Todo lo que hoy resuelves con llamadas, carteles y avisos
+              sueltos, en un solo sitio.
+            </p>
+          </div>
+          <div class="benefit-grid">
+            <div class="benefit-card">
+              <div class="icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M6 8a6 6 0 0 1 12 0c0 4.5 1.5 6 2 7H4c.5-1 2-2.5 2-7Z"
+                  />
+                  <path d="M10 20a2 2 0 0 0 4 0" />
+                </svg>
+              </div>
+              <h3>Avisos al instante</h3>
+              <p>
+                En cuanto publicas, quien te sigue recibe la notificación en
+                el móvil. Sin esperar a nadie.
+              </p>
+            </div>
+            <div class="benefit-card">
+              <div class="icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="4" y="3" width="12" height="18" rx="2" />
+                  <path d="M9 3v18" />
+                  <path d="M15 8h5M15 12h5M15 16h3" />
+                </svg>
+              </div>
+              <h3>Publicación en minutos</h3>
+              <p>
+                Un formulario simple desde el móvil: nombre, datos del
+                funeral y listo. Sin llamadas ni intermediarios.
+              </p>
+            </div>
+            <div class="benefit-card">
+              <div class="icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <path d="M3 8h18M8 3v5" />
+                  <path d="M7.5 14.5l2 2 4-4.5" />
+                </svg>
+              </div>
+              <h3>Importación con IA</h3>
+              <p>
+                Escanea una esquela ya redactada o impórtala de tu web: la IA
+                rellena los datos por ti.
+              </p>
+            </div>
+            <div class="benefit-card">
+              <div class="icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M4 19V10l8-5 8 5v9" />
+                  <path d="M9 19v-6h6v6" />
+                  <path d="M4 19h16" />
+                </svg>
+              </div>
+              <h3>Varias sedes, una cuenta</h3>
+              <p>
+                Gestiona todos tus tanatorios o sedes desde una única cuenta,
+                sin duplicar trabajo.
+              </p>
+            </div>
+            <div class="benefit-card">
+              <div class="icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M4 6v11a17 17 0 0 0 16 0V6" />
+                  <path d="M4 6l8-3 8 3" />
+                  <path d="M8 11l3 3 5-5" />
+                </svg>
+              </div>
+              <h3>Alta verificada</h3>
+              <p>
+                Cada cuenta de negocio se revisa antes de activarse: tu
+                marca queda asociada a información de fiar.
+              </p>
+            </div>
+            <div class="benefit-card">
+              <div class="icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M4 19V9l7-5 7 5v10" />
+                  <path d="M9 19v-5h3v5M15 19v-8h2v8" />
+                </svg>
+              </div>
+              <h3>Panel de estadísticas</h3>
+              <p>
+                Consulta cuánta gente sigue tu negocio y cómo se mueven tus
+                publicaciones.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="como-funciona" class="alt">
+        <div class="container">
+          <div class="section-head">
+            <h2>Cómo funciona</h2>
+            <p>De la esquela a la notificación, en tres pasos.</p>
+          </div>
+          <div class="steps-visual">
+            <div class="step-visual">
+              <svg class="phone" viewBox="0 0 200 400">
+                <rect
+                  x="10"
+                  y="10"
+                  width="180"
+                  height="380"
+                  rx="28"
+                  fill="#ffffff"
+                  stroke="#1a1420"
+                  stroke-width="3"
+                />
+                <rect x="28" y="34" width="144" height="14" rx="3" fill="#1a1420" />
+                <rect
+                  x="28"
+                  y="66"
+                  width="144"
+                  height="16"
+                  rx="4"
+                  fill="#f5f4f6"
+                  stroke="#e2dfe3"
+                />
+                <rect
+                  x="28"
+                  y="92"
+                  width="144"
+                  height="16"
+                  rx="4"
+                  fill="#f5f4f6"
+                  stroke="#e2dfe3"
+                />
+                <rect
+                  x="28"
+                  y="118"
+                  width="90"
+                  height="16"
+                  rx="4"
+                  fill="#f5f4f6"
+                  stroke="#e2dfe3"
+                />
+                <rect
+                  x="28"
+                  y="160"
+                  width="144"
+                  height="60"
+                  rx="6"
+                  fill="#f5f4f6"
+                  stroke="#e2dfe3"
+                />
+                <rect
+                  x="28"
+                  y="340"
+                  width="144"
+                  height="32"
+                  rx="16"
+                  fill="#1a1420"
+                />
+              </svg>
+              <span class="step-number">1</span>
+              <h3>Publicas la esquela</h3>
+              <p>
+                Rellenas los datos del funeral (o los importas con IA) desde
+                el móvil.
+              </p>
+            </div>
+            <div class="step-visual">
+              <svg class="phone" viewBox="0 0 200 400">
+                <rect
+                  x="10"
+                  y="10"
+                  width="180"
+                  height="380"
+                  rx="28"
+                  fill="#ffffff"
+                  stroke="#1a1420"
+                  stroke-width="3"
+                />
+                <rect x="28" y="34" width="100" height="14" rx="3" fill="#1a1420" />
+                <rect
+                  x="24"
+                  y="66"
+                  width="152"
+                  height="52"
+                  rx="10"
+                  fill="#1a1420"
+                />
+                <circle cx="46" cy="92" r="9" fill="#ffffff" />
+                <rect x="64" y="82" width="96" height="8" rx="2" fill="#ffffff" />
+                <rect
+                  x="64"
+                  y="96"
+                  width="70"
+                  height="7"
+                  rx="2"
+                  fill="#9a94a0"
+                />
+                <rect
+                  x="28"
+                  y="136"
+                  width="144"
+                  height="16"
+                  rx="4"
+                  fill="#f5f4f6"
+                  stroke="#e2dfe3"
+                />
+                <rect
+                  x="28"
+                  y="162"
+                  width="144"
+                  height="16"
+                  rx="4"
+                  fill="#f5f4f6"
+                  stroke="#e2dfe3"
+                />
+                <rect
+                  x="28"
+                  y="188"
+                  width="100"
+                  height="16"
+                  rx="4"
+                  fill="#f5f4f6"
+                  stroke="#e2dfe3"
+                />
+              </svg>
+              <span class="step-number">2</span>
+              <h3>Avisamos a quien te sigue</h3>
+              <p>
+                Cada seguidor de tu funeraria recibe la notificación al
+                momento, sin que tengas que hacer nada más.
+              </p>
+            </div>
+            <div class="step-visual">
+              <svg class="phone" viewBox="0 0 200 400">
+                <rect
+                  x="10"
+                  y="10"
+                  width="180"
+                  height="380"
+                  rx="28"
+                  fill="#ffffff"
+                  stroke="#1a1420"
+                  stroke-width="3"
+                />
+                <rect x="28" y="34" width="120" height="14" rx="3" fill="#1a1420" />
+                <rect
+                  x="28"
+                  y="70"
+                  width="144"
+                  height="140"
+                  rx="8"
+                  fill="#f5f4f6"
+                  stroke="#e2dfe3"
+                />
+                <rect x="44" y="160" width="18" height="34" fill="#1a1420" />
+                <rect x="72" y="130" width="18" height="64" fill="#1a1420" />
+                <rect x="100" y="110" width="18" height="84" fill="#1a1420" />
+                <rect x="128" y="140" width="18" height="54" fill="#1a1420" />
+                <rect
+                  x="28"
+                  y="228"
+                  width="90"
+                  height="16"
+                  rx="4"
+                  fill="#f5f4f6"
+                  stroke="#e2dfe3"
+                />
+                <rect
+                  x="28"
+                  y="254"
+                  width="144"
+                  height="16"
+                  rx="4"
+                  fill="#f5f4f6"
+                  stroke="#e2dfe3"
+                />
+              </svg>
+              <span class="step-number">3</span>
+              <h3>Consultas el panel</h3>
+              <p>
+                Sigues cuánta gente te sigue y cómo funcionan tus
+                publicaciones, todo desde tu cuenta.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="planes">
+        <div class="container">
+          <div class="section-head">
+            <h2>Planes</h2>
+            <p>Pensados para negocios de un solo tanatorio o de varios.</p>
+          </div>
+          <p class="plans-note">
+            Los planes todavía se están terminando de definir — estos son
+            orientativos. Escríbenos y te damos precio y condiciones
+            concretas para tu funeraria o tanatorio.
+          </p>
+          <div class="plan-grid">
+            <div class="plan-card">
+              <h3>Sede única</h3>
+              <div class="plan-price">
+                A consultar<small>por tanatorio</small>
+              </div>
+              <ul>
+                <li>Publicaciones ilimitadas</li>
+                <li>Avisos automáticos a tus seguidores</li>
+                <li>Importación de esquelas con IA</li>
+                <li>Alta verificada</li>
+              </ul>
+              <a class="btn btn-secondary" href="#cta">Hablemos</a>
+            </div>
+            <div class="plan-card featured">
+              <span class="plan-badge">Más habitual</span>
+              <h3>Varias sedes</h3>
+              <div class="plan-price">
+                A consultar<small>por grupo</small>
+              </div>
+              <ul>
+                <li>Todo lo de "Sede única"</li>
+                <li>Varios tanatorios en una sola cuenta</li>
+                <li>Panel de estadísticas por sede</li>
+                <li>Soporte prioritario</li>
+              </ul>
+              <a class="btn btn-primary" href="#cta">Hablemos</a>
+            </div>
+            <div class="plan-card">
+              <h3>A medida</h3>
+              <div class="plan-price">
+                A consultar<small>grupos grandes</small>
+              </div>
+              <ul>
+                <li>Todo lo de "Varias sedes"</li>
+                <li>Integración con tu web o sistema actual</li>
+                <li>Condiciones adaptadas a tu volumen</li>
+              </ul>
+              <a class="btn btn-secondary" href="#cta">Hablemos</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="cta" class="alt">
+        <div class="container">
+          <div class="cta-box">
+            <h2>¿Damos de alta tu funeraria o tanatorio?</h2>
+            <p>
+              Escríbenos y te contamos cómo empezar. La solicitud de alta se
+              puede hacer también desde la propia app.
+            </p>
+            <a
+              class="btn btn-primary"
+              href="mailto:info@tanapp.es?subject=Alta%20como%20funeraria%20en%20TanApp"
+              >Solicitar alta</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <section id="contacto">
+        <div class="container">
+          <div class="section-head">
+            <h2>Contacto</h2>
+            <p>¿Dudas o algo que preguntar antes de darte de alta?</p>
+          </div>
+          <div class="contact-list">
+            <a href="mailto:info@tanapp.es">info@tanapp.es</a>
+            <a href="mailto:soporte_tanapp@tanapp.es"
+              >soporte_tanapp@tanapp.es</a
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <span>&copy; <span id="anio"></span> TanApp</span>
+        <span class="xaga-credit"
+          >Hecho por
+          <strong
+            >xaga<span class="xaga-code">&lt;/&gt;</span></strong
+          ><span class="xaga-labs">&nbsp;LABS</span></span
+        >
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('anio').textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>

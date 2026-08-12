@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../../core/preferences/escala_texto_provider.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/cruz_icon.dart';
 import '../../../condolencias/presentation/widgets/condolencias_modal.dart';
 import '../../data/publicacion_con_sede.dart';
@@ -15,19 +14,34 @@ import 'condolencias_indicador.dart';
 import 'escuchar_esquela_button.dart';
 import 'publicacion_detalle.dart';
 
+/// Tarjeta de una esquela: misma tarjeta tanto en el Taboleiro/Arquivo/Seguindo (uso normal) como
+/// en "Mis publicaciones" del cliente dueño (pasando [esPropia] y los callbacks de editar/
+/// eliminar) — así el cliente ve su propia esquela exactamente igual que la ve cualquier usuario,
+/// con sus acciones de gestión añadidas encima en vez de una tarjeta aparte con otro aspecto.
 class PublicacionCard extends ConsumerWidget {
   final PublicacionConSede publicacion;
+  final bool esPropia;
+  final VoidCallback? onEditar;
+  final VoidCallback? onEliminar;
+  final bool eliminando;
 
-  const PublicacionCard({super.key, required this.publicacion});
+  const PublicacionCard({
+    super.key,
+    required this.publicacion,
+    this.esPropia = false,
+    this.onEditar,
+    this.onEliminar,
+    this.eliminando = false,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final escala = ref.watch(escalaTextoProvider);
     return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.black, width: 2),
-      ),
+      // Blanco (el de por defecto del tema) con sombra en vez de borde negro: la tarjeta se
+      // distingue del fondo por elevación, no por un contorno marcado.
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: MediaQuery(
@@ -49,11 +63,21 @@ class PublicacionCard extends ConsumerWidget {
                     ),
                   ),
                   EscucharEsquelaButton(publicacion: publicacion),
-                  ArchivarPublicacionButton(
-                    idClientePublicacion: publicacion.idClientePublicacion,
-                  ),
+                  // Archivar es para guardarla en el Arquivo personal de un seguidor: no tiene
+                  // sentido que el propio cliente "archive" su propia esquela.
+                  if (!esPropia)
+                    ArchivarPublicacionButton(
+                      idClientePublicacion: publicacion.idClientePublicacion,
+                    ),
                 ],
               ),
+              if (esPropia) ...[
+                const SizedBox(height: 2),
+                Text(
+                  publicacion.concello,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+              ],
               const SizedBox(height: 8),
               PublicacionDetalle(
                 publicacion: publicacion,
@@ -67,6 +91,25 @@ class PublicacionCard extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 12),
+              if (esPropia) ...[
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.edit_outlined),
+                      label: Text(context.l10n.editar),
+                      onPressed: eliminando ? null : onEditar,
+                    ),
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.delete_outline),
+                      label: Text(context.l10n.eliminar),
+                      onPressed: eliminando ? null : onEliminar,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+              ],
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
@@ -77,11 +120,21 @@ class PublicacionCard extends ConsumerWidget {
                       'idClienteSede': publicacion.idClienteSede,
                     },
                   ),
-                  child: Text(context.l10n.publicarCondolencias),
+                  // El dueño no deja su propia condolencia aquí: entra a revisar/moderar las que
+                  // le han dejado a él.
+                  child: Text(
+                    esPropia
+                        ? context.l10n.publicarVerCondolencias
+                        : context.l10n.publicarCondolencias,
+                  ),
                 ),
               ),
-              const SizedBox(height: 10),
-              CompartirEsquelaButton(publicacion: publicacion),
+              // Compartir por WhatsApp es para que un seguidor la reenvíe: no tiene sentido que
+              // el propio cliente "comparta" su propia esquela desde aquí.
+              if (!esPropia) ...[
+                const SizedBox(height: 10),
+                CompartirEsquelaButton(publicacion: publicacion),
+              ],
               const SizedBox(height: 8),
               Text(
                 DateFormat(

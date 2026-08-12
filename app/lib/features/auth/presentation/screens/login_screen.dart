@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/l10n/l10n_extensions.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_exception.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_button.dart';
@@ -17,7 +18,13 @@ import '../../../sistema_usuarios/data/usuarios_repository.dart';
 import '../../data/auth_repository.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+  /// true si se llegó aquí desde la opción "Soy una funeraria o tanatorio" de BienvenidaScreen:
+  /// cambia el subtítulo y, abajo, el enlace de alta (solicitud de cliente en vez de registro de
+  /// usuario particular). El resto (email/contraseña, Google, "¿ya tienes un código?"...) es
+  /// igual para los dos, así que se reutiliza la misma pantalla en vez de duplicarla.
+  final bool esCliente;
+
+  const LoginScreen({super.key, this.esCliente = false});
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -80,6 +87,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         await sesionPolicy.registrarLoginExplicito(
           idSistemaUsuario: perfil.idSistemaUsuario,
           recordar: _recordar,
+          roles: perfil.roles,
         );
       }
     } catch (e) {
@@ -142,7 +150,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
                     Text(
-                      context.l10n.loginTagline,
+                      widget.esCliente
+                          ? context.l10n.loginTaglineCliente
+                          : context.l10n.loginTagline,
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
@@ -185,50 +195,87 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ],
                     ),
+                    Center(
+                      child: TextButton(
+                        onPressed: () => context.push('/tengo-codigo'),
+                        child: Text(context.l10n.loginYaTengoCodigo),
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     AppButton(
                       label: context.l10n.loginIniciarSesion,
                       loading: _loading,
                       onPressed: _submit,
                     ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        const Expanded(child: Divider()),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Text(
-                            context.l10n.o,
-                            style: Theme.of(context).textTheme.bodySmall,
+                    // Las cuentas de funeraria/tanatorio las da de alta un ADMIN con un email y
+                    // contraseña concretos, no son cuentas personales: no tiene sentido ofrecer
+                    // aquí un login con Google.
+                    if (!widget.esCliente) ...[
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          const Expanded(child: Divider()),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Text(
+                              context.l10n.o,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
                           ),
-                        ),
-                        const Expanded(child: Divider()),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    GoogleSignInButton(
-                      label: _loadingGoogle
-                          ? context.l10n.googleConectando
-                          : context.l10n.googleContinuar,
-                      onPressed: _loadingGoogle ? null : _submitGoogle,
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(context.l10n.loginNoTienesCuenta),
-                        TextButton(
-                          onPressed: () => context.push('/register'),
-                          child: Text(context.l10n.loginRegistrate),
-                        ),
-                      ],
-                    ),
-                    Center(
-                      child: TextButton(
-                        onPressed: () => context.push('/solicitud-cliente'),
-                        child: Text(context.l10n.loginEresFuneraria),
+                          const Expanded(child: Divider()),
+                        ],
                       ),
-                    ),
+                      const SizedBox(height: 16),
+                      GoogleSignInButton(
+                        label: _loadingGoogle
+                            ? context.l10n.googleConectando
+                            : context.l10n.googleContinuar,
+                        onPressed: _loadingGoogle ? null : _submitGoogle,
+                      ),
+                    ],
+                    const SizedBox(height: 24),
+                    if (widget.esCliente)
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.plum, width: 1.5),
+                        ),
+                        child: Column(
+                          children: [
+                            const Icon(
+                              Icons.storefront_outlined,
+                              color: AppColors.plum,
+                              size: 32,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              context.l10n.loginEresFunerariaPregunta,
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 12),
+                            AppButton(
+                              secondary: true,
+                              label: context.l10n.loginSolicitarAlta,
+                              onPressed: () =>
+                                  context.push('/solicitud-cliente'),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(context.l10n.loginNoTienesCuenta),
+                          TextButton(
+                            onPressed: () => context.push('/register'),
+                            child: Text(context.l10n.loginRegistrate),
+                          ),
+                        ],
+                      ),
                     const SizedBox(height: 40),
                     const Center(child: XagaLabsLogo()),
                   ],

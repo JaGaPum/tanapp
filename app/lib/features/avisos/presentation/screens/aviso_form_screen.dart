@@ -8,6 +8,7 @@ import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_banner.dart';
+import '../../../../core/widgets/sede_sin_renombrar_bloqueo.dart';
 import '../../../cliente_sedes/application/cliente_sedes_providers.dart';
 import '../../application/avisos_providers.dart';
 import '../../data/avisos_repository.dart';
@@ -83,6 +84,9 @@ class _AvisoFormScreenState extends ConsumerState<AvisoFormScreen> {
               message: context.l10n.publicarSinSedes,
               icon: Icons.storefront_outlined,
             );
+          }
+          if (ref.watch(tieneSedeSinRenombrarProvider)) {
+            return const SedeSinRenombrarBloqueo();
           }
           _idClienteSedeSeleccionada ??= sedes.first.idClienteSede;
           return SingleChildScrollView(

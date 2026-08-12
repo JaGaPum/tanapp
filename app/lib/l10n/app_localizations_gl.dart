@@ -157,10 +157,30 @@ class AppLocalizationsGl extends AppLocalizations {
   String get loginTagline => 'Información funeraria';
 
   @override
+  String get loginTaglineCliente => 'Acceso para funerarias e tanatorios';
+
+  @override
+  String get bienvenidaOpcionParticularTitulo => 'Quero estar informado';
+
+  @override
+  String get bienvenidaOpcionParticularSubtitulo =>
+      'Segue esquelas, avisos e funerais da túa zona';
+
+  @override
+  String get bienvenidaOpcionClienteTitulo => 'Son unha funeraria ou tanatorio';
+
+  @override
+  String get bienvenidaOpcionClienteSubtitulo =>
+      'Accede ou dá de alta o teu negocio en TanApp';
+
+  @override
   String get loginRecordarme => 'Lembrarme';
 
   @override
   String get loginOlvidasteContrasena => 'Esqueciches o contrasinal?';
+
+  @override
+  String get loginYaTengoCodigo => 'Xa tes un código?';
 
   @override
   String get loginIniciarSesion => 'Iniciar sesión';
@@ -172,8 +192,11 @@ class AppLocalizationsGl extends AppLocalizations {
   String get loginRegistrate => 'Rexístrate';
 
   @override
-  String get loginEresFuneraria =>
-      'És unha funeraria ou tanatorio? Solicita a alta';
+  String get loginEresFunerariaPregunta =>
+      'Es unha funeraria, tanatorio ou parroquia e aínda non tes conta?';
+
+  @override
+  String get loginSolicitarAlta => 'Solicitar alta';
 
   @override
   String get registerTitle => 'Crear conta';
@@ -192,7 +215,21 @@ class AppLocalizationsGl extends AppLocalizations {
   String get forgotPasswordEnviarCodigo => 'Enviar código';
 
   @override
+  String get tengoCodigoTitulo => 'Introducir código';
+
+  @override
+  String get tengoCodigoIntro =>
+      'Se xa recibiches un código de acceso por correo, escribe o teu email para continuar.';
+
+  @override
+  String get tengoCodigoContinuar => 'Continuar';
+
+  @override
   String get resetPasswordTitle => 'Novo contrasinal';
+
+  @override
+  String get resetPasswordInfo =>
+      'Escolle o contrasinal co que vas acceder a TanApp a partir de agora. Debe ter polo menos 8 caracteres.';
 
   @override
   String get resetPasswordNuevaContrasena => 'Novo contrasinal';
@@ -201,8 +238,7 @@ class AppLocalizationsGl extends AppLocalizations {
   String get resetPasswordGuardar => 'Gardar contrasinal';
 
   @override
-  String get resetPasswordActualizada =>
-      'Contrasinal actualizado, inicia sesión de novo';
+  String get resetPasswordActualizada => 'Contrasinal actualizado';
 
   @override
   String get verifyOtpTitle => 'Verificar código';
@@ -436,6 +472,15 @@ class AppLocalizationsGl extends AppLocalizations {
   String get validacionEmail => 'Validación de email';
 
   @override
+  String get usuarioTerminosTitulo => 'Termos e condicións';
+
+  @override
+  String get usuarioTerminosAceptados => 'Aceptados';
+
+  @override
+  String get usuarioTerminosPendientes => 'Pendentes';
+
+  @override
   String get marcarComoValidado => 'Marcar como validado';
 
   @override
@@ -492,6 +537,32 @@ class AppLocalizationsGl extends AppLocalizations {
   }
 
   @override
+  String get elegirSedeTitulo => '¿Con que sede vas traballar?';
+
+  @override
+  String get elegirSedeMensaje =>
+      'Escolle a sede coa que vas traballar nesta sesión. Poderás cambiala máis adiante cando queiras.';
+
+  @override
+  String get sedeLimiteTitulo => 'Límite de sesións acadado';
+
+  @override
+  String sedeLimiteMensaje(String sede) {
+    return 'Xa hai 2 sesións abertas traballando como \"$sede\". Se continúas, pecharase a máis antiga.';
+  }
+
+  @override
+  String get sedeLimiteConfirmar => 'Pechar a máis antiga e continuar';
+
+  @override
+  String sedeActualTexto(String sede) {
+    return 'Sede: $sede';
+  }
+
+  @override
+  String get sedeActualCambiar => 'Cambiar sede';
+
+  @override
   String get solicitudTitulo => 'Solicitude de alta de cliente';
 
   @override
@@ -500,6 +571,21 @@ class AppLocalizationsGl extends AppLocalizations {
   @override
   String get solicitudEnviadaMensaje =>
       'Recibimos a túa solicitude. Un administrador revisaraa e contactaremos contigo en breve.';
+
+  @override
+  String get solicitudEnviadaProcesoTitulo => 'Que pasa agora?';
+
+  @override
+  String get solicitudEnviadaPaso1 =>
+      'Revisamos a túa solicitude (normalmente en 1-2 días laborables).';
+
+  @override
+  String get solicitudEnviadaPaso2 =>
+      'Cando se aprobe, chegarache un correo co teu código de acceso.';
+
+  @override
+  String get solicitudEnviadaPaso3 =>
+      'Abre a app, na pantalla de inicio de sesión preme \"Xa tes un código?\", introduce o teu email e o código para fixar o teu contrasinal e entrar.';
 
   @override
   String get volverAlInicio => 'Volver ao inicio';
@@ -1010,6 +1096,12 @@ class AppLocalizationsGl extends AppLocalizations {
   String get drawerMisSedes => 'As miñas sedes/tanatorios';
 
   @override
+  String get drawerContactarSoporte => 'Contactar con soporte';
+
+  @override
+  String get soporteAsuntoPorDefecto => 'Soporte TanApp';
+
+  @override
   String get misSedesTitulo => 'As miñas sedes/tanatorios';
 
   @override
@@ -1024,6 +1116,10 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get misSedesNombreSede => 'Nome da sede/tanatorio';
+
+  @override
+  String get misSedesNombreAyuda =>
+      'É o nome que aparecerá nas notificacións, avisos e esquelas desta sede.';
 
   @override
   String get misSedesEliminarTitulo => 'Eliminar sede/tanatorio';
@@ -1122,6 +1218,13 @@ class AppLocalizationsGl extends AppLocalizations {
       'Aínda non tes ningunha sede/tanatorio. Dá de alta unha en \"Miñas sedes\" antes de publicar.';
 
   @override
+  String get sedeSinRenombrarAviso =>
+      'Antes de publicar esquelas ou enviar avisos, revisa (ou cambia) o nome da túa sede desde \"As miñas sedes\". É o nome que aparecerá nas notificacións, avisos e esquelas que envíes.';
+
+  @override
+  String get sedeSinRenombrarBoton => 'Cambiar o nome da sede';
+
+  @override
   String get publicarAvisoDatosPersonales =>
       'Por protección de datos, non inclúas datos persoais de familiares (nomes, teléfonos, enderezos). Só o nome do falecido e a información relevante para o público.';
 
@@ -1172,7 +1275,7 @@ class AppLocalizationsGl extends AppLocalizations {
   String get publicarPararEscoita => 'Deter a lectura';
 
   @override
-  String get publicarCompartirEsquela => 'Enviar por WhatsApp';
+  String get publicarCompartirEsquela => 'Compartir por WhatsApp';
 
   @override
   String get publicarCompartidoPor => 'Publicado por';
@@ -1182,6 +1285,9 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get publicarCondolencias => 'Enviar condolencias';
+
+  @override
+  String get publicarVerCondolencias => 'Ver condolencias';
 
   @override
   String condolenciasCantidad(int n) {
@@ -1232,6 +1338,52 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get condolenciasPdfPie => 'Descarga TanApp';
+
+  @override
+  String get condolenciasAnonimo => 'Anónimo';
+
+  @override
+  String get condolenciasAnonimaTitulo => 'Publicar como anónima';
+
+  @override
+  String get condolenciasAnonimaAyuda =>
+      'O teu nome non se amosará a ninguén, nin sequera a quen publicou a esquela.';
+
+  @override
+  String get condolenciasPrivadaTitulo => 'Condolencia privada';
+
+  @override
+  String get condolenciasPrivadaAyuda =>
+      'Só poderá vela quen publicou a esquela.';
+
+  @override
+  String get condolenciasModerarEliminarTitulo => 'Eliminar condolencia';
+
+  @override
+  String get condolenciasModerarEliminarMensaje =>
+      'Ocultarase esta condolencia e avisarase a quen a escribiu de que foi retirada por non axustarse ás normas de uso. Continuar?';
+
+  @override
+  String get condolenciasModerarEditarTitulo => 'Editar condolencia';
+
+  @override
+  String get condolenciasModerarEditarAyuda =>
+      'Avisarase a quen a escribiu de que modificaches o texto da súa condolencia.';
+
+  @override
+  String get condolenciasAvisoEliminada =>
+      'O cliente que publicou esta esquela eliminou a túa condolencia por considerar que o seu contido non era apropiado.';
+
+  @override
+  String get condolenciasAvisoEditada =>
+      'O cliente que publicou esta esquela modificou o texto da túa condolencia por considerar que parte do seu contido non era apropiado.';
+
+  @override
+  String get elegirIdiomaTitulo => 'Escolle o teu idioma';
+
+  @override
+  String get elegirIdiomaMensaje =>
+      'En que idioma queres usar TanApp? Poderás cambialo máis adiante desde A miña conta.';
 
   @override
   String publicarFuneralVoz(String fecha, String hora) {
@@ -1326,6 +1478,9 @@ class AppLocalizationsGl extends AppLocalizations {
   String get panelDatosPublicaciones => 'Publicacións';
 
   @override
+  String get panelDatosCondolenciasPorMes => 'Condolencias por mes';
+
+  @override
   String get panelDatosSeguidores => 'Seguidores';
 
   @override
@@ -1416,6 +1571,37 @@ class AppLocalizationsGl extends AppLocalizations {
   String get dashboardTabIa => 'IA';
 
   @override
+  String get dashboardTabEnVivo => 'En vivo';
+
+  @override
+  String get enVivoConexionesAbiertas => 'Conexións abertas';
+
+  @override
+  String get enVivoFiltrarPorCliente => 'Filtrar por cliente';
+
+  @override
+  String get enVivoSinCoincidencias => 'Ningún resultado con ese filtro.';
+
+  @override
+  String get enVivoVacio => 'Non hai ningunha sesión aberta agora mesmo.';
+
+  @override
+  String get enVivoSinSede => 'Sen sede asignada';
+
+  @override
+  String enVivoUltimoAcceso(String fecha) {
+    return 'último acceso $fecha';
+  }
+
+  @override
+  String get enVivoCerrarSesionTitulo => 'Pechar sesión';
+
+  @override
+  String enVivoCerrarSesionMensaje(String nombre) {
+    return '¿Pechar a sesión de \"$nombre\"?';
+  }
+
+  @override
   String get dashboardSinDatos => 'Aínda non hai datos abondo.';
 
   @override
@@ -1432,6 +1618,9 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get dashboardAvisosTotal => 'Avisos';
+
+  @override
+  String get dashboardCondolenciasTotal => 'Condolencias';
 
   @override
   String get dashboardClientesPorTipo => 'Clientes por tipo';

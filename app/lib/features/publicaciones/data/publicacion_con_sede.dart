@@ -48,13 +48,6 @@ class PublicacionConSede {
     final fechaFuneral = map['FechaFuneral'] as String?;
     // Postgres devuelve "time" como "HH:mm:ss"; en la app solo interesan horas y minutos.
     final horaFuneralCruda = map['HoraFuneral'] as String?;
-    // El embed "TClientePublicacionesCondolencias(count)" de PostgREST devuelve una lista con un
-    // único objeto {"count": N}, no la lista de condolencias en sí.
-    final condolenciasEmbed = map['TClientePublicacionesCondolencias'] as List?;
-    final numCondolencias =
-        condolenciasEmbed != null && condolenciasEmbed.isNotEmpty
-        ? (condolenciasEmbed.first as Map<String, dynamic>)['count'] as int
-        : 0;
     return PublicacionConSede(
       idClientePublicacion: map['IdClientePublicacion'] as String,
       idClienteSede: map['IdClienteSede'] as String,
@@ -77,7 +70,7 @@ class PublicacionConSede {
       nombreSede: sede['Nombre'] as String,
       concello: sede['Concello'] as String,
       provincia: sede['Provincia'] as String,
-      numCondolencias: numCondolencias,
+      numCondolencias: map['numCondolencias'] as int? ?? 0,
     );
   }
 

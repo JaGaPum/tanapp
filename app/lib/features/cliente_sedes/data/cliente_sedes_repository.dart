@@ -54,6 +54,8 @@ class ClienteSedesRepository {
           'Provincia': provincia,
           'Concello': concello,
           'Direccion': direccion.trim(),
+          // Guardar el formulario (le cambie el nombre o no) cuenta como confirmarlo.
+          'NombreConfirmado': true,
         })
         .eq('IdClienteSede', idClienteSede);
   }

@@ -1,9 +1,16 @@
+import 'dart:async';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/l10n/l10n_extensions.dart';
+import '../../../../core/widgets/confirm_dialog.dart';
+import '../../../../core/widgets/empty_state.dart';
+import '../../../sesiones/application/sesiones_providers.dart';
+import '../../../sesiones/data/sesion.dart';
+import '../../../sesiones/data/sesiones_repository.dart';
 import '../../application/dashboard_providers.dart';
 import '../../data/conteo_por_periodo.dart';
 import '../../data/ia_stats.dart';
@@ -37,7 +44,7 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         backgroundColor: _DashColors.fondoPagina,
         appBar: AppBar(
@@ -56,11 +63,15 @@ class DashboardScreen extends StatelessWidget {
                 icon: const Icon(Icons.smart_toy_outlined),
                 text: context.l10n.dashboardTabIa,
               ),
+              Tab(
+                icon: const Icon(Icons.sensors),
+                text: context.l10n.dashboardTabEnVivo,
+              ),
             ],
           ),
         ),
         body: const TabBarView(
-          children: [_ClientesTab(), _UsuariosTab(), _IaTab()],
+          children: [_ClientesTab(), _UsuariosTab(), _IaTab(), _EnVivoTab()],
         ),
       ),
     );
@@ -115,6 +126,12 @@ class _ClientesTab extends ConsumerWidget {
                   value: '${stats.totalAvisos}',
                   icon: Icons.notifications_active_outlined,
                   color: _DashColors.naranja,
+                ),
+                _StatTile(
+                  label: context.l10n.dashboardCondolenciasTotal,
+                  value: '${stats.totalCondolencias}',
+                  icon: Icons.volunteer_activism_outlined,
+                  color: _DashColors.cian,
                 ),
               ],
             ),
@@ -482,60 +499,68 @@ class _StatTile extends StatelessWidget {
   final String value;
   final IconData icon;
   final Color color;
+  final VoidCallback? onTap;
   const _StatTile({
     required this.label,
     required this.value,
     required this.icon,
     required this.color,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final contenido = Padding(
+      padding: const EdgeInsets.all(14),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.14),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 22),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodySmall,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          if (onTap != null)
+            Icon(Icons.chevron_right, color: color.withValues(alpha: 0.6)),
+        ],
+      ),
+    );
     return Card(
       elevation: 1,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: color.withValues(alpha: 0.18)),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.14),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: color, size: 22),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    value,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    label,
-                    style: Theme.of(context).textTheme.bodySmall,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+      clipBehavior: Clip.antiAlias,
+      child: onTap == null
+          ? contenido
+          : InkWell(onTap: onTap, child: contenido),
     );
   }
 }
@@ -774,6 +799,151 @@ class _BarChartGenerico extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+// Refresco periódico en vez de Realtime de verdad: el resto de la app funciona igual (pedir y
+// cachear, sin websockets), así que se mantiene el mismo patrón aquí; si algún día hiciera
+// falta ver los cambios al instante, este es el sitio para pasar a una subscripción Realtime.
+const _enVivoIntervaloRefresco = Duration(seconds: 20);
+
+class _EnVivoTab extends ConsumerStatefulWidget {
+  const _EnVivoTab();
+
+  @override
+  ConsumerState<_EnVivoTab> createState() => _EnVivoTabState();
+}
+
+class _EnVivoTabState extends ConsumerState<_EnVivoTab> {
+  Timer? _timer;
+  bool _mostrarListado = false;
+  final _busquedaController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(
+      _enVivoIntervaloRefresco,
+      (_) => ref.invalidate(sesionesAbiertasProvider),
+    );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _busquedaController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _cerrar(SesionAbierta sesion) async {
+    final confirmado = await showConfirmDialog(
+      context,
+      title: context.l10n.enVivoCerrarSesionTitulo,
+      message: context.l10n.enVivoCerrarSesionMensaje(sesion.nombreUsuario),
+      confirmLabel: context.l10n.enVivoCerrarSesionTitulo,
+    );
+    if (!confirmado) return;
+    await ref
+        .read(sesionesRepositoryProvider)
+        .cerrarSesion(sesion.idSistemaSesion);
+    ref.invalidate(sesionesAbiertasProvider);
+  }
+
+  List<SesionAbierta> _filtrar(List<SesionAbierta> sesiones) {
+    final termino = _busquedaController.text.trim().toLowerCase();
+    if (termino.isEmpty) return sesiones;
+    return sesiones
+        .where((s) => s.nombreUsuario.toLowerCase().contains(termino))
+        .toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final sesionesAsync = ref.watch(sesionesAbiertasProvider);
+    return sesionesAsync.when(
+      data: (sesiones) {
+        final filtradas = _filtrar(sesiones);
+        return SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(
+            16,
+            16,
+            16,
+            16 + MediaQuery.of(context).padding.bottom,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _StatGrid(
+                tiles: [
+                  _StatTile(
+                    label: context.l10n.enVivoConexionesAbiertas,
+                    value: '${sesiones.length}',
+                    icon: Icons.sensors,
+                    color: _DashColors.verde,
+                    onTap: () =>
+                        setState(() => _mostrarListado = !_mostrarListado),
+                  ),
+                ],
+              ),
+              if (_mostrarListado) ...[
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _busquedaController,
+                  decoration: InputDecoration(
+                    labelText: context.l10n.enVivoFiltrarPorCliente,
+                    prefixIcon: const Icon(Icons.search),
+                  ),
+                  onChanged: (_) => setState(() {}),
+                ),
+                const SizedBox(height: 12),
+                if (sesiones.isEmpty)
+                  EmptyState(
+                    message: context.l10n.enVivoVacio,
+                    icon: Icons.sensors_off_outlined,
+                  )
+                else if (filtradas.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Text(context.l10n.enVivoSinCoincidencias),
+                  )
+                else
+                  Column(
+                    children: [
+                      for (final sesion in filtradas) ...[
+                        Card(
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.circle,
+                              color: _DashColors.verde,
+                              size: 14,
+                            ),
+                            title: Text(sesion.nombreUsuario),
+                            subtitle: Text(
+                              '${sesion.emailUsuario}\n'
+                              '${sesion.nombreSede ?? context.l10n.enVivoSinSede} · '
+                              '${context.l10n.enVivoUltimoAcceso(DateFormat('dd/MM HH:mm').format(sesion.fechaUltimoAcceso.toLocal()))}',
+                            ),
+                            isThreeLine: true,
+                            trailing: IconButton(
+                              icon: const Icon(Icons.logout),
+                              tooltip: context.l10n.enVivoCerrarSesionTitulo,
+                              onPressed: () => _cerrar(sesion),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                    ],
+                  ),
+              ],
+            ],
+          ),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) =>
+          Center(child: Text(context.l10n.errorGenerico(e.toString()))),
     );
   }
 }

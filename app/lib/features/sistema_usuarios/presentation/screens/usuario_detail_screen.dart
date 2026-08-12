@@ -21,6 +21,7 @@ import '../../../importacion_web/data/importacion_web_repository.dart';
 import '../../../auth/application/auth_providers.dart';
 import '../../../sesiones/application/sesiones_providers.dart';
 import '../../../suplantacion/application/suplantacion_providers.dart';
+import '../../../terminos/application/terminos_providers.dart';
 import '../../application/usuarios_providers.dart';
 import '../../data/catalogos_repository.dart';
 import '../../data/usuario_perfil.dart';
@@ -530,6 +531,53 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                     ),
                 ],
               ),
+              if (!widget.perfil.roles.contains('ADMIN')) ...[
+                const SizedBox(height: 32),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      context.l10n.usuarioTerminosTitulo,
+                      style: _sectionTitleStyle(context),
+                    ),
+                    ref
+                        .watch(
+                          terminosPendientesDeUsuarioProvider(
+                            widget.perfil.idSistemaUsuario,
+                          ),
+                        )
+                        .when(
+                          data: (pendientes) => pendientes.isEmpty
+                              ? Chip(
+                                  avatar: const Icon(
+                                    Icons.verified_outlined,
+                                    color: AppColors.green,
+                                    size: 18,
+                                  ),
+                                  label: Text(
+                                    context.l10n.usuarioTerminosAceptados,
+                                  ),
+                                )
+                              : Chip(
+                                  avatar: Icon(
+                                    Icons.warning_amber_outlined,
+                                    color: Theme.of(context).colorScheme.error,
+                                    size: 18,
+                                  ),
+                                  label: Text(
+                                    context.l10n.usuarioTerminosPendientes,
+                                  ),
+                                ),
+                          loading: () => const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                          error: (_, _) => const SizedBox.shrink(),
+                        ),
+                  ],
+                ),
+              ],
               const SizedBox(height: 32),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

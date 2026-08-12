@@ -134,6 +134,15 @@ class _SedeFormDialogState extends ConsumerState<SedeFormDialog> {
                     ? context.l10n.errorNombreRequerido
                     : null,
               ),
+              Padding(
+                padding: const EdgeInsets.only(top: 6, left: 4, right: 4),
+                child: Text(
+                  context.l10n.misSedesNombreAyuda,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                ),
+              ),
               const SizedBox(height: 16),
               ProvinciaConcelloFields(
                 provinciaInicial: _provinciaSeleccionada,

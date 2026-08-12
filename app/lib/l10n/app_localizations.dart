@@ -380,6 +380,36 @@ abstract class AppLocalizations {
   /// **'Información funeraria'**
   String get loginTagline;
 
+  /// No description provided for @loginTaglineCliente.
+  ///
+  /// In es, this message translates to:
+  /// **'Acceso para funerarias y tanatorios'**
+  String get loginTaglineCliente;
+
+  /// No description provided for @bienvenidaOpcionParticularTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Quiero estar informado'**
+  String get bienvenidaOpcionParticularTitulo;
+
+  /// No description provided for @bienvenidaOpcionParticularSubtitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Sigue esquelas, avisos y funerales de tu zona'**
+  String get bienvenidaOpcionParticularSubtitulo;
+
+  /// No description provided for @bienvenidaOpcionClienteTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Soy una funeraria o tanatorio'**
+  String get bienvenidaOpcionClienteTitulo;
+
+  /// No description provided for @bienvenidaOpcionClienteSubtitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Accede o da de alta tu negocio en TanApp'**
+  String get bienvenidaOpcionClienteSubtitulo;
+
   /// No description provided for @loginRecordarme.
   ///
   /// In es, this message translates to:
@@ -391,6 +421,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'¿Olvidaste tu contraseña?'**
   String get loginOlvidasteContrasena;
+
+  /// No description provided for @loginYaTengoCodigo.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Ya tienes un código?'**
+  String get loginYaTengoCodigo;
 
   /// No description provided for @loginIniciarSesion.
   ///
@@ -410,11 +446,17 @@ abstract class AppLocalizations {
   /// **'Regístrate'**
   String get loginRegistrate;
 
-  /// No description provided for @loginEresFuneraria.
+  /// No description provided for @loginEresFunerariaPregunta.
   ///
   /// In es, this message translates to:
-  /// **'¿Eres una funeraria o tanatorio? Solicita el alta'**
-  String get loginEresFuneraria;
+  /// **'¿Eres una funeraria, tanatorio o parroquia y todavía no tienes cuenta?'**
+  String get loginEresFunerariaPregunta;
+
+  /// No description provided for @loginSolicitarAlta.
+  ///
+  /// In es, this message translates to:
+  /// **'Solicitar alta'**
+  String get loginSolicitarAlta;
 
   /// No description provided for @registerTitle.
   ///
@@ -446,11 +488,35 @@ abstract class AppLocalizations {
   /// **'Enviar código'**
   String get forgotPasswordEnviarCodigo;
 
+  /// No description provided for @tengoCodigoTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Introducir código'**
+  String get tengoCodigoTitulo;
+
+  /// No description provided for @tengoCodigoIntro.
+  ///
+  /// In es, this message translates to:
+  /// **'Si ya has recibido un código de acceso por correo, escribe tu email para continuar.'**
+  String get tengoCodigoIntro;
+
+  /// No description provided for @tengoCodigoContinuar.
+  ///
+  /// In es, this message translates to:
+  /// **'Continuar'**
+  String get tengoCodigoContinuar;
+
   /// No description provided for @resetPasswordTitle.
   ///
   /// In es, this message translates to:
   /// **'Nueva contraseña'**
   String get resetPasswordTitle;
+
+  /// No description provided for @resetPasswordInfo.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige la contraseña con la que vas a acceder a TanApp a partir de ahora. Debe tener al menos 8 caracteres.'**
+  String get resetPasswordInfo;
 
   /// No description provided for @resetPasswordNuevaContrasena.
   ///
@@ -467,7 +533,7 @@ abstract class AppLocalizations {
   /// No description provided for @resetPasswordActualizada.
   ///
   /// In es, this message translates to:
-  /// **'Contraseña actualizada, inicia sesión de nuevo'**
+  /// **'Contraseña actualizada'**
   String get resetPasswordActualizada;
 
   /// No description provided for @verifyOtpTitle.
@@ -872,6 +938,24 @@ abstract class AppLocalizations {
   /// **'Validación de email'**
   String get validacionEmail;
 
+  /// No description provided for @usuarioTerminosTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Términos y condiciones'**
+  String get usuarioTerminosTitulo;
+
+  /// No description provided for @usuarioTerminosAceptados.
+  ///
+  /// In es, this message translates to:
+  /// **'Aceptados'**
+  String get usuarioTerminosAceptados;
+
+  /// No description provided for @usuarioTerminosPendientes.
+  ///
+  /// In es, this message translates to:
+  /// **'Pendientes'**
+  String get usuarioTerminosPendientes;
+
   /// No description provided for @marcarComoValidado.
   ///
   /// In es, this message translates to:
@@ -980,6 +1064,48 @@ abstract class AppLocalizations {
   /// **'No se pudieron cargar las sesiones: {error}'**
   String errorCargarSesiones(String error);
 
+  /// No description provided for @elegirSedeTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Con qué sede vas a trabajar?'**
+  String get elegirSedeTitulo;
+
+  /// No description provided for @elegirSedeMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige la sede con la que vas a trabajar en esta sesión. Podrás cambiarla más adelante cuando quieras.'**
+  String get elegirSedeMensaje;
+
+  /// No description provided for @sedeLimiteTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Límite de sesiones alcanzado'**
+  String get sedeLimiteTitulo;
+
+  /// No description provided for @sedeLimiteMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya hay 2 sesiones abiertas trabajando como \"{sede}\". Si continúas, se cerrará la más antigua.'**
+  String sedeLimiteMensaje(String sede);
+
+  /// No description provided for @sedeLimiteConfirmar.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar la más antigua y continuar'**
+  String get sedeLimiteConfirmar;
+
+  /// No description provided for @sedeActualTexto.
+  ///
+  /// In es, this message translates to:
+  /// **'Sede: {sede}'**
+  String sedeActualTexto(String sede);
+
+  /// No description provided for @sedeActualCambiar.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar sede'**
+  String get sedeActualCambiar;
+
   /// No description provided for @solicitudTitulo.
   ///
   /// In es, this message translates to:
@@ -997,6 +1123,30 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Hemos recibido tu solicitud. Un administrador la revisará y te contactaremos en breve.'**
   String get solicitudEnviadaMensaje;
+
+  /// No description provided for @solicitudEnviadaProcesoTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Qué pasa ahora?'**
+  String get solicitudEnviadaProcesoTitulo;
+
+  /// No description provided for @solicitudEnviadaPaso1.
+  ///
+  /// In es, this message translates to:
+  /// **'Revisamos tu solicitud (normalmente en 1-2 días laborables).'**
+  String get solicitudEnviadaPaso1;
+
+  /// No description provided for @solicitudEnviadaPaso2.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuando se apruebe, te llegará un correo con tu código de acceso.'**
+  String get solicitudEnviadaPaso2;
+
+  /// No description provided for @solicitudEnviadaPaso3.
+  ///
+  /// In es, this message translates to:
+  /// **'Abre la app, en la pantalla de inicio de sesión pulsa \"¿Ya tienes un código?\", introduce tu email y el código para fijar tu contraseña y entrar.'**
+  String get solicitudEnviadaPaso3;
 
   /// No description provided for @volverAlInicio.
   ///
@@ -1880,6 +2030,18 @@ abstract class AppLocalizations {
   /// **'Mis sedes/tanatorios'**
   String get drawerMisSedes;
 
+  /// No description provided for @drawerContactarSoporte.
+  ///
+  /// In es, this message translates to:
+  /// **'Contactar con soporte'**
+  String get drawerContactarSoporte;
+
+  /// No description provided for @soporteAsuntoPorDefecto.
+  ///
+  /// In es, this message translates to:
+  /// **'Soporte TanApp'**
+  String get soporteAsuntoPorDefecto;
+
   /// No description provided for @misSedesTitulo.
   ///
   /// In es, this message translates to:
@@ -1909,6 +2071,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Nombre de la sede/tanatorio'**
   String get misSedesNombreSede;
+
+  /// No description provided for @misSedesNombreAyuda.
+  ///
+  /// In es, this message translates to:
+  /// **'Es el nombre que aparecerá en las notificaciones, avisos y esquelas de esta sede.'**
+  String get misSedesNombreAyuda;
 
   /// No description provided for @misSedesEliminarTitulo.
   ///
@@ -2066,6 +2234,18 @@ abstract class AppLocalizations {
   /// **'Todavía no tienes ninguna sede/tanatorio. Da de alta una en \"Miñas sedes\" antes de publicar.'**
   String get publicarSinSedes;
 
+  /// No description provided for @sedeSinRenombrarAviso.
+  ///
+  /// In es, this message translates to:
+  /// **'Antes de publicar esquelas o enviar avisos, revisa (o cambia) el nombre de tu sede desde \"Mis sedes\". Es el nombre que aparecerá en las notificaciones, avisos y esquelas que envíes.'**
+  String get sedeSinRenombrarAviso;
+
+  /// No description provided for @sedeSinRenombrarBoton.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar el nombre de la sede'**
+  String get sedeSinRenombrarBoton;
+
   /// No description provided for @publicarAvisoDatosPersonales.
   ///
   /// In es, this message translates to:
@@ -2165,7 +2345,7 @@ abstract class AppLocalizations {
   /// No description provided for @publicarCompartirEsquela.
   ///
   /// In es, this message translates to:
-  /// **'Enviar por WhatsApp'**
+  /// **'Compartir por WhatsApp'**
   String get publicarCompartirEsquela;
 
   /// No description provided for @publicarCompartidoPor.
@@ -2185,6 +2365,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Enviar condolencias'**
   String get publicarCondolencias;
+
+  /// No description provided for @publicarVerCondolencias.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver condolencias'**
+  String get publicarVerCondolencias;
 
   /// No description provided for @condolenciasCantidad.
   ///
@@ -2257,6 +2443,84 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Descarga TanApp'**
   String get condolenciasPdfPie;
+
+  /// No description provided for @condolenciasAnonimo.
+  ///
+  /// In es, this message translates to:
+  /// **'Anónimo'**
+  String get condolenciasAnonimo;
+
+  /// No description provided for @condolenciasAnonimaTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Publicar como anónima'**
+  String get condolenciasAnonimaTitulo;
+
+  /// No description provided for @condolenciasAnonimaAyuda.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu nombre no se mostrará a nadie, ni siquiera a quien ha publicado la esquela.'**
+  String get condolenciasAnonimaAyuda;
+
+  /// No description provided for @condolenciasPrivadaTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Condolencia privada'**
+  String get condolenciasPrivadaTitulo;
+
+  /// No description provided for @condolenciasPrivadaAyuda.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo podrá verla quien ha publicado la esquela.'**
+  String get condolenciasPrivadaAyuda;
+
+  /// No description provided for @condolenciasModerarEliminarTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar condolencia'**
+  String get condolenciasModerarEliminarTitulo;
+
+  /// No description provided for @condolenciasModerarEliminarMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'Se ocultará esta condolencia y se avisará a quien la escribió de que ha sido retirada por no ajustarse a las normas de uso. ¿Continuar?'**
+  String get condolenciasModerarEliminarMensaje;
+
+  /// No description provided for @condolenciasModerarEditarTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar condolencia'**
+  String get condolenciasModerarEditarTitulo;
+
+  /// No description provided for @condolenciasModerarEditarAyuda.
+  ///
+  /// In es, this message translates to:
+  /// **'Se avisará a quien la escribió de que has modificado el texto de su condolencia.'**
+  String get condolenciasModerarEditarAyuda;
+
+  /// No description provided for @condolenciasAvisoEliminada.
+  ///
+  /// In es, this message translates to:
+  /// **'El cliente que publicó esta esquela ha eliminado tu condolencia por considerar que su contenido no era apropiado.'**
+  String get condolenciasAvisoEliminada;
+
+  /// No description provided for @condolenciasAvisoEditada.
+  ///
+  /// In es, this message translates to:
+  /// **'El cliente que publicó esta esquela ha modificado el texto de tu condolencia por considerar que parte de su contenido no era apropiado.'**
+  String get condolenciasAvisoEditada;
+
+  /// No description provided for @elegirIdiomaTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige tu idioma'**
+  String get elegirIdiomaTitulo;
+
+  /// No description provided for @elegirIdiomaMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'¿En qué idioma quieres usar TanApp? Podrás cambiarlo más adelante desde Mi cuenta.'**
+  String get elegirIdiomaMensaje;
 
   /// No description provided for @publicarFuneralVoz.
   ///
@@ -2408,6 +2672,12 @@ abstract class AppLocalizations {
   /// **'Publicaciones'**
   String get panelDatosPublicaciones;
 
+  /// No description provided for @panelDatosCondolenciasPorMes.
+  ///
+  /// In es, this message translates to:
+  /// **'Condolencias por mes'**
+  String get panelDatosCondolenciasPorMes;
+
   /// No description provided for @panelDatosSeguidores.
   ///
   /// In es, this message translates to:
@@ -2546,6 +2816,60 @@ abstract class AppLocalizations {
   /// **'IA'**
   String get dashboardTabIa;
 
+  /// No description provided for @dashboardTabEnVivo.
+  ///
+  /// In es, this message translates to:
+  /// **'En vivo'**
+  String get dashboardTabEnVivo;
+
+  /// No description provided for @enVivoConexionesAbiertas.
+  ///
+  /// In es, this message translates to:
+  /// **'Conexiones abiertas'**
+  String get enVivoConexionesAbiertas;
+
+  /// No description provided for @enVivoFiltrarPorCliente.
+  ///
+  /// In es, this message translates to:
+  /// **'Filtrar por cliente'**
+  String get enVivoFiltrarPorCliente;
+
+  /// No description provided for @enVivoSinCoincidencias.
+  ///
+  /// In es, this message translates to:
+  /// **'Ningún resultado con ese filtro.'**
+  String get enVivoSinCoincidencias;
+
+  /// No description provided for @enVivoVacio.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay ninguna sesión abierta ahora mismo.'**
+  String get enVivoVacio;
+
+  /// No description provided for @enVivoSinSede.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin sede asignada'**
+  String get enVivoSinSede;
+
+  /// No description provided for @enVivoUltimoAcceso.
+  ///
+  /// In es, this message translates to:
+  /// **'último acceso {fecha}'**
+  String enVivoUltimoAcceso(String fecha);
+
+  /// No description provided for @enVivoCerrarSesionTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar sesión'**
+  String get enVivoCerrarSesionTitulo;
+
+  /// No description provided for @enVivoCerrarSesionMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Cerrar la sesión de \"{nombre}\"?'**
+  String enVivoCerrarSesionMensaje(String nombre);
+
   /// No description provided for @dashboardSinDatos.
   ///
   /// In es, this message translates to:
@@ -2581,6 +2905,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Avisos'**
   String get dashboardAvisosTotal;
+
+  /// No description provided for @dashboardCondolenciasTotal.
+  ///
+  /// In es, this message translates to:
+  /// **'Condolencias'**
+  String get dashboardCondolenciasTotal;
 
   /// No description provided for @dashboardClientesPorTipo.
   ///

@@ -6,6 +6,11 @@ class ClienteSede {
   final String concello;
   final String direccion;
 
+  /// False solo en la primera sede que crea la Edge Function "aprobar-solicitud-cliente" al
+  /// aprobar una solicitud, hasta que el cliente la revise o cambie desde "Mis sedes" (ver
+  /// "tieneSedeSinRenombrarProvider"). Una sede dada de alta a mano ya nace confirmada.
+  final bool nombreConfirmado;
+
   const ClienteSede({
     required this.idClienteSede,
     required this.codigo,
@@ -13,6 +18,7 @@ class ClienteSede {
     required this.provincia,
     required this.concello,
     required this.direccion,
+    required this.nombreConfirmado,
   });
 
   factory ClienteSede.fromMap(Map<String, dynamic> map) => ClienteSede(
@@ -22,5 +28,6 @@ class ClienteSede {
     provincia: map['Provincia'] as String,
     concello: map['Concello'] as String,
     direccion: map['Direccion'] as String,
+    nombreConfirmado: map['NombreConfirmado'] as bool? ?? true,
   );
 }

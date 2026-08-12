@@ -42,9 +42,12 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
       final repo = ref.read(authRepositoryProvider);
       final actualizadaMensaje = context.l10n.resetPasswordActualizada;
       await repo.updatePassword(newPassword: _passwordController.text);
-      await repo.signOut();
+      // Ya hay una sesión válida (la abrió "verifyRecoveryOtp" antes de llegar aquí, con su
+      // TSistemaSesiones ya registrada por el router): en vez de cerrarla y mandar a /login a
+      // volver a autenticarse, se entra directo. Si hace falta aceptar términos o elegir sede,
+      // el redirect del router ya se encarga de interceptar "/home" y llevar a donde toque.
       if (mounted) {
-        context.go('/login');
+        context.go('/home');
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(actualizadaMensaje)));
@@ -75,6 +78,18 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    Icon(
+                      Icons.lock_outline,
+                      size: 48,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      context.l10n.resetPasswordInfo,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 24),
                     if (_error != null) ErrorBanner(message: _error!),
                     PasswordField(
                       controller: _passwordController,

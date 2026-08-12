@@ -6,8 +6,11 @@ import '../../features/auth/application/auth_providers.dart';
 import '../../features/auth/data/auth_repository.dart';
 import '../l10n/l10n_extensions.dart';
 import '../theme/app_theme.dart';
+import '../utils/email_launcher.dart';
 import 'confirm_dialog.dart';
 import 'xaga_labs_logo.dart';
+
+const _emailSoporte = 'soporte_tanapp@tanapp.es';
 
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
@@ -15,6 +18,17 @@ class AppDrawer extends ConsumerWidget {
   void _navigate(BuildContext context, String location) {
     Navigator.of(context).pop();
     context.push(location);
+  }
+
+  void _contactarSoporte(BuildContext context) {
+    Navigator.of(context).pop();
+    // Sin formulario ni pantalla propia: directo al gestor de correo del dispositivo, con el
+    // destinatario ya puesto (no hay backend de correo saliente propio en el proyecto).
+    enviarCorreo(
+      destinatario: _emailSoporte,
+      asunto: context.l10n.soporteAsuntoPorDefecto,
+      cuerpo: '',
+    );
   }
 
   Future<void> _signOut(BuildContext context, WidgetRef ref) async {
@@ -129,6 +143,12 @@ class AppDrawer extends ConsumerWidget {
                   leading: const Icon(Icons.storefront_outlined),
                   title: Text(context.l10n.drawerMisSedes),
                   onTap: () => _navigate(context, '/mis-sedes'),
+                ),
+              if (isCliente)
+                ListTile(
+                  leading: const Icon(Icons.support_agent_outlined),
+                  title: Text(context.l10n.drawerContactarSoporte),
+                  onTap: () => _contactarSoporte(context),
                 ),
               const Spacer(),
               Padding(

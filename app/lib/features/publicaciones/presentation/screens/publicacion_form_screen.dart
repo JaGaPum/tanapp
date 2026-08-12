@@ -12,8 +12,10 @@ import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/cruz_icon.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_banner.dart';
+import '../../../../core/widgets/sede_sin_renombrar_bloqueo.dart';
 import '../../../cliente_sedes/application/cliente_sedes_providers.dart';
 import '../../../configuracion/application/configuracion_providers.dart';
+import '../../../sesiones/application/sesiones_providers.dart';
 import '../../../importacion_web/application/importacion_web_providers.dart';
 import '../../../propuestas_publicaciones/application/propuestas_providers.dart';
 import '../../../propuestas_publicaciones/data/propuestas_repository.dart';
@@ -381,7 +383,17 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
               icon: Icons.storefront_outlined,
             );
           }
-          _idClienteSedeSeleccionada ??= sedes.first.idClienteSede;
+          // Solo bloquea el alta de publicaciones nuevas; editar una ya existente (p. ej. para
+          // corregir un dato) no depende de si la sede está bien nombrada.
+          if (!_esEdicion && ref.watch(tieneSedeSinRenombrarProvider)) {
+            return const SedeSinRenombrarBloqueo();
+          }
+          // Si no se ha pasado una sede explícita (p. ej. desde una propuesta de importación),
+          // se propone la que tiene asignada esta sesión — sigue siendo un simple valor por
+          // defecto, el desplegable de abajo permite cambiarla igualmente.
+          _idClienteSedeSeleccionada ??=
+              ref.read(sesionActualProvider).value?.idClienteSede ??
+              sedes.first.idClienteSede;
           return SingleChildScrollView(
             padding: EdgeInsets.fromLTRB(
               16,

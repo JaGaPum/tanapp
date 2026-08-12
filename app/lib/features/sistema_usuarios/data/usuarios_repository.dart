@@ -91,8 +91,27 @@ class UsuariosRepository {
           'IdSistemaIdiomaPreferido': idSistemaIdiomaPreferido,
           'IdConfiguracionClienteTipo': idConfiguracionClienteTipo,
           'Activo': activo,
+          // Se manda un idioma explícito desde este formulario: se da por confirmado, igual
+          // que si hubiese pasado por "Elige tu idioma" (ver "confirmarIdioma" más abajo).
+          'IdiomaConfirmado': true,
           if (notificacionesPushActivas != null)
             'NotificacionesPushActivas': notificacionesPushActivas,
+        })
+        .eq('IdSistemaUsuario', idSistemaUsuario);
+  }
+
+  /// Pantalla "Elige tu idioma" (bloqueo del router justo después de aceptar términos, ver
+  /// app_router.dart): guarda la preferencia y marca que ya se ha preguntado explícitamente,
+  /// sin tocar el resto del perfil (a diferencia de [updatePerfil], que exige mandarlo todo).
+  Future<void> confirmarIdioma({
+    required String idSistemaUsuario,
+    required String idSistemaIdiomaPreferido,
+  }) async {
+    await _client
+        .from('TSistemaUsuarios')
+        .update({
+          'IdSistemaIdiomaPreferido': idSistemaIdiomaPreferido,
+          'IdiomaConfirmado': true,
         })
         .eq('IdSistemaUsuario', idSistemaUsuario);
   }

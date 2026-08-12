@@ -8,6 +8,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../avisos/application/avisos_providers.dart';
 import '../../../avisos/data/aviso_estadistica.dart';
 import '../../../cliente_sedes/application/cliente_sedes_providers.dart';
+import '../../../condolencias/application/condolencias_providers.dart';
 import '../../../publicaciones/application/publicaciones_providers.dart';
 import '../../../publicaciones/data/publicaciones_por_mes.dart';
 import '../../../seguidos/application/seguidos_providers.dart';
@@ -21,6 +22,7 @@ class PanelDatosScreen extends ConsumerWidget {
     final sedesAsync = ref.watch(misSedesProvider);
     final publicacionesAsync = ref.watch(misPublicacionesProvider);
     final publicacionesPorMesAsync = ref.watch(publicacionesPorMesProvider);
+    final condolenciasPorMesAsync = ref.watch(condolenciasPorMesProvider);
     final seguidoresAsync = ref.watch(misSeguidoresPorSedeProvider);
     final seguidoresTotalUnicoAsync = ref.watch(
       misSeguidoresTotalUnicoProvider,
@@ -70,6 +72,20 @@ class PanelDatosScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 12),
                       publicacionesPorMesAsync.when(
+                        data: (porMes) =>
+                            _PublicacionesPorMesChart(datos: porMes),
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (e, _) =>
+                            Text(context.l10n.errorGenerico(e.toString())),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        context.l10n.panelDatosCondolenciasPorMes,
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      const SizedBox(height: 12),
+                      condolenciasPorMesAsync.when(
                         data: (porMes) =>
                             _PublicacionesPorMesChart(datos: porMes),
                         loading: () =>

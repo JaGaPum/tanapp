@@ -129,7 +129,9 @@ async function handle(req: Request): Promise<Response> {
   }
 
   // El trigger FSistemaHandleNewAuthUser ya creó la fila en TSistemaUsuarios y le asignó
-  // USUARIO_ORDINARIO; aquí añadimos además el rol CLIENTE.
+  // USUARIO_ORDINARIO (lo hace con cualquier alta en auth.users, sin saber todavía si va a ser
+  // un cliente): aquí añadimos el rol CLIENTE y le quitamos ese USUARIO_ORDINARIO, que no le
+  // corresponde a una cuenta de negocio.
   const { data: nuevoPerfil } = await adminClient
     .from('TSistemaUsuarios')
     .select('IdSistemaUsuario')
@@ -137,16 +139,24 @@ async function handle(req: Request): Promise<Response> {
     .maybeSingle();
 
   if (nuevoPerfil) {
-    const { data: rolCliente } = await adminClient
+    const { data: roles } = await adminClient
       .from('TSistemaRoles')
-      .select('IdSistemaRol')
-      .eq('Codigo', 'CLIENTE')
-      .maybeSingle();
+      .select('IdSistemaRol, Codigo')
+      .in('Codigo', ['CLIENTE', 'USUARIO_ORDINARIO']);
+    const rolCliente = roles?.find((r) => r.Codigo === 'CLIENTE');
+    const rolOrdinario = roles?.find((r) => r.Codigo === 'USUARIO_ORDINARIO');
     if (rolCliente) {
       await adminClient.from('TSistemaUsuariosRoles').insert({
         IdSistemaUsuario: nuevoPerfil.IdSistemaUsuario,
         IdSistemaRol: rolCliente.IdSistemaRol,
       });
+    }
+    if (rolOrdinario) {
+      await adminClient
+        .from('TSistemaUsuariosRoles')
+        .delete()
+        .eq('IdSistemaUsuario', nuevoPerfil.IdSistemaUsuario)
+        .eq('IdSistemaRol', rolOrdinario.IdSistemaRol);
     }
 
     // Enlaza la solicitud con el usuario creado, para no volver a ofrecer el botón de crear cuenta.
@@ -166,17 +176,34 @@ async function handle(req: Request): Promise<Response> {
     // Da de alta la primera sede del cliente (la de la propia solicitud). Buscar/Seguindo/
     // "Cómo llegar" operan sobre sedes, no sobre el cliente directamente, así que sin esto
     // el cliente recién aprobado no aparecería en ningún resultado hasta que él mismo diera
-    // de alta una sede a mano.
+    // de alta una sede a mano. El nombre de partida es el de la propia razón social (más útil
+    // que un genérico), pero "NombreConfirmado: false" bloquea publicar/enviar avisos (ver
+    // "tieneSedeSinRenombrarProvider" en la app) hasta que el cliente lo revise o cambie desde
+    // "Mis sedes" -el nombre de cada sede es el que aparece en notificaciones, avisos y
+    // esquelas, así que no debe quedar sin más como el que puso el propio ADMIN al aprobar-.
     if (solicitud.Direccion && solicitud.Provincia && solicitud.Localidad) {
       await adminClient.from('TClienteSedes').insert({
         IdSistemaUsuario: nuevoPerfil.IdSistemaUsuario,
-        Codigo: 'Sede001',
-        Nombre: 'Sede principal',
+        Codigo: '001',
+        Nombre: solicitud.RazonSocial,
         Provincia: solicitud.Provincia,
         Concello: solicitud.Localidad,
         Direccion: solicitud.Direccion,
+        NombreConfirmado: false,
       });
     }
+  }
+
+  // Dispara el correo de "restablecer contraseña" de Supabase (mismo flujo que ya usa
+  // "¿Olvidaste tu contraseña?" en el login): al no tener contraseña, es la forma de que el
+  // cliente reciba un código con el que entrar por primera vez. No es crítico: si el envío
+  // falla (p. ej. SMTP aún sin configurar), la cuenta ya está creada y el cliente siempre
+  // puede pedir el código él mismo desde "¿Olvidaste tu contraseña?".
+  const { error: recoveryError } = await adminClient.auth.resetPasswordForEmail(
+    solicitud.EmailContacto,
+  );
+  if (recoveryError) {
+    console.error('aprobar-solicitud-cliente: no se pudo enviar el correo de acceso', recoveryError);
   }
 
   return jsonResponse({ idAuthSupabase: created.user.id });

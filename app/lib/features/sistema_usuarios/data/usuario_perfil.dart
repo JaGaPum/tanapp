@@ -30,6 +30,7 @@ class UsuarioPerfil {
   final bool emailConfirmado;
   final bool notificacionesPushActivas;
   final bool escaneoEsquelaIaActiva;
+  final bool idiomaConfirmado;
   final List<RolAsignado> rolesAsignados;
 
   const UsuarioPerfil({
@@ -50,6 +51,7 @@ class UsuarioPerfil {
     required this.emailConfirmado,
     required this.notificacionesPushActivas,
     required this.escaneoEsquelaIaActiva,
+    required this.idiomaConfirmado,
     required this.rolesAsignados,
   });
 
@@ -102,6 +104,7 @@ class UsuarioPerfil {
       notificacionesPushActivas:
           map['NotificacionesPushActivas'] as bool? ?? true,
       escaneoEsquelaIaActiva: map['EscaneoEsquelaIaActiva'] as bool? ?? true,
+      idiomaConfirmado: map['IdiomaConfirmado'] as bool? ?? false,
       rolesAsignados: roles,
     );
   }

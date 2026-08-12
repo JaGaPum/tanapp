@@ -11,7 +11,12 @@ import '../../../../core/widgets/error_banner.dart';
 import '../../data/auth_repository.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
-  const ForgotPasswordScreen({super.key});
+  /// false para el enlace "¿Ya tienes un código?" de Login: un cliente recién aprobado (o
+  /// cualquiera con un código de recuperación aún válido en el correo) no necesita que se le
+  /// mande uno nuevo — eso invalidaría el que ya tiene — solo confirmar su email para pasar
+  /// directamente a la pantalla de introducirlo.
+  final bool enviarCodigoNuevo;
+  const ForgotPasswordScreen({super.key, this.enviarCodigoNuevo = true});
 
   @override
   ConsumerState<ForgotPasswordScreen> createState() =>
@@ -37,9 +42,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       _error = null;
     });
     try {
-      await ref
-          .read(authRepositoryProvider)
-          .requestPasswordReset(email: _emailController.text);
+      if (widget.enviarCodigoNuevo) {
+        await ref
+            .read(authRepositoryProvider)
+            .requestPasswordReset(email: _emailController.text);
+      }
       if (mounted) {
         context.push(
           '/forgot-password/verify',
@@ -60,7 +67,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.forgotPasswordTitle)),
+      appBar: AppBar(
+        title: Text(
+          widget.enviarCodigoNuevo
+              ? context.l10n.forgotPasswordTitle
+              : context.l10n.tengoCodigoTitulo,
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -73,7 +86,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      context.l10n.forgotPasswordIntro,
+                      widget.enviarCodigoNuevo
+                          ? context.l10n.forgotPasswordIntro
+                          : context.l10n.tengoCodigoIntro,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     const SizedBox(height: 24),
@@ -86,7 +101,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     ),
                     const SizedBox(height: 24),
                     AppButton(
-                      label: context.l10n.forgotPasswordEnviarCodigo,
+                      label: widget.enviarCodigoNuevo
+                          ? context.l10n.forgotPasswordEnviarCodigo
+                          : context.l10n.tengoCodigoContinuar,
                       loading: _loading,
                       onPressed: _submit,
                     ),

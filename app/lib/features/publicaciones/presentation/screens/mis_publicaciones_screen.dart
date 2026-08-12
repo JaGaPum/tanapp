@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../core/l10n/l10n_extensions.dart';
-import '../../../../core/preferences/escala_texto_provider.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
-import '../../../../core/widgets/cruz_icon.dart';
 import '../../../../core/widgets/empty_state.dart';
-import '../../../condolencias/presentation/widgets/condolencias_modal.dart';
 import '../../application/publicaciones_providers.dart';
 import '../../data/publicacion_con_sede.dart';
 import '../../data/publicaciones_repository.dart';
-import '../widgets/condolencias_indicador.dart';
-import '../widgets/publicacion_detalle.dart';
+import '../widgets/publicacion_card.dart';
 
 class MisPublicacionesScreen extends ConsumerWidget {
   const MisPublicacionesScreen({super.key});
@@ -45,6 +40,8 @@ class MisPublicacionesScreen extends ConsumerWidget {
   }
 }
 
+/// Delega todo el aspecto visual en [PublicacionCard] (con [PublicacionCard.esPropia]): esta
+/// clase solo aporta las acciones propias del dueño (editar/eliminar) y su estado de carga.
 class _MiPublicacionCard extends ConsumerStatefulWidget {
   final PublicacionConSede publicacion;
   const _MiPublicacionCard({required this.publicacion});
@@ -104,93 +101,12 @@ class _MiPublicacionCardState extends ConsumerState<_MiPublicacionCard> {
 
   @override
   Widget build(BuildContext context) {
-    final publicacion = widget.publicacion;
-    final escala = ref.watch(escalaTextoProvider);
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            MediaQuery(
-              data: MediaQuery.of(
-                context,
-              ).copyWith(textScaler: TextScaler.linear(escala)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CruzIcon(size: 20 * escala),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          publicacion.nombreFallecido,
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    publicacion.concello,
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  PublicacionDetalle(
-                    publicacion: publicacion,
-                    trailingLugar: CondolenciasIndicador(
-                      numCondolencias: publicacion.numCondolencias,
-                      onTap: () => mostrarCondolenciasModal(
-                        context,
-                        idClientePublicacion: publicacion.idClientePublicacion,
-                        nombreFallecido: publicacion.nombreFallecido,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              DateFormat(
-                'dd/MM/yyyy HH:mm',
-              ).format(publicacion.fechaAlta.toLocal()),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.edit_outlined),
-                  label: Text(context.l10n.editar),
-                  onPressed: _eliminando ? null : _editar,
-                ),
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.delete_outline),
-                  label: Text(context.l10n.eliminar),
-                  onPressed: _eliminando ? null : _eliminar,
-                ),
-                OutlinedButton(
-                  onPressed: () => context.push(
-                    '/publicacion/${publicacion.idClientePublicacion}/condolencias',
-                    extra: {
-                      'nombreFallecido': publicacion.nombreFallecido,
-                      'idClienteSede': publicacion.idClienteSede,
-                    },
-                  ),
-                  child: Text(context.l10n.publicarCondolencias),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+    return PublicacionCard(
+      publicacion: widget.publicacion,
+      esPropia: true,
+      eliminando: _eliminando,
+      onEditar: _editar,
+      onEliminar: _eliminar,
     );
   }
 }

@@ -78,6 +78,13 @@ class DashboardRepository {
         .map((e) => e as Map<String, dynamic>)
         .toList();
 
+    // Las ocultas por moderación (050) no cuentan, igual que en "FSistemaContarCondolencias".
+    final condolenciasCount = await _client
+        .from('TClientePublicacionesCondolencias')
+        .select('IdClientePublicacionCondolencia')
+        .eq('ModeradaOculta', false)
+        .count(CountOption.exact);
+
     final porTipoConteo = <String, int>{};
     for (final cliente in clientes) {
       final tipo = cliente['IdConfiguracionClienteTipo'] as String?;
@@ -104,6 +111,7 @@ class DashboardRepository {
       totalSedes: sedesCount.count,
       totalPublicaciones: publicacionesList.length,
       totalAvisos: avisosList.length,
+      totalCondolencias: condolenciasCount.count,
       // El nombre de cada tipo se resuelve aparte (catálogo de tipos de cliente), aquí solo se
       // agrupa por id: lo hace el provider, que ya tiene ambos datos.
       porTipo: porTipoConteo.entries.toList(),

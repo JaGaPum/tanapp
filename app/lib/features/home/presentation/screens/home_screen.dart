@@ -20,6 +20,7 @@ import '../../../publicaciones/presentation/screens/mis_publicaciones_screen.dar
 import '../../../publicar/presentation/screens/publicar_screen.dart';
 import '../../../seguidos/presentation/screens/mis_seguidos_screen.dart';
 import '../../../seguidos/presentation/screens/seguidos_screen.dart';
+import '../../../sesiones/presentation/widgets/sede_actual_banner.dart';
 import '../../../suplantacion/presentation/widgets/banner_suplantacion.dart';
 import '../../../tablon/presentation/screens/tablon_screen.dart';
 
@@ -178,6 +179,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       body: Column(
         children: [
           const BannerSuplantacion(),
+          const SedeActualBanner(),
           Expanded(
             child: KeyedSubtree(
               key: ValueKey(idSesionActual),

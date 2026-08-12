@@ -13,6 +13,13 @@
 -- igual que ya hace UsuariosRepository.eliminarUsuario() para un usuario suelto,
 -- más el borrado de auth.users que ese método no hace.
 --
+-- Aparte del CASCADE, "TClienteSolicitudes" es la única tabla que NO cuelga en
+-- cascada de "TSistemaUsuarios" (su FK "IdSistemaUsuarioCliente" es ON DELETE
+-- SET NULL a propósito, para que la solicitud sobreviva como histórico si se
+-- borra el usuario resultante) — aquí se borran TODAS sin más (aprobadas o
+-- todavía pendientes sin usuario vinculado), ya que el objetivo de este script
+-- es vaciar datos de prueba, no dejar solicitudes sueltas colgando.
+--
 -- PASO 1 (hazlo antes, como consulta aparte): revisa quién se va a borrar.
 --
 --   SELECT "IdSistemaUsuario", "Email", "Nombre"
@@ -47,6 +54,11 @@ WHERE NOT EXISTS (
 
 DELETE FROM "TSistemaUsuariosRoles"
 WHERE "IdSistemaUsuario" IN (SELECT "IdSistemaUsuario" FROM _usuarios_a_borrar);
+
+-- No cuelga de "TSistemaUsuarios" vía CASCADE (ver nota de arriba): hay que borrarla aparte.
+-- Todas, no solo las vinculadas a un usuario: las pendientes sin aprobar tampoco tienen
+-- "IdSistemaUsuarioCliente" y también son datos de prueba a limpiar.
+DELETE FROM "TClienteSolicitudes";
 
 DELETE FROM "TSistemaUsuarios"
 WHERE "IdSistemaUsuario" IN (SELECT "IdSistemaUsuario" FROM _usuarios_a_borrar);

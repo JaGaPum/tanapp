@@ -117,9 +117,42 @@ class _SolicitudClienteFormScreenState
         const SizedBox(height: 8),
         Text(context.l10n.solicitudEnviadaMensaje, textAlign: TextAlign.center),
         const SizedBox(height: 24),
+        Card(
+          color: Theme.of(
+            context,
+          ).colorScheme.secondary.withValues(alpha: 0.08),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.l10n.solicitudEnviadaProcesoTitulo,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                const SizedBox(height: 12),
+                _PasoProceso(
+                  numero: 1,
+                  texto: context.l10n.solicitudEnviadaPaso1,
+                ),
+                const SizedBox(height: 8),
+                _PasoProceso(
+                  numero: 2,
+                  texto: context.l10n.solicitudEnviadaPaso2,
+                ),
+                const SizedBox(height: 8),
+                _PasoProceso(
+                  numero: 3,
+                  texto: context.l10n.solicitudEnviadaPaso3,
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
         AppButton(
           label: context.l10n.volverAlInicio,
-          onPressed: () => context.go('/login'),
+          onPressed: () => context.go('/bienvenida'),
         ),
       ],
     );
@@ -216,6 +249,36 @@ class _SolicitudClienteFormScreenState
           ),
         ],
       ),
+    );
+  }
+}
+
+class _PasoProceso extends StatelessWidget {
+  final int numero;
+  final String texto;
+
+  const _PasoProceso({required this.numero, required this.texto});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CircleAvatar(
+          radius: 12,
+          backgroundColor: Theme.of(context).colorScheme.secondary,
+          child: Text(
+            '$numero',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSecondary,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(child: Text(texto)),
+      ],
     );
   }
 }

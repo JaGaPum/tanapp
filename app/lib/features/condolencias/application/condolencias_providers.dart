@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/pagination/paginated_notifier.dart';
+import '../../publicaciones/application/publicaciones_providers.dart';
+import '../../publicaciones/data/publicaciones_por_mes.dart';
 import '../data/condolencia.dart';
 import '../data/condolencias_repository.dart';
 
@@ -37,4 +39,15 @@ final condolenciasVistaPreviaProvider = FutureProvider.autoDispose
       return ref
           .watch(condolenciasRepositoryProvider)
           .listTodasCondolencias(idClientePublicacion);
+    });
+
+/// Condolencias por mes en las publicaciones propias del cliente, para el Panel de Datos
+/// (dentro de "Publicaciones", junto a "publicaciones por mes").
+final condolenciasPorMesProvider =
+    FutureProvider.autoDispose<List<PublicacionesPorMes>>((ref) async {
+      final publicaciones = await ref.watch(misPublicacionesProvider.future);
+      final ids = publicaciones.map((p) => p.idClientePublicacion).toList();
+      return ref
+          .watch(condolenciasRepositoryProvider)
+          .listCondolenciasPorMes(ids);
     });

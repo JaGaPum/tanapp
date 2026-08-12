@@ -10,6 +10,8 @@ import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/error_banner.dart';
 import '../../../../core/widgets/otp_input_field.dart';
+import '../../../sesiones/application/sesion_policy_service.dart';
+import '../../../sistema_usuarios/data/usuarios_repository.dart';
 import '../../data/auth_repository.dart';
 
 enum OtpPurpose { signup, recovery }
@@ -101,10 +103,33 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
         );
         if (mounted) context.go('/login');
       } else {
+        // Se registra la sesión aquí mismo (en vez de dejar que el router reaccione al evento
+        // "passwordRecovery" que dispara "verifyRecoveryOtp") por la misma razón que el login
+        // por contraseña (ver login_screen.dart): navegar a "/reset-password" justo después
+        // puede ganarle la carrera al router antes de que se entere del evento, y entonces lo
+        // trata como un arranque en frío sin sesión previa registrada y la cierra, dejando
+        // "Auth session missing!" al intentar guardar la contraseña nueva.
+        final usuariosRepo = ref.read(usuariosRepositoryProvider);
+        final sesionPolicy = ref.read(sesionPolicyServiceProvider);
+        final cuentaDesactivadaMensaje = context.l10n.cuentaDesactivada;
+        ref.read(sesionBootstrapGuardProvider).completado = true;
         await repo.verifyRecoveryOtp(
           email: widget.email,
           token: _otpController.text,
         );
+        final user = repo.currentUser;
+        if (user != null) {
+          final perfil = await usuariosRepo.fetchPerfilByAuthId(user.id);
+          if (perfil == null || !perfil.activo) {
+            await repo.signOut();
+            throw AppException(cuentaDesactivadaMensaje);
+          }
+          await sesionPolicy.registrarLoginExplicito(
+            idSistemaUsuario: perfil.idSistemaUsuario,
+            recordar: true,
+            roles: perfil.roles,
+          );
+        }
         if (mounted) context.go('/reset-password');
       }
     } catch (e) {

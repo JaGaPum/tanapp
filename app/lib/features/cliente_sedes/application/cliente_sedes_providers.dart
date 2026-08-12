@@ -20,3 +20,10 @@ final sedesDeUsuarioProvider = FutureProvider.autoDispose
           .watch(clienteSedesRepositoryProvider)
           .listSedesDeUsuario(idSistemaUsuario);
     });
+
+/// True si el cliente tiene alguna sede sin "NombreConfirmado" (ver "ClienteSede"): se usa para
+/// bloquear publicar esquelas y enviar avisos hasta que la revise o cambie desde "Mis sedes".
+final tieneSedeSinRenombrarProvider = Provider.autoDispose<bool>((ref) {
+  final sedes = ref.watch(misSedesProvider).value ?? const [];
+  return sedes.any((s) => !s.nombreConfirmado);
+});

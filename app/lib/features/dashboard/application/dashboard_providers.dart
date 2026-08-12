@@ -23,6 +23,7 @@ final clientesStatsProvider = FutureProvider.autoDispose<ClientesStats>((
     totalSedes: stats.totalSedes,
     totalPublicaciones: stats.totalPublicaciones,
     totalAvisos: stats.totalAvisos,
+    totalCondolencias: stats.totalCondolencias,
     porTipo:
         stats.porTipo
             .map((e) => MapEntry(nombrePorId[e.key] ?? e.key, e.value))

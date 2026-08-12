@@ -11,10 +11,12 @@ class TerminosRepository {
       'IdSistemaTermino, Tipo, '
       'TSistemaTerminosIdiomas(Titulo, Cuerpo, TSistemaIdiomas(Codigo))';
 
+  // Cualquier usuario autenticado (particular o CLIENTE) puede dejar condolencias, así que
+  // también necesita aceptar TERMINOS_USO -no solo quien publica esquelas- (051): la única
+  // exención sigue siendo ADMIN.
   List<String> _tiposRequeridos(List<String> roles) {
     if (roles.contains('ADMIN')) return const [];
-    if (roles.contains('CLIENTE')) return const ['TERMINOS_USO', 'PRIVACIDAD'];
-    return const ['PRIVACIDAD'];
+    return const ['TERMINOS_USO', 'PRIVACIDAD'];
   }
 
   Future<List<Termino>> _fetchActivos(
