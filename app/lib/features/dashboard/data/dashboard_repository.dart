@@ -53,6 +53,20 @@ class DashboardRepository {
     });
   }
 
+  Future<List<DateTime>> _fetchBajasPorRol(String rolCodigo) async {
+    final data = await _client
+        .from('TSistemaBajas')
+        .select('FechaAlta')
+        .eq('Rol', rolCodigo);
+    return (data as List)
+        .map(
+          (e) => DateTime.parse(
+            (e as Map<String, dynamic>)['FechaAlta'] as String,
+          ),
+        )
+        .toList();
+  }
+
   Future<ClientesStats> fetchClientesStats() async {
     final clientes = await _listUsuariosPorRol('CLIENTE');
     final activos = clientes.where((c) => c['Activo'] == true).length;
@@ -105,6 +119,8 @@ class DashboardRepository {
     final topClientes = porClienteConteo.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 
+    final bajas = await _fetchBajasPorRol('CLIENTE');
+
     return ClientesStats(
       totalActivos: activos,
       totalInactivos: clientes.length - activos,
@@ -127,6 +143,11 @@ class DashboardRepository {
             .toList(),
         6,
       ),
+      altasPorMes: _agruparPorMes(
+        clientes.map((c) => DateTime.parse(c['FechaAlta'] as String)).toList(),
+        6,
+      ),
+      bajasPorMes: _agruparPorMes(bajas, 6),
       topClientesPorPublicaciones: topClientes.take(5).toList(),
     );
   }
@@ -163,10 +184,17 @@ class DashboardRepository {
     final topConcellos = porConcelloConteo.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 
+    final bajas = await _fetchBajasPorRol('USUARIO_ORDINARIO');
+
     return UsuariosStats(
       totalActivos: activos,
       totalInactivos: usuarios.length - activos,
       totalConNotificacionesPush: conPush,
+      altasPorMes: _agruparPorMes(
+        usuarios.map((u) => DateTime.parse(u['FechaAlta'] as String)).toList(),
+        6,
+      ),
+      bajasPorMes: _agruparPorMes(bajas, 6),
       totalSeguimientos: seguimientosCount.count,
       totalZonasSeguidas: zonasCount.count,
       // Igual que porTipo en ClientesStats: aquí se agrupa por id de idioma, el provider lo

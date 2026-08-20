@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/pagination/paginated_notifier.dart';
 import '../../cliente_sedes/application/cliente_sedes_providers.dart';
 import '../data/aviso_estadistica.dart';
+import '../data/aviso_programado.dart';
 import '../data/aviso_recibido.dart';
 import '../data/avisos_repository.dart';
 import '../data/cliente_aviso.dart';
@@ -45,6 +46,15 @@ final misAvisosRecibidosProvider =
 final avisosNoLeidosCountProvider = FutureProvider.autoDispose<int>((ref) {
   return ref.watch(avisosRepositoryProvider).contarAvisosNoLeidos();
 });
+
+/// Avisos programados (055) de todas mis sedes, pendientes de que llegue su fecha.
+final misAvisosProgramadosProvider =
+    FutureProvider.autoDispose<List<AvisoProgramado>>((ref) async {
+      final sedes = await ref.watch(misSedesProvider.future);
+      return ref
+          .watch(avisosRepositoryProvider)
+          .listAvisosProgramados(sedes.map((s) => s.idClienteSede).toList());
+    });
 
 /// Estadísticas de los últimos avisos enviados (recibidos/leídos), para la gráfica del Panel
 /// de Datos del cliente.

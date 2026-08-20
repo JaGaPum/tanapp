@@ -22,6 +22,7 @@ import '../../../auth/application/auth_providers.dart';
 import '../../../sesiones/application/sesiones_providers.dart';
 import '../../../suplantacion/application/suplantacion_providers.dart';
 import '../../../terminos/application/terminos_providers.dart';
+import '../../../terminos/data/termino_aceptacion_detalle.dart';
 import '../../application/usuarios_providers.dart';
 import '../../data/catalogos_repository.dart';
 import '../../data/usuario_perfil.dart';
@@ -36,6 +37,104 @@ String _formatFecha(DateTime dt) {
   String dosDigitos(int n) => n.toString().padLeft(2, '0');
   return '${dosDigitos(local.day)}/${dosDigitos(local.month)}/${local.year} '
       '${dosDigitos(local.hour)}:${dosDigitos(local.minute)}';
+}
+
+/// Snapshot de lo que aceptó (060): puede no coincidir ya con el documento actual si el admin
+/// lo ha editado después.
+void _mostrarTextoAceptado(
+  BuildContext context,
+  TerminoAceptacionDetalle detalle,
+) {
+  showDialog<void>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(detalle.tituloAceptado ?? detalle.tituloActual),
+      content: SizedBox(
+        width: 480,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (detalle.idiomaAceptado != null) ...[
+                Text(
+                  detalle.idiomaAceptado!,
+                  style: Theme.of(context).textTheme.labelMedium,
+                ),
+                const SizedBox(height: 8),
+              ],
+              Text(detalle.cuerpoAceptado ?? ''),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(context.l10n.avisosCerrar),
+        ),
+      ],
+    ),
+  );
+}
+
+/// Envuelve una DataTable ancha con una pista visible de que hay más columnas deslizando hacia
+/// la derecha (icono + texto) y una barra de scroll siempre visible: sin esto no se intuía que
+/// hubiera más datos fuera de la pantalla.
+class _TablaDeslizable extends StatefulWidget {
+  final Widget child;
+  const _TablaDeslizable({required this.child});
+
+  @override
+  State<_TablaDeslizable> createState() => _TablaDeslizableState();
+}
+
+class _TablaDeslizableState extends State<_TablaDeslizable> {
+  final _controller = ScrollController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.swap_horiz,
+                size: 16,
+                color: Theme.of(context).colorScheme.outline,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                context.l10n.deslizaParaVerMas,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Scrollbar(
+          controller: _controller,
+          thumbVisibility: true,
+          child: SingleChildScrollView(
+            controller: _controller,
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.only(bottom: 10),
+            child: widget.child,
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class UsuarioDetailScreen extends ConsumerWidget {
@@ -81,6 +180,7 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
   late bool _activo;
   bool _loading = false;
   bool _mostrarSesiones = false;
+  bool _mostrarTerminos = false;
   String? _error;
 
   @override
@@ -577,6 +677,100 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                         ),
                   ],
                 ),
+                TextButton.icon(
+                  icon: Icon(
+                    _mostrarTerminos ? Icons.expand_less : Icons.expand_more,
+                  ),
+                  label: Text(
+                    _mostrarTerminos
+                        ? context.l10n.ocultarDetalle
+                        : context.l10n.verDetalle,
+                  ),
+                  onPressed: () =>
+                      setState(() => _mostrarTerminos = !_mostrarTerminos),
+                ),
+                if (_mostrarTerminos)
+                  ref
+                      .watch(
+                        terminosDetalleDeUsuarioProvider(
+                          widget.perfil.idSistemaUsuario,
+                        ),
+                      )
+                      .when(
+                        data: (detalle) => detalle.isEmpty
+                            ? const SizedBox.shrink()
+                            : _TablaDeslizable(
+                                child: DataTable(
+                                  columns: [
+                                    DataColumn(
+                                      label: Text(
+                                        context.l10n.terminosColDocumento,
+                                      ),
+                                    ),
+                                    DataColumn(
+                                      label: Text(context.l10n.sesionColEstado),
+                                    ),
+                                    DataColumn(
+                                      label: Text(
+                                        context.l10n.terminosColFecha,
+                                      ),
+                                    ),
+                                    DataColumn(label: Text('')),
+                                  ],
+                                  rows: detalle
+                                      .map(
+                                        (t) => DataRow(
+                                          cells: [
+                                            DataCell(Text(t.tituloActual)),
+                                            DataCell(
+                                              Text(
+                                                t.aceptado
+                                                    ? context
+                                                          .l10n
+                                                          .usuarioTerminosAceptados
+                                                    : context
+                                                          .l10n
+                                                          .usuarioTerminosPendientes,
+                                              ),
+                                            ),
+                                            DataCell(
+                                              Text(
+                                                t.fechaAceptacion != null
+                                                    ? _formatFecha(
+                                                        t.fechaAceptacion!,
+                                                      )
+                                                    : '—',
+                                              ),
+                                            ),
+                                            DataCell(
+                                              t.tieneTextoAceptado
+                                                  ? TextButton(
+                                                      onPressed: () =>
+                                                          _mostrarTextoAceptado(
+                                                            context,
+                                                            t,
+                                                          ),
+                                                      child: Text(
+                                                        context
+                                                            .l10n
+                                                            .terminosVerTexto,
+                                                      ),
+                                                    )
+                                                  : const SizedBox.shrink(),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                      .toList(),
+                                ),
+                              ),
+                        loading: () => const Padding(
+                          padding: EdgeInsets.only(top: 8),
+                          child: LinearProgressIndicator(),
+                        ),
+                        error: (e, _) =>
+                            Text(context.l10n.errorGenerico(e.toString())),
+                      ),
               ],
               const SizedBox(height: 32),
               Row(
@@ -769,8 +963,7 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                               padding: const EdgeInsets.only(top: 8),
                               child: Text(context.l10n.sinSesionesRegistradas),
                             )
-                          : SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
+                          : _TablaDeslizable(
                               child: DataTable(
                                 columns: [
                                   DataColumn(
@@ -784,6 +977,11 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                                   ),
                                   DataColumn(
                                     label: Text(context.l10n.sesionColRecordar),
+                                  ),
+                                  DataColumn(
+                                    label: Text(
+                                      context.l10n.sesionColDispositivo,
+                                    ),
                                   ),
                                 ],
                                 rows: sesiones
@@ -817,6 +1015,9 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                                                   ? context.l10n.si
                                                   : context.l10n.no,
                                             ),
+                                          ),
+                                          DataCell(
+                                            Text(sesion.dispositivo ?? '—'),
                                           ),
                                         ],
                                       ),

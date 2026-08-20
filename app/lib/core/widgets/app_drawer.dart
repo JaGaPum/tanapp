@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/application/auth_providers.dart';
-import '../../features/auth/data/auth_repository.dart';
+import '../../features/sesiones/application/sesion_policy_service.dart';
 import '../l10n/l10n_extensions.dart';
 import '../theme/app_theme.dart';
 import '../utils/email_launcher.dart';
@@ -40,7 +40,7 @@ class AppDrawer extends ConsumerWidget {
       confirmLabel: context.l10n.drawerCerrarSesion,
     );
     if (!confirmado) return;
-    await ref.read(authRepositoryProvider).signOut();
+    await ref.read(sesionPolicyServiceProvider).cerrarSesionActual();
   }
 
   @override

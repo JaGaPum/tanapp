@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../auth/data/auth_repository.dart';
 import '../../cliente_sedes/data/cliente_sedes_repository.dart';
 import '../../sistema_usuarios/data/usuarios_repository.dart';
+import '../data/device_info_helper.dart';
 import '../data/device_sesion_store.dart';
 import '../data/sesiones_repository.dart';
 
@@ -11,11 +12,13 @@ import '../data/sesiones_repository.dart';
 /// - Sesión abierta con Recordar=true: se reanuda sin pedir credenciales, sin límite de tiempo.
 /// - Sesión abierta con Recordar=false, o sin sesión abierta: se fuerza login en cada arranque.
 ///
-/// Un mismo usuario puede tener varias sesiones abiertas a la vez (un cliente con varias sedes
-/// puede trabajar desde varios sitios): ya no se cierran las demás al iniciar sesión. Lo que sí
-/// hace falta es saber qué fila de "TSistemaSesiones" es la de ESTE dispositivo en concreto
-/// (ver [DeviceSesionStore]), y si el usuario es CLIENTE con una única sede, asignársela sola
-/// sin preguntar (con varias sedes, quien pregunta es la pantalla "elegir sede" del router).
+/// Un mismo usuario puede tener varias sesiones abiertas a la vez en dispositivos distintos (un
+/// cliente con varias sedes puede trabajar desde varios sitios). Lo que NO puede pasar es que un
+/// mismo dispositivo tenga más de una sesión "ABIERTA" a la vez (ver 057 y
+/// [DeviceSesionStore.leerOCrearIdDispositivo]): antes de dar por buena una sesión (nueva o
+/// reutilizada) se cierran todas las demás que sigan abiertas de ese mismo dispositivo, sea cual
+/// sea el usuario al que pertenezcan. Si el usuario es CLIENTE con una única sede, se le asigna
+/// sola sin preguntar (con varias sedes, quien pregunta es la pantalla "elegir sede" del router).
 class SesionPolicyService {
   final SesionesRepository _sesionesRepo;
   final UsuariosRepository _usuariosRepo;
@@ -64,6 +67,15 @@ class SesionPolicyService {
     if (abierta.recordar) {
       await _sesionesRepo.tocarSesion(abierta.idSistemaSesion);
       await _deviceSesionStore.guardar(abierta.idSistemaSesion);
+      final idDispositivo = await _deviceSesionStore.leerOCrearIdDispositivo();
+      await _sesionesRepo.vincularDispositivo(
+        abierta.idSistemaSesion,
+        idDispositivo,
+      );
+      await _sesionesRepo.cerrarOtrasSesionesDelDispositivo(
+        idDispositivo: idDispositivo,
+        excluirIdSistemaSesion: abierta.idSistemaSesion,
+      );
       if (abierta.idClienteSede == null) {
         await _autoAsignarSedeUnica(
           idSistemaUsuario: perfil.idSistemaUsuario,
@@ -75,8 +87,23 @@ class SesionPolicyService {
     }
 
     await _sesionesRepo.cerrarSesion(abierta.idSistemaSesion);
+    await _deviceSesionStore.borrar();
     await _authRepo.signOut();
     return true;
+  }
+
+  /// Cierra por completo la sesión de ESTE dispositivo: la fila de "TSistemaSesiones" (si la
+  /// hay), el puntero local en [DeviceSesionStore] y la sesión de Supabase Auth. Antes de esto,
+  /// "Cerrar sesión" solo cerraba la sesión de Auth y dejaba la fila de TSistemaSesiones
+  /// "ABIERTA" para siempre (se veían sesiones "Abertas"/"En curso" en el panel de admin que en
+  /// realidad ya nadie estaba usando).
+  Future<void> cerrarSesionActual() async {
+    final idLocal = await _deviceSesionStore.leer();
+    if (idLocal != null) {
+      await _sesionesRepo.cerrarSesion(idLocal);
+      await _deviceSesionStore.borrar();
+    }
+    await _authRepo.signOut();
   }
 
   Future<void> registrarLoginExplicito({
@@ -84,6 +111,8 @@ class SesionPolicyService {
     required bool recordar,
     required List<String> roles,
   }) async {
+    final idDispositivo = await _deviceSesionStore.leerOCrearIdDispositivo();
+
     // Si este dispositivo ya tiene una sesión abierta de este mismo usuario (p. ej. quien
     // vuelve a meter sus credenciales sin haber cerrado sesión antes, como al probar el login
     // varias veces seguidas), se reutiliza esa fila en vez de crear otra: sin esto, cada login
@@ -107,10 +136,20 @@ class SesionPolicyService {
       final nueva = await _sesionesRepo.crearSesion(
         idSistemaUsuario: idSistemaUsuario,
         recordar: recordar,
+        idDispositivo: idDispositivo,
+        dispositivo: await obtenerDescripcionDispositivo(),
       );
       await _deviceSesionStore.guardar(nueva.idSistemaSesion);
       idSistemaSesion = nueva.idSistemaSesion;
     }
+    // Vincula el dispositivo (backfill si la fila reutilizada es de antes de 057) y cierra
+    // cualquier otra sesión que siga abierta de este mismo dispositivo, sea de este usuario o de
+    // otro: así solo puede quedar una sesión "ABIERTA" por dispositivo.
+    await _sesionesRepo.vincularDispositivo(idSistemaSesion, idDispositivo);
+    await _sesionesRepo.cerrarOtrasSesionesDelDispositivo(
+      idDispositivo: idDispositivo,
+      excluirIdSistemaSesion: idSistemaSesion,
+    );
     await _autoAsignarSedeUnica(
       idSistemaUsuario: idSistemaUsuario,
       idSistemaSesion: idSistemaSesion,

@@ -1,3 +1,5 @@
+import '../../acto_tipos/data/acto_tipo.dart';
+
 /// Una publicación (esquela) con los datos de la sede y del cliente que la firma, para
 /// mostrarla en el Taboleiro, en "Seguindo" o en el panel de datos del propio cliente.
 class PublicacionConSede {
@@ -20,6 +22,16 @@ class PublicacionConSede {
   final String provincia;
   final int numCondolencias;
 
+  /// 'ESQUELA' (por defecto) o 'ACTO' (misa u otro acto de recuerdo, no ligado a un fallecimiento
+  /// recién ocurrido — ver 064).
+  final String tipo;
+  final String? idConfiguracionActoTipo;
+
+  /// Solo cuando el cliente ha elegido "Otro" en vez de un tipo del catálogo.
+  final String? actoTipoOtro;
+
+  bool get esActo => tipo == 'ACTO';
+
   const PublicacionConSede({
     required this.idClientePublicacion,
     required this.idClienteSede,
@@ -39,6 +51,9 @@ class PublicacionConSede {
     required this.concello,
     required this.provincia,
     required this.numCondolencias,
+    this.tipo = 'ESQUELA',
+    this.idConfiguracionActoTipo,
+    this.actoTipoOtro,
   });
 
   factory PublicacionConSede.fromMap(Map<String, dynamic> map) {
@@ -71,6 +86,9 @@ class PublicacionConSede {
       concello: sede['Concello'] as String,
       provincia: sede['Provincia'] as String,
       numCondolencias: map['numCondolencias'] as int? ?? 0,
+      tipo: map['Tipo'] as String? ?? 'ESQUELA',
+      idConfiguracionActoTipo: map['IdConfiguracionActoTipo'] as String?,
+      actoTipoOtro: map['ActoTipoOtro'] as String?,
     );
   }
 
@@ -104,6 +122,27 @@ class PublicacionConSede {
       concello: map['Concello'] as String,
       provincia: map['Provincia'] as String,
       numCondolencias: map['NumCondolencias'] as int? ?? 0,
+      tipo: map['Tipo'] as String? ?? 'ESQUELA',
+      idConfiguracionActoTipo: map['IdConfiguracionActoTipo'] as String?,
+      actoTipoOtro: map['ActoTipoOtro'] as String?,
     );
   }
+}
+
+/// Nombre del tipo de acto de [publicacion] (del catálogo, o el texto libre de "Otro"), o null si
+/// no es un acto o todavía no se ha resuelto. Se usa tanto en la tarjeta (para el chip) como en
+/// el detalle (para la fila con el tipo), a partir del mismo catálogo ya cargado en memoria
+/// (ver [actoTiposListProvider]).
+String? nombreActoTipoDe(
+  PublicacionConSede publicacion,
+  List<ActoTipo> actoTipos,
+) {
+  if (!publicacion.esActo) return null;
+  if (publicacion.actoTipoOtro != null) return publicacion.actoTipoOtro;
+  return actoTipos
+      .where(
+        (t) => t.idConfiguracionActoTipo == publicacion.idConfiguracionActoTipo,
+      )
+      .map((t) => t.nombre)
+      .firstOrNull;
 }

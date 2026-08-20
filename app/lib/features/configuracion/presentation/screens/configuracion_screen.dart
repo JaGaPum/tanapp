@@ -47,10 +47,28 @@ class ConfiguracionScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Card(
             child: ListTile(
+              leading: const Icon(Icons.church_outlined),
+              title: Text(context.l10n.tiposActo),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/admin/configuracion/tipos-acto'),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Card(
+            child: ListTile(
               leading: const Icon(Icons.smart_toy_outlined),
               title: Text(context.l10n.configuracionIa),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => context.push('/admin/configuracion/ia'),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.gavel_outlined),
+              title: Text(context.l10n.usuarioTerminosTitulo),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/admin/configuracion/terminos'),
             ),
           ),
         ],

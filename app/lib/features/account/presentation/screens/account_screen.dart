@@ -9,11 +9,14 @@ import '../../../../core/utils/app_exception.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/error_banner.dart';
 import '../../../../core/widgets/password_field.dart';
+import '../../../../core/widgets/password_requirements.dart';
 import '../../../../core/widgets/provincia_concello_fields.dart';
 import '../../../auth/application/auth_providers.dart';
 import '../../../auth/data/auth_repository.dart';
+import '../../../sesiones/application/sesion_policy_service.dart';
 import '../../../suplantacion/application/suplantacion_providers.dart';
 import '../../../sistema_usuarios/data/catalogos_repository.dart';
 import '../../../sistema_usuarios/data/usuario_perfil.dart';
@@ -77,7 +80,32 @@ class _AccountBody extends StatelessWidget {
               const SizedBox(height: 16),
               _DatosPersonalesForm(perfil: perfil),
               const SizedBox(height: 40),
-              const _CambiarPasswordSection(),
+              _CambiarPasswordSection(
+                esCliente: perfil.roles.contains('CLIENTE'),
+              ),
+              if (perfil.roles.contains('CLIENTE')) ...[
+                const SizedBox(height: 40),
+                Text(
+                  context.l10n.accountCuentaPersonalTitulo,
+                  style: _sectionTitleStyle(context),
+                ),
+                const SizedBox(height: 16),
+                const _CuentaPersonalSection(),
+              ],
+              if (!perfil.roles.contains('ADMIN')) ...[
+                const SizedBox(height: 40),
+                Text(
+                  context.l10n.accountDarseDeBajaTitulo,
+                  style: _sectionTitleStyle(context),
+                ),
+                const SizedBox(height: 16),
+                _DarseDeBajaSection(
+                  idSistemaUsuario: perfil.idSistemaUsuario,
+                  rol: perfil.roles.contains('CLIENTE')
+                      ? 'CLIENTE'
+                      : 'USUARIO_ORDINARIO',
+                ),
+              ],
             ],
           ),
         ),
@@ -416,7 +444,8 @@ class _DatosPersonalesFormState extends ConsumerState<_DatosPersonalesForm> {
 }
 
 class _CambiarPasswordSection extends StatefulWidget {
-  const _CambiarPasswordSection();
+  final bool esCliente;
+  const _CambiarPasswordSection({required this.esCliente});
 
   @override
   State<_CambiarPasswordSection> createState() =>
@@ -439,6 +468,7 @@ class _CambiarPasswordSectionState extends State<_CambiarPasswordSection> {
           )
         else
           _CambiarPasswordForm(
+            esCliente: widget.esCliente,
             onCompletado: () => setState(() => _expandido = false),
           ),
       ],
@@ -447,8 +477,12 @@ class _CambiarPasswordSectionState extends State<_CambiarPasswordSection> {
 }
 
 class _CambiarPasswordForm extends ConsumerStatefulWidget {
+  final bool esCliente;
   final VoidCallback onCompletado;
-  const _CambiarPasswordForm({required this.onCompletado});
+  const _CambiarPasswordForm({
+    required this.esCliente,
+    required this.onCompletado,
+  });
 
   @override
   ConsumerState<_CambiarPasswordForm> createState() =>
@@ -574,7 +608,11 @@ class _CambiarPasswordFormState extends ConsumerState<_CambiarPasswordForm> {
             controller: _passwordController,
             focusNode: estaSuplantando ? _passwordFocusNode : null,
             label: context.l10n.resetPasswordNuevaContrasena,
-            validator: Validators.password(context),
+            validator: Validators.password(context, estricta: widget.esCliente),
+          ),
+          PasswordRequirements(
+            controller: _passwordController,
+            estricta: widget.esCliente,
           ),
           const SizedBox(height: 16),
           PasswordField(
@@ -593,6 +631,146 @@ class _CambiarPasswordFormState extends ConsumerState<_CambiarPasswordForm> {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Un CLIENTE puede tener también su propia cuenta personal USUARIO_ORDINARIO (063), separada de
+/// la de negocio, para seguir clientes/zonas y dejar condolencias con la misma libertad que
+/// cualquier otro usuario. Se crea sola la primera vez que se pulsa "Entrar" y luego se reutiliza
+/// siempre la misma. No se muestra si ya hay una sesión secundaria activa (evita anidar
+/// suplantación/cuenta propia, que rompería el "volver").
+class _CuentaPersonalSection extends ConsumerStatefulWidget {
+  const _CuentaPersonalSection();
+
+  @override
+  ConsumerState<_CuentaPersonalSection> createState() =>
+      _CuentaPersonalSectionState();
+}
+
+class _CuentaPersonalSectionState
+    extends ConsumerState<_CuentaPersonalSection> {
+  bool _loading = false;
+  String? _error;
+
+  Future<void> _entrar() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      await ref
+          .read(sesionAdminGuardadaProvider.notifier)
+          .entrarComoCuentaPropia();
+      if (mounted) context.go('/home');
+    } catch (e) {
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.errorInesperado,
+      );
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (ref.watch(sesionAdminGuardadaProvider) != null) {
+      return const SizedBox.shrink();
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (_error != null) ErrorBanner(message: _error!),
+        Text(
+          context.l10n.accountCuentaPersonalAyuda,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 12),
+        OutlinedButton.icon(
+          icon: const Icon(Icons.switch_account_outlined),
+          label: Text(context.l10n.accountCuentaPersonalEntrar),
+          onPressed: _loading ? null : _entrar,
+        ),
+      ],
+    );
+  }
+}
+
+/// CLIENTE y USUARIO_ORDINARIO pueden darse de baja ellos mismos (ADMIN no ve esta sección):
+/// desactiva la cuenta, avisa al admin (Database Webhook sobre "TSistemaBajas", 058) y cierra
+/// la sesión. No hay reactivación en autoservicio; solo el admin puede reactivar una cuenta.
+class _DarseDeBajaSection extends ConsumerStatefulWidget {
+  final String idSistemaUsuario;
+  final String rol;
+  const _DarseDeBajaSection({
+    required this.idSistemaUsuario,
+    required this.rol,
+  });
+
+  @override
+  ConsumerState<_DarseDeBajaSection> createState() =>
+      _DarseDeBajaSectionState();
+}
+
+class _DarseDeBajaSectionState extends ConsumerState<_DarseDeBajaSection> {
+  bool _loading = false;
+  String? _error;
+
+  Future<void> _darseDeBaja() async {
+    final confirmado = await showConfirmDialog(
+      context,
+      title: context.l10n.accountDarseDeBajaTitulo,
+      message: context.l10n.accountDarseDeBajaMensaje,
+      confirmLabel: context.l10n.accountDarseDeBajaTitulo,
+    );
+    if (!confirmado) return;
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      await ref
+          .read(usuariosRepositoryProvider)
+          .registrarBaja(
+            idSistemaUsuario: widget.idSistemaUsuario,
+            rol: widget.rol,
+          );
+      await ref.read(sesionPolicyServiceProvider).cerrarSesionActual();
+      if (mounted) context.go('/login');
+    } catch (e) {
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.errorInesperado,
+      );
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (_error != null) ErrorBanner(message: _error!),
+        Text(
+          context.l10n.accountDarseDeBajaAyuda,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 12),
+        OutlinedButton.icon(
+          icon: const Icon(Icons.no_accounts_outlined),
+          label: Text(context.l10n.accountDarseDeBajaTitulo),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: Theme.of(context).colorScheme.error,
+            side: BorderSide(color: Theme.of(context).colorScheme.error),
+          ),
+          onPressed: _loading ? null : _darseDeBaja,
+        ),
+      ],
     );
   }
 }

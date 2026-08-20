@@ -176,6 +176,26 @@ class _ClientesTab extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             _SeccionCard(
+              titulo: context.l10n.dashboardAltasPorMes,
+              icon: Icons.show_chart,
+              color: _DashColors.verde,
+              child: _ConteoPorMesChart(
+                datos: stats.altasPorMes,
+                color: _DashColors.verde,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _SeccionCard(
+              titulo: context.l10n.dashboardBajasPorMes,
+              icon: Icons.show_chart,
+              color: _DashColors.rojo,
+              child: _ConteoPorMesChart(
+                datos: stats.bajasPorMes,
+                color: _DashColors.rojo,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _SeccionCard(
               titulo: context.l10n.dashboardTopClientes,
               icon: Icons.emoji_events_outlined,
               color: _DashColors.amarillo,
@@ -273,6 +293,26 @@ class _UsuariosTab extends ConsumerWidget {
                           ),
                       ],
                     ),
+            ),
+            const SizedBox(height: 16),
+            _SeccionCard(
+              titulo: context.l10n.dashboardAltasPorMes,
+              icon: Icons.show_chart,
+              color: _DashColors.verde,
+              child: _ConteoPorMesChart(
+                datos: stats.altasPorMes,
+                color: _DashColors.verde,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _SeccionCard(
+              titulo: context.l10n.dashboardBajasPorMes,
+              icon: Icons.show_chart,
+              color: _DashColors.rojo,
+              child: _ConteoPorMesChart(
+                datos: stats.bajasPorMes,
+                color: _DashColors.rojo,
+              ),
             ),
             const SizedBox(height: 16),
             _SeccionCard(

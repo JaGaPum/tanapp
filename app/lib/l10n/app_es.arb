@@ -13,6 +13,11 @@
   "validatorEmailInvalid": "Introduce un email válido",
   "validatorPasswordRequired": "La contraseña es obligatoria",
   "validatorPasswordTooShort": "Debe tener al menos 8 caracteres",
+  "validatorPasswordTooShortEstricta": "Debe tener al menos {minimo} caracteres",
+  "@validatorPasswordTooShortEstricta": {
+    "placeholders": { "minimo": { "type": "int" } }
+  },
+  "validatorPasswordSinLetraYNumero": "Debe combinar letras y números",
   "validatorPasswordMismatch": "Las contraseñas no coinciden",
   "validatorOtpLength": "Introduce el código de 6 dígitos",
   "validatorOtpDigitsOnly": "El código solo contiene números",
@@ -23,6 +28,11 @@
   "confirmDialogCancel": "Cancelar",
 
   "passwordFieldLabel": "Contraseña",
+  "passwordRequisitoLongitud": "Mínimo {minimo} caracteres",
+  "@passwordRequisitoLongitud": {
+    "placeholders": { "minimo": { "type": "int" } }
+  },
+  "passwordRequisitoLetraNumero": "Combina letras y números",
   "fieldNombre": "Nombre",
   "fieldPrimerApellido": "Primer apellido",
   "fieldSegundoApellidoOpcional": "Segundo apellido (opcional)",
@@ -75,7 +85,7 @@
   "loginIniciarSesion": "Iniciar sesión",
   "loginNoTienesCuenta": "¿No tienes cuenta?",
   "loginRegistrate": "Regístrate",
-  "loginEresFunerariaPregunta": "¿Eres una funeraria, tanatorio o parroquia y todavía no tienes cuenta?",
+  "loginEresFunerariaPregunta": "¿Eres una funeraria o tanatorio y todavía no tienes cuenta?",
   "loginSolicitarAlta": "Solicitar alta",
 
   "registerTitle": "Crear cuenta",
@@ -129,6 +139,12 @@
   "accountActualizarContrasena": "Actualizar contraseña",
   "accountGuardarCambios": "Guardar cambios",
   "accountNotificacionesPush": "Deseo recibir notificaciones de las publicaciones en mi móvil.",
+  "accountDarseDeBajaTitulo": "Darse de baja",
+  "accountDarseDeBajaAyuda": "Al darte de baja tu cuenta se desactiva y se cierra tu sesión. Solo un administrador puede reactivarla.",
+  "accountDarseDeBajaMensaje": "¿Seguro que quieres darte de baja? Tu cuenta se desactivará y se cerrará tu sesión.",
+  "accountCuentaPersonalTitulo": "Tu cuenta personal",
+  "accountCuentaPersonalAyuda": "Como cliente también puedes tener tu propia cuenta personal, separada de la de tu negocio, para seguir clientes y zonas y dejar condolencias como cualquier otro usuario.",
+  "accountCuentaPersonalEntrar": "Entrar en tu cuenta personal",
 
   "terminosTitulo": "Antes de continuar",
   "terminosHeAceptado": "He leído y acepto: {titulo}",
@@ -183,6 +199,8 @@
     "placeholders": { "nombre": { "type": "String" } }
   },
   "suplantacionVolver": "Volver a mi cuenta",
+  "cuentaPropiaBannerTexto": "Estás en tu cuenta personal de seguidor",
+  "cuentaPropiaVolver": "Volver a mi cuenta de cliente",
   "usuarioIdiomaPreferido": "Idioma preferido",
   "errorCargarIdiomas": "No se pudieron cargar los idiomas: {error}",
   "@errorCargarIdiomas": {
@@ -202,6 +220,21 @@
   "usuarioTerminosTitulo": "Términos y condiciones",
   "usuarioTerminosAceptados": "Aceptados",
   "usuarioTerminosPendientes": "Pendientes",
+  "terminosTipoUso": "Términos de uso",
+  "terminosTipoPrivacidad": "Política de privacidad",
+  "terminosCampoTitulo": "Título",
+  "terminosCampoCuerpo": "Contenido",
+  "terminosContenidoGuardadoEnIdioma": "Contenido en {idioma} guardado",
+  "@terminosContenidoGuardadoEnIdioma": {
+    "placeholders": { "idioma": { "type": "String" } }
+  },
+  "terminosColDocumento": "Documento",
+  "terminosColFecha": "Fecha",
+  "terminosVerTexto": "Ver texto",
+  "terminosRolCliente": "Cliente",
+  "terminosRolUsuarioOrdinario": "Usuario ordinario",
+  "verDetalle": "Ver detalle",
+  "ocultarDetalle": "Ocultar detalle",
   "marcarComoValidado": "Marcar como validado",
   "validado": "Validado",
   "roles": "Roles",
@@ -214,6 +247,8 @@
   "sesionColFin": "Fin",
   "sesionColEstado": "Estado",
   "sesionColRecordar": "Recordar",
+  "sesionColDispositivo": "Dispositivo",
+  "deslizaParaVerMas": "Desliza para ver más",
   "sesionEnCurso": "En curso",
   "sesionAbierta": "Abierta",
   "sesionCerrada": "Cerrada",
@@ -246,7 +281,7 @@
   "solicitudEnviadaPaso2": "Cuando se apruebe, te llegará un correo con tu código de acceso.",
   "solicitudEnviadaPaso3": "Abre la app, en la pantalla de inicio de sesión pulsa \"¿Ya tienes un código?\", introduce tu email y el código para fijar tu contraseña y entrar.",
   "volverAlInicio": "Volver al inicio",
-  "solicitudIntro": "Solicita el alta de tu funeraria, tanatorio o parroquia en TanApp. Un administrador revisará tu solicitud antes de darte acceso.",
+  "solicitudIntro": "Solicita el alta de tu funeraria o tanatorio en TanApp. Un administrador revisará tu solicitud antes de darte acceso.",
   "fieldRazonSocial": "Razón social",
   "fieldNifCif": "NIF / CIF",
   "fieldNombreContacto": "Nombre de la persona de contacto",
@@ -287,6 +322,18 @@
 
   "tiposCliente": "Tipos de Clientes",
   "configuracionTiposClienteTitulo": "Configuración > Tipos de Clientes",
+
+  "tiposActo": "Tipos de acto",
+  "configuracionTiposActoTitulo": "Configuración > Tipos de acto",
+  "noHayTiposActoDadosDeAlta": "No hay tipos de acto dados de alta",
+  "actoTipoNuevo": "Nuevo tipo de acto",
+  "actoTipoEditar": "Editar tipo de acto",
+  "actoTipoActivo": "Activo",
+  "actoTipoEliminarTitulo": "Eliminar tipo de acto",
+  "actoTipoEliminarMensaje": "¿Eliminar \"{nombre}\"?",
+  "@actoTipoEliminarMensaje": {
+    "placeholders": { "nombre": { "type": "String" } }
+  },
 
   "configuracionIa": "Configuración IA",
   "configuracionIaTitulo": "Configuración > IA",
@@ -399,7 +446,7 @@
   "seguidos": "Buscar",
   "avisos": "Avisos",
 
-  "avisosNuevo": "Nuevo aviso",
+  "avisosNuevo": "Aviso",
   "avisosFormTitulo": "Nuevo aviso",
   "avisosTituloLabel": "Título",
   "avisosTextoLabel": "Texto",
@@ -428,22 +475,31 @@
     "placeholders": { "count": { "type": "int" } }
   },
   "avisosCancelarSeleccion": "Cancelar",
+  "avisosEditarProgramado": "Editar aviso programado",
+  "avisosProgramadosTitulo": "Programados",
+  "avisosCancelarProgramadoTitulo": "Cancelar aviso programado",
+  "avisosCancelarProgramadoMensaje": "¿Seguro que quieres cancelar el aviso programado \"{titulo}\"? No se enviará.",
+  "@avisosCancelarProgramadoMensaje": {
+    "placeholders": { "titulo": { "type": "String" } }
+  },
 
   "seguidosSeleccionaTipo": "Elige a quién seguir",
   "seguidosSeleccionaProvincia": "Elige la provincia",
   "seguidosSeleccionaConcello": "Elige el concello",
   "seguidosBuscarConcello": "Buscar concello",
-  "seguidosNoHayActivosNesteConcello": "{tipoNombre, select, Tanatorio{Todavía no hay ningún tanatorio activo en este concello} Funeraria{Todavía no hay ninguna funeraria activa en este concello} Parroquia{Todavía no hay ninguna parroquia activa en este concello} other{Todavía no hay ningún cliente activo en este concello}}",
+  "seguidosNoHayActivosNesteConcello": "{tipoNombre, select, Tanatorio{Todavía no hay ningún tanatorio activo en este concello} Funeraria{Todavía no hay ninguna funeraria activa en este concello} other{Todavía no hay ningún cliente activo en este concello}}",
   "@seguidosNoHayActivosNesteConcello": {
     "placeholders": { "tipoNombre": { "type": "String" } }
   },
   "seguidosSeguir": "Seguir",
   "seguidosDejarDeSeguir": "Dejar de seguir",
+  "seguidosSilenciar": "Desactivar notificaciones",
+  "seguidosActivarAvisos": "Activar notificaciones",
   "seguidosSiguiendoEtiqueta": "Siguiendo",
   "seguidosNoSiguiendoEtiqueta": "No sigues",
   "siguiendoTab": "Siguiendo",
   "misSeguidosBuscarNombre": "Buscar por nombre",
-  "misSeguidosVacio": "Todavía no sigues a ningún cliente",
+  "misSeguidosVacio": "Todavía no sigues a ningún cliente. Usa \"Seguir un cliente nuevo\" para buscar funerarias y tanatorios.",
   "misSeguidosTabClientes": "Clientes",
   "misSeguidosTabZonas": "Zonas",
   "misSeguidosSeguirNuevo": "Seguir un cliente nuevo",
@@ -453,7 +509,7 @@
   "zonaSeguir": "Seguir",
   "zonaDejarDeSeguir": "Dejar de seguir",
   "zonaSeguirNueva": "Seguir una zona nueva",
-  "misZonasVacio": "Todavía no sigues ninguna zona",
+  "misZonasVacio": "Todavía no sigues ninguna zona. Usa \"Seguir una zona nueva\" para recibir avisos de todo un concello.",
 
   "drawerMisSedes": "Mis sedes/tanatorios",
   "drawerContactarSoporte": "Contactar con soporte",
@@ -476,6 +532,7 @@
   "tabPanelDatos": "Panel de Datos",
 
   "publicarEscanear": "Escanear",
+  "publicarEscanearAyuda": "¿Tienes la esquela en papel o en una foto? Escanéala y te rellenamos el formulario.",
   "publicarManual": "Manual",
   "publicarDeceso": "Deceso",
   "publicarImportarWeb": "Importación automática",
@@ -502,6 +559,18 @@
   },
   "importacionWebReconfigurar": "Configurar importación automática",
   "publicarNuevaPublicacion": "Nueva publicación",
+  "publicarMisa": "Misa/Acto",
+  "publicarNuevoActo": "Nueva/o Misa/Acto",
+  "publicarEditarActo": "Editar Misa/Acto",
+  "publicarEnMemoriaDe": "En memoria de",
+  "publicarTipoActo": "Tipo de acto",
+  "publicarTipoActoOtroOpcion": "Otro",
+  "publicarTipoActoOtro": "Especifica el tipo de acto",
+  "publicarFechaActo": "Fecha del acto",
+  "publicarHoraActo": "Hora del acto",
+  "publicarActoLabel": "Acto",
+  "publicarMisaLabel": "Misa",
+  "publicarIglesiaLocalizacion": "Iglesia/Localización",
   "publicarSeleccionaSede": "Selecciona la sede/tanatorio",
   "publicarSinSedes": "Todavía no tienes ninguna sede/tanatorio. Da de alta una en \"Miñas sedes\" antes de publicar.",
   "sedeSinRenombrarAviso": "Antes de publicar esquelas o enviar avisos, revisa (o cambia) el nombre de tu sede desde \"Mis sedes\". Es el nombre que aparecerá en las notificaciones, avisos y esquelas que envíes.",
@@ -524,9 +593,13 @@
   "publicarPararEscoita": "Detener lectura",
   "publicarCompartirEsquela": "Compartir por WhatsApp",
   "publicarCompartidoPor": "Publicado por",
+  "publicarPublicadoPorSede": "Publicado por: {nombreCliente} ({nombreSede})",
+  "@publicarPublicadoPorSede": {
+    "placeholders": { "nombreCliente": { "type": "String" }, "nombreSede": { "type": "String" } }
+  },
   "publicarDescargaApp": "Descarga TanApp:",
   "publicarCondolencias": "Enviar condolencias",
-  "publicarVerCondolencias": "Ver condolencias",
+  "publicarVerCondolencias": "Administrar condolencias",
   "condolenciasCantidad": "{n, plural, one{1 condolencia} other{{n} condolencias}}",
   "@condolenciasCantidad": {
     "placeholders": { "n": { "type": "int" } }
@@ -566,6 +639,14 @@
   "@publicarFuneralVoz": {
     "placeholders": { "fecha": { "type": "String" }, "hora": { "type": "String" } }
   },
+  "publicarMisaVoz": "La misa será el {fecha} a las {hora}",
+  "@publicarMisaVoz": {
+    "placeholders": { "fecha": { "type": "String" }, "hora": { "type": "String" } }
+  },
+  "publicarActoVoz": "El acto será el {fecha} a las {hora}",
+  "@publicarActoVoz": {
+    "placeholders": { "fecha": { "type": "String" }, "hora": { "type": "String" } }
+  },
   "tablonAumentarLetra": "Aumentar tamaño de letra",
   "tablonDisminuirLetra": "Disminuir tamaño de letra",
   "publicarEdadInvalida": "Introduce un número entero válido",
@@ -592,6 +673,26 @@
   "publicarEliminarTitulo": "Eliminar publicación",
   "publicarEliminarMensaje": "¿Seguro que quieres eliminar la publicación de {nombre}?",
   "@publicarEliminarMensaje": {
+    "placeholders": { "nombre": { "type": "String" } }
+  },
+  "publicarProgramarTitulo": "Programar para más tarde",
+  "publicarProgramarAyuda": "En vez de publicarse ahora, se publicará sola en la fecha y hora que elijas.",
+  "publicarProgramarFecha": "Fecha de publicación",
+  "publicarProgramarHora": "Hora de publicación",
+  "publicarProgramarEnElPasado": "La fecha y hora programadas tienen que ser posteriores a ahora.",
+  "publicarProgramar": "Programar",
+  "publicarProgramadaOk": "Publicación programada",
+  "publicarProgramacionActualizada": "Programación actualizada",
+  "publicarEditarProgramada": "Editar publicación programada",
+  "publicarProgramadasTitulo": "Programadas",
+  "publicarPublicadasTitulo": "Publicadas",
+  "publicarProgramadaPara": "Programada para el {fecha} a las {hora}",
+  "@publicarProgramadaPara": {
+    "placeholders": { "fecha": { "type": "String" }, "hora": { "type": "String" } }
+  },
+  "publicarCancelarProgramadaTitulo": "Cancelar publicación programada",
+  "publicarCancelarProgramadaMensaje": "¿Seguro que quieres cancelar la publicación programada de {nombre}? No se publicará.",
+  "@publicarCancelarProgramadaMensaje": {
     "placeholders": { "nombre": { "type": "String" } }
   },
 
@@ -665,6 +766,8 @@
   "dashboardClientesPorTipo": "Clientes por tipo",
   "dashboardPublicacionesPorMes": "Publicaciones por mes",
   "dashboardAvisosPorMes": "Avisos por mes",
+  "dashboardAltasPorMes": "Altas por mes",
+  "dashboardBajasPorMes": "Bajas por mes",
   "dashboardTopClientes": "Clientes con más publicaciones",
   "dashboardUsuariosActivos": "Usuarios activos",
   "dashboardUsuariosInactivos": "Usuarios inactivos",

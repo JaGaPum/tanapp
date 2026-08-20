@@ -116,6 +116,25 @@ class UsuariosRepository {
         .eq('IdSistemaUsuario', idSistemaUsuario);
   }
 
+  /// Baja en autoservicio (CLIENTE o USUARIO_ORDINARIO se dan de baja desde su propia cuenta,
+  /// ver AccountScreen): deja constancia en "TSistemaBajas" (058, dispara el aviso push al
+  /// admin y alimenta el gráfico "Altas y bajas" del dashboard) y desactiva la cuenta. Se
+  /// registra el log ANTES de desactivar para no acabar con una cuenta desactivada sin rastro
+  /// si algo falla a mitad de camino.
+  Future<void> registrarBaja({
+    required String idSistemaUsuario,
+    required String rol,
+  }) async {
+    await _client.from('TSistemaBajas').insert({
+      'IdSistemaUsuario': idSistemaUsuario,
+      'Rol': rol,
+    });
+    await _client
+        .from('TSistemaUsuarios')
+        .update({'Activo': false})
+        .eq('IdSistemaUsuario', idSistemaUsuario);
+  }
+
   Future<String> subirFoto({
     required String idSistemaUsuario,
     required String authId,

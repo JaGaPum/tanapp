@@ -61,10 +61,11 @@ class SeguidosRepository {
         .order('FechaAlta', ascending: false)
         .range(offset, offset + limit - 1);
     return (data as List)
+        .map((e) => e as Map<String, dynamic>)
         .map(
           (e) => ClienteSeguible.fromSedeMap(
-            (e as Map<String, dynamic>)['TClienteSedes']
-                as Map<String, dynamic>,
+            e['TClienteSedes'] as Map<String, dynamic>,
+            silenciado: e['Silenciado'] as bool? ?? false,
           ),
         )
         .toList();
@@ -108,6 +109,20 @@ class SeguidosRepository {
     await _client
         .from('TClienteSeguimientos')
         .delete()
+        .eq('IdSistemaUsuario', idSistemaUsuario)
+        .eq('IdClienteSede', idClienteSede);
+  }
+
+  /// Silenciar (059): sigue viendo al cliente en "Seguindo" y su histórico, pero deja de
+  /// recibir el aviso/push de cada publicación o aviso manual suyo.
+  Future<void> actualizarSilenciado({
+    required String idSistemaUsuario,
+    required String idClienteSede,
+    required bool silenciado,
+  }) async {
+    await _client
+        .from('TClienteSeguimientos')
+        .update({'Silenciado': silenciado})
         .eq('IdSistemaUsuario', idSistemaUsuario)
         .eq('IdClienteSede', idClienteSede);
   }

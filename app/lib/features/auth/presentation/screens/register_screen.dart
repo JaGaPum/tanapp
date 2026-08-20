@@ -10,6 +10,7 @@ import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/error_banner.dart';
 import '../../../../core/widgets/google_sign_in_button.dart';
 import '../../../../core/widgets/password_field.dart';
+import '../../../../core/widgets/password_requirements.dart';
 import '../../../../core/widgets/provincia_concello_fields.dart';
 import '../../data/auth_repository.dart';
 
@@ -163,6 +164,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       controller: _passwordController,
                       validator: Validators.password(context),
                     ),
+                    PasswordRequirements(controller: _passwordController),
                     const SizedBox(height: 16),
                     PasswordField(
                       controller: _confirmController,

@@ -1,18 +1,18 @@
 <!doctype html>
-<html lang="es">
+<html lang="gl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TanApp para funerarias, tanatorios y parroquias</title>
+    <title>TanApp para funerarias e tanatorios</title>
     <meta
       name="description"
-      content="TanApp es la app para que funerarias, tanatorios y parroquias de Galicia publiquen esquelas en minutos y lleguen directamente a quien las sigue."
+      content="TanApp é a app para que funerarias e tanatorios de Galicia publiquen esquelas en segundos e cheguen directamente a quen as segue."
     />
     <link rel="icon" href="assets/logo.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500&family=Playfair+Display:wght@700;900&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
@@ -25,11 +25,14 @@
           <span>TanApp</span>
         </a>
         <nav class="site-nav">
-          <a href="#ventajas">Ventajas</a>
-          <a href="#como-funciona">Cómo funciona</a>
-          <a href="#planes">Planes</a>
-          <a href="#contacto">Contacto</a>
-          <a class="btn btn-primary" href="#cta">Solicitar alta</a>
+          <a href="#ventajas" data-i18n="nav_ventajas">Vantaxes</a>
+          <a href="#como-funciona" data-i18n="nav_como">Como funciona</a>
+          <a href="#planes" data-i18n="nav_planes">Plans</a>
+          <a href="#contacto" data-i18n="nav_contacto">Contacto</a>
+          <div class="lang-switch">
+            <button type="button" class="lang-btn" data-lang="gl">GL</button>
+            <button type="button" class="lang-btn" data-lang="es">ES</button>
+          </div>
         </nav>
       </div>
     </header>
@@ -37,19 +40,27 @@
     <main id="top">
       <section class="hero">
         <div class="container">
-          <span class="eyebrow"
-            >Para funerarias · tanatorios · parroquias</span
+          <span class="eyebrow" data-i18n="hero_eyebrow"
+            >Funerarias e Tanatorios</span
           >
-          <h1>Publica esquelas en minutos. Llega directo a quien las espera.</h1>
-          <p class="lead">
-            TanApp sustituye las llamadas, los carteles y la espera al
-            periódico: publicas desde el móvil y quien sigue tu funeraria se
-            entera al instante.
+          <h1 data-i18n="hero_h1">Publica esquelas e avisos en segundos.</h1>
+          <p class="hero-sub" data-i18n="hero_sub">
+            Información directa para quen espera.
+          </p>
+          <p class="lead" data-i18n="hero_lead">
+            TanApp substitúe as chamadas, os carteis e o xornal: publicas
+            dende o móbil e quen segue a túa funeraria ou zona entérase ao
+            instante.
           </p>
           <div class="hero-actions">
-            <a class="btn btn-primary" href="#cta">Solicitar alta</a>
-            <a class="btn btn-secondary" href="#como-funciona"
-              >Ver cómo funciona</a
+            <a class="btn btn-primary" href="#cta" data-i18n="btn_alta"
+              >Solicitar a alta</a
+            >
+            <a
+              class="btn btn-secondary"
+              href="#como-funciona"
+              data-i18n="btn_como"
+              >Ver como funciona</a
             >
           </div>
         </div>
@@ -58,13 +69,47 @@
       <section id="ventajas">
         <div class="container">
           <div class="section-head">
-            <h2>Por qué trabajar con TanApp</h2>
-            <p>
-              Todo lo que hoy resuelves con llamadas, carteles y avisos
-              sueltos, en un solo sitio.
+            <h2 data-i18n="ventajas_h2">Por que traballar con TanApp</h2>
+            <p data-i18n="ventajas_p">
+              Todo o que hoxe resolves con chamadas, carteis e avisos soltos,
+              nun só sitio.
             </p>
           </div>
           <div class="benefit-grid">
+            <div class="benefit-card featured">
+              <svg
+                class="badge-star"
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M12 2.5l2.9 6.1 6.6.8-4.9 4.5 1.3 6.6-5.9-3.3-5.9 3.3 1.3-6.6-4.9-4.5 6.6-.8Z"
+                />
+              </svg>
+              <div class="icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <path d="M3 8h18M8 3v5" />
+                  <path d="M7.5 14.5l2 2 4-4.5" />
+                </svg>
+              </div>
+              <h3 data-i18n="benefit1_h3">Publica unha esquela en segundos</h3>
+              <p data-i18n="benefit1_p">
+                Escanea unha esquela xa redactada (en papel ou desde a túa
+                web) e deixa que a IA cubra os datos por ti: nome, datas,
+                igrexa, tanatorio... Revisas e publicas, sen teclear todo a
+                man.
+              </p>
+            </div>
             <div class="benefit-card">
               <div class="icon">
                 <svg
@@ -81,10 +126,10 @@
                   <path d="M10 20a2 2 0 0 0 4 0" />
                 </svg>
               </div>
-              <h3>Avisos al instante</h3>
-              <p>
-                En cuanto publicas, quien te sigue recibe la notificación en
-                el móvil. Sin esperar a nadie.
+              <h3 data-i18n="benefit2_h3">Avisos ao instante</h3>
+              <p data-i18n="benefit2_p">
+                En canto publicas, quen te segue recibe a notificación no
+                móbil. Sen esperar a ninguén.
               </p>
             </div>
             <div class="benefit-card">
@@ -97,15 +142,17 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
-                  <rect x="4" y="3" width="12" height="18" rx="2" />
-                  <path d="M9 3v18" />
-                  <path d="M15 8h5M15 12h5M15 16h3" />
+                  <path d="M12 21s7-7.5 7-12a7 7 0 0 0-14 0c0 4.5 7 12 7 12Z" />
+                  <circle cx="12" cy="9" r="2.5" />
                 </svg>
               </div>
-              <h3>Publicación en minutos</h3>
-              <p>
-                Un formulario simple desde el móvil: nombre, datos del
-                funeral y listo. Sin llamadas ni intermediarios.
+              <h3 data-i18n="benefit3_h3">
+                Chega a quen te segue, por zona ou directamente
+              </h3>
+              <p data-i18n="benefit3_p">
+                Alguén pode seguir a túa funeraria en concreto, ou todo un
+                concello ou zona: das dúas formas, a túa publicación
+                chégalle igual.
               </p>
             </div>
             <div class="benefit-card">
@@ -118,15 +165,15 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
-                  <rect x="3" y="3" width="18" height="18" rx="2" />
-                  <path d="M3 8h18M8 3v5" />
-                  <path d="M7.5 14.5l2 2 4-4.5" />
+                  <path d="M4 5h16v11H8l-4 4V5Z" />
+                  <path d="M8.5 10.5l2 2 4-4.5" />
                 </svg>
               </div>
-              <h3>Importación con IA</h3>
-              <p>
-                Escanea una esquela ya redactada o impórtala de tu web: la IA
-                rellena los datos por ti.
+              <h3 data-i18n="benefit4_h3">Xestión de condolencias</h3>
+              <p data-i18n="benefit4_p">
+                Revisa as condolencias que recibe cada esquela e modera as
+                que non procedan, directamente desde a app. Tamén podes
+                descargalas para entregarllas á familia.
               </p>
             </div>
             <div class="benefit-card">
@@ -144,10 +191,10 @@
                   <path d="M4 19h16" />
                 </svg>
               </div>
-              <h3>Varias sedes, una cuenta</h3>
-              <p>
-                Gestiona todos tus tanatorios o sedes desde una única cuenta,
-                sin duplicar trabajo.
+              <h3 data-i18n="benefit5_h3">Varias sedes, unha conta</h3>
+              <p data-i18n="benefit5_p">
+                Xestiona todos os teus tanatorios ou sedes desde unha única
+                conta, sen duplicar traballo.
               </p>
             </div>
             <div class="benefit-card">
@@ -160,15 +207,14 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
-                  <path d="M4 6v11a17 17 0 0 0 16 0V6" />
-                  <path d="M4 6l8-3 8 3" />
-                  <path d="M8 11l3 3 5-5" />
+                  <rect x="5" y="11" width="14" height="9" rx="2" />
+                  <path d="M8 11V7a4 4 0 0 1 8 0v4" />
                 </svg>
               </div>
-              <h3>Alta verificada</h3>
-              <p>
-                Cada cuenta de negocio se revisa antes de activarse: tu
-                marca queda asociada a información de fiar.
+              <h3 data-i18n="benefit6_h3">Cumpre coa protección de datos</h3>
+              <p data-i18n="benefit6_p">
+                Tratamos os datos conforme ao RGPD: só se publica o
+                necesario, e cada usuario controla a súa propia información.
               </p>
             </div>
             <div class="benefit-card">
@@ -185,10 +231,32 @@
                   <path d="M9 19v-5h3v5M15 19v-8h2v8" />
                 </svg>
               </div>
-              <h3>Panel de estadísticas</h3>
-              <p>
-                Consulta cuánta gente sigue tu negocio y cómo se mueven tus
-                publicaciones.
+              <h3 data-i18n="benefit7_h3">Panel de datos</h3>
+              <p data-i18n="benefit7_p">
+                Consulta cantas publicacións fixeches, cantas persoas te
+                seguen e cantas condolencias recibes, mes a mes.
+              </p>
+            </div>
+            <div class="benefit-card">
+              <div class="icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"
+                  />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </div>
+              <h3 data-i18n="benefit8_h3">Visibilidade para o teu negocio</h3>
+              <p data-i18n="benefit8_p">
+                Quen te busca atópate: contacta contigo, ubícate no mapa e
+                consulta o teu arquivo de esquelas publicadas.
               </p>
             </div>
           </div>
@@ -198,8 +266,8 @@
       <section id="como-funciona" class="alt">
         <div class="container">
           <div class="section-head">
-            <h2>Cómo funciona</h2>
-            <p>De la esquela a la notificación, en tres pasos.</p>
+            <h2 data-i18n="como_h2">Como funciona</h2>
+            <p data-i18n="como_p">Da esquela á notificación, en tres pasos.</p>
           </div>
           <div class="steps-visual">
             <div class="step-visual">
@@ -210,19 +278,19 @@
                   width="180"
                   height="380"
                   rx="28"
-                  fill="#ffffff"
-                  stroke="#1a1420"
+                  fill="#1c1922"
+                  stroke="rgba(255,255,255,0.4)"
                   stroke-width="3"
                 />
-                <rect x="28" y="34" width="144" height="14" rx="3" fill="#1a1420" />
+                <rect x="28" y="34" width="144" height="14" rx="3" fill="#ffffff" />
                 <rect
                   x="28"
                   y="66"
                   width="144"
                   height="16"
                   rx="4"
-                  fill="#f5f4f6"
-                  stroke="#e2dfe3"
+                  fill="rgba(255,255,255,0.06)"
+                  stroke="rgba(255,255,255,0.18)"
                 />
                 <rect
                   x="28"
@@ -230,8 +298,8 @@
                   width="144"
                   height="16"
                   rx="4"
-                  fill="#f5f4f6"
-                  stroke="#e2dfe3"
+                  fill="rgba(255,255,255,0.06)"
+                  stroke="rgba(255,255,255,0.18)"
                 />
                 <rect
                   x="28"
@@ -239,8 +307,8 @@
                   width="90"
                   height="16"
                   rx="4"
-                  fill="#f5f4f6"
-                  stroke="#e2dfe3"
+                  fill="rgba(255,255,255,0.06)"
+                  stroke="rgba(255,255,255,0.18)"
                 />
                 <rect
                   x="28"
@@ -248,8 +316,8 @@
                   width="144"
                   height="60"
                   rx="6"
-                  fill="#f5f4f6"
-                  stroke="#e2dfe3"
+                  fill="rgba(255,255,255,0.06)"
+                  stroke="rgba(255,255,255,0.18)"
                 />
                 <rect
                   x="28"
@@ -257,14 +325,14 @@
                   width="144"
                   height="32"
                   rx="16"
-                  fill="#1a1420"
+                  fill="#ffffff"
                 />
               </svg>
               <span class="step-number">1</span>
-              <h3>Publicas la esquela</h3>
-              <p>
-                Rellenas los datos del funeral (o los importas con IA) desde
-                el móvil.
+              <h3 data-i18n="step1_h3">Publicas a esquela</h3>
+              <p data-i18n="step1_p">
+                Cobres os datos do funeral (ou impórtaos con IA) desde o
+                móbil.
               </p>
             </div>
             <div class="step-visual">
@@ -275,28 +343,28 @@
                   width="180"
                   height="380"
                   rx="28"
-                  fill="#ffffff"
-                  stroke="#1a1420"
+                  fill="#1c1922"
+                  stroke="rgba(255,255,255,0.4)"
                   stroke-width="3"
                 />
-                <rect x="28" y="34" width="100" height="14" rx="3" fill="#1a1420" />
+                <rect x="28" y="34" width="100" height="14" rx="3" fill="#ffffff" />
                 <rect
                   x="24"
                   y="66"
                   width="152"
                   height="52"
                   rx="10"
-                  fill="#1a1420"
+                  fill="#ffffff"
                 />
-                <circle cx="46" cy="92" r="9" fill="#ffffff" />
-                <rect x="64" y="82" width="96" height="8" rx="2" fill="#ffffff" />
+                <circle cx="46" cy="92" r="9" fill="#0f0d12" />
+                <rect x="64" y="82" width="96" height="8" rx="2" fill="#0f0d12" />
                 <rect
                   x="64"
                   y="96"
                   width="70"
                   height="7"
                   rx="2"
-                  fill="#9a94a0"
+                  fill="#6b6470"
                 />
                 <rect
                   x="28"
@@ -304,8 +372,8 @@
                   width="144"
                   height="16"
                   rx="4"
-                  fill="#f5f4f6"
-                  stroke="#e2dfe3"
+                  fill="rgba(255,255,255,0.06)"
+                  stroke="rgba(255,255,255,0.18)"
                 />
                 <rect
                   x="28"
@@ -313,8 +381,8 @@
                   width="144"
                   height="16"
                   rx="4"
-                  fill="#f5f4f6"
-                  stroke="#e2dfe3"
+                  fill="rgba(255,255,255,0.06)"
+                  stroke="rgba(255,255,255,0.18)"
                 />
                 <rect
                   x="28"
@@ -322,15 +390,15 @@
                   width="100"
                   height="16"
                   rx="4"
-                  fill="#f5f4f6"
-                  stroke="#e2dfe3"
+                  fill="rgba(255,255,255,0.06)"
+                  stroke="rgba(255,255,255,0.18)"
                 />
               </svg>
               <span class="step-number">2</span>
-              <h3>Avisamos a quien te sigue</h3>
-              <p>
-                Cada seguidor de tu funeraria recibe la notificación al
-                momento, sin que tengas que hacer nada más.
+              <h3 data-i18n="step2_h3">Avisamos a quen te segue</h3>
+              <p data-i18n="step2_p">
+                Cada seguidor da túa funeraria recibe a notificación ao
+                momento, sen que teñas que facer nada máis.
               </p>
             </div>
             <div class="step-visual">
@@ -341,32 +409,32 @@
                   width="180"
                   height="380"
                   rx="28"
-                  fill="#ffffff"
-                  stroke="#1a1420"
+                  fill="#1c1922"
+                  stroke="rgba(255,255,255,0.4)"
                   stroke-width="3"
                 />
-                <rect x="28" y="34" width="120" height="14" rx="3" fill="#1a1420" />
+                <rect x="28" y="34" width="120" height="14" rx="3" fill="#ffffff" />
                 <rect
                   x="28"
                   y="70"
                   width="144"
                   height="140"
                   rx="8"
-                  fill="#f5f4f6"
-                  stroke="#e2dfe3"
+                  fill="rgba(255,255,255,0.06)"
+                  stroke="rgba(255,255,255,0.18)"
                 />
-                <rect x="44" y="160" width="18" height="34" fill="#1a1420" />
-                <rect x="72" y="130" width="18" height="64" fill="#1a1420" />
-                <rect x="100" y="110" width="18" height="84" fill="#1a1420" />
-                <rect x="128" y="140" width="18" height="54" fill="#1a1420" />
+                <rect x="44" y="160" width="18" height="34" fill="#ffffff" />
+                <rect x="72" y="130" width="18" height="64" fill="#ffffff" />
+                <rect x="100" y="110" width="18" height="84" fill="#ffffff" />
+                <rect x="128" y="140" width="18" height="54" fill="#ffffff" />
                 <rect
                   x="28"
                   y="228"
                   width="90"
                   height="16"
                   rx="4"
-                  fill="#f5f4f6"
-                  stroke="#e2dfe3"
+                  fill="rgba(255,255,255,0.06)"
+                  stroke="rgba(255,255,255,0.18)"
                 />
                 <rect
                   x="28"
@@ -374,15 +442,15 @@
                   width="144"
                   height="16"
                   rx="4"
-                  fill="#f5f4f6"
-                  stroke="#e2dfe3"
+                  fill="rgba(255,255,255,0.06)"
+                  stroke="rgba(255,255,255,0.18)"
                 />
               </svg>
               <span class="step-number">3</span>
-              <h3>Consultas el panel</h3>
-              <p>
-                Sigues cuánta gente te sigue y cómo funcionan tus
-                publicaciones, todo desde tu cuenta.
+              <h3 data-i18n="step3_h3">Consultas o panel</h3>
+              <p data-i18n="step3_p">
+                Segues cantas persoas te seguen e como funcionan as túas
+                publicacións, todo desde a túa conta.
               </p>
             </div>
           </div>
@@ -392,53 +460,74 @@
       <section id="planes">
         <div class="container">
           <div class="section-head">
-            <h2>Planes</h2>
-            <p>Pensados para negocios de un solo tanatorio o de varios.</p>
+            <h2 data-i18n="planes_h2">Plans</h2>
+            <p data-i18n="planes_p">
+              Pensados para negocios dun só tanatorio ou de varios.
+            </p>
           </div>
-          <p class="plans-note">
-            Los planes todavía se están terminando de definir — estos son
-            orientativos. Escríbenos y te damos precio y condiciones
-            concretas para tu funeraria o tanatorio.
+          <p class="plans-note" data-i18n="planes_note">
+            Os plans aínda se están rematando de definir — estes son
+            orientativos. Escríbenos e dámosche prezo e condicións concretas
+            para a túa funeraria ou tanatorio.
           </p>
           <div class="plan-grid">
             <div class="plan-card">
-              <h3>Sede única</h3>
+              <h3 data-i18n="plan1_h3">Sede única</h3>
               <div class="plan-price">
-                A consultar<small>por tanatorio</small>
+                <span data-i18n="plan_price">A consultar</span
+                ><small data-i18n="plan1_price_small">por tanatorio</small>
               </div>
               <ul>
-                <li>Publicaciones ilimitadas</li>
-                <li>Avisos automáticos a tus seguidores</li>
-                <li>Importación de esquelas con IA</li>
-                <li>Alta verificada</li>
+                <li data-i18n="plan1_li1">Publicacións ilimitadas</li>
+                <li data-i18n="plan1_li2">
+                  Avisos automáticos aos teus seguidores
+                </li>
+                <li data-i18n="plan1_li3">Importación de esquelas con IA</li>
+                <li data-i18n="plan1_li4">Alta verificada</li>
               </ul>
-              <a class="btn btn-secondary" href="#cta">Hablemos</a>
+              <a class="btn btn-secondary" href="#cta" data-i18n="plan_btn"
+                >Falemos</a
+              >
             </div>
             <div class="plan-card featured">
-              <span class="plan-badge">Más habitual</span>
-              <h3>Varias sedes</h3>
+              <span class="plan-badge" data-i18n="plan2_badge"
+                >Máis habitual</span
+              >
+              <h3 data-i18n="plan2_h3">Varias sedes</h3>
               <div class="plan-price">
-                A consultar<small>por grupo</small>
+                <span data-i18n="plan_price">A consultar</span
+                ><small data-i18n="plan2_price_small">por grupo</small>
               </div>
               <ul>
-                <li>Todo lo de "Sede única"</li>
-                <li>Varios tanatorios en una sola cuenta</li>
-                <li>Panel de estadísticas por sede</li>
-                <li>Soporte prioritario</li>
+                <li data-i18n="plan2_li1">Todo o de "Sede única"</li>
+                <li data-i18n="plan2_li2">
+                  Varios tanatorios nunha soa conta
+                </li>
+                <li data-i18n="plan2_li3">Panel de estatísticas por sede</li>
+                <li data-i18n="plan2_li4">Soporte prioritario</li>
               </ul>
-              <a class="btn btn-primary" href="#cta">Hablemos</a>
+              <a class="btn btn-primary" href="#cta" data-i18n="plan_btn"
+                >Falemos</a
+              >
             </div>
             <div class="plan-card">
-              <h3>A medida</h3>
+              <h3 data-i18n="plan3_h3">A medida</h3>
               <div class="plan-price">
-                A consultar<small>grupos grandes</small>
+                <span data-i18n="plan_price">A consultar</span
+                ><small data-i18n="plan3_price_small">grupos grandes</small>
               </div>
               <ul>
-                <li>Todo lo de "Varias sedes"</li>
-                <li>Integración con tu web o sistema actual</li>
-                <li>Condiciones adaptadas a tu volumen</li>
+                <li data-i18n="plan3_li1">Todo o de "Varias sedes"</li>
+                <li data-i18n="plan3_li2">
+                  Integración coa túa web ou sistema actual
+                </li>
+                <li data-i18n="plan3_li3">
+                  Condicións adaptadas ao teu volume
+                </li>
               </ul>
-              <a class="btn btn-secondary" href="#cta">Hablemos</a>
+              <a class="btn btn-secondary" href="#cta" data-i18n="plan_btn"
+                >Falemos</a
+              >
             </div>
           </div>
         </div>
@@ -447,15 +536,16 @@
       <section id="cta" class="alt">
         <div class="container">
           <div class="cta-box">
-            <h2>¿Damos de alta tu funeraria o tanatorio?</h2>
-            <p>
-              Escríbenos y te contamos cómo empezar. La solicitud de alta se
-              puede hacer también desde la propia app.
+            <h2 data-i18n="cta_h2">Damos de alta a túa funeraria ou tanatorio?</h2>
+            <p data-i18n="cta_p">
+              Escríbenos e contámosche como empezar. A solicitude de alta
+              pódese facer tamén desde a propia app.
             </p>
             <a
               class="btn btn-primary"
               href="mailto:info@tanapp.es?subject=Alta%20como%20funeraria%20en%20TanApp"
-              >Solicitar alta</a
+              data-i18n="btn_alta"
+              >Solicitar a alta</a
             >
           </div>
         </div>
@@ -464,8 +554,10 @@
       <section id="contacto">
         <div class="container">
           <div class="section-head">
-            <h2>Contacto</h2>
-            <p>¿Dudas o algo que preguntar antes de darte de alta?</p>
+            <h2 data-i18n="contacto_h2">Contacto</h2>
+            <p data-i18n="contacto_p">
+              Dúbidas ou algo que preguntar antes de darte de alta?
+            </p>
           </div>
           <div class="contact-list">
             <a href="mailto:info@tanapp.es">info@tanapp.es</a>
@@ -481,7 +573,7 @@
       <div class="container">
         <span>&copy; <span id="anio"></span> TanApp</span>
         <span class="xaga-credit"
-          >Hecho por
+          ><span data-i18n="footer_hecho_por">Feito por</span>
           <strong
             >xaga<span class="xaga-code">&lt;/&gt;</span></strong
           ><span class="xaga-labs">&nbsp;LABS</span></span
@@ -490,6 +582,200 @@
     </footer>
 
     <script>
+      const translations = {
+        es: {
+          nav_ventajas: 'Ventajas',
+          nav_como: 'Cómo funciona',
+          nav_planes: 'Planes',
+          nav_contacto: 'Contacto',
+          hero_eyebrow: 'Funerarias y Tanatorios',
+          hero_h1: 'Publica esquelas y avisos en segundos.',
+          hero_sub: 'Información directa para quien espera.',
+          hero_lead:
+            'TanApp sustituye las llamadas, los carteles y el periódico: publicas desde el móvil y quien sigue tu funeraria o zona se entera al instante.',
+          btn_alta: 'Solicitar alta',
+          btn_como: 'Ver cómo funciona',
+          ventajas_h2: 'Por qué trabajar con TanApp',
+          ventajas_p:
+            'Todo lo que hoy resuelves con llamadas, carteles y avisos sueltos, en un solo sitio.',
+          benefit1_h3: 'Publica una esquela en segundos',
+          benefit1_p:
+            'Escanea una esquela ya redactada (en papel o desde tu web) y deja que la IA rellene los datos por ti: nombre, fechas, iglesia, tanatorio... Revisas y publicas, sin teclear todo a mano.',
+          benefit2_h3: 'Avisos al instante',
+          benefit2_p:
+            'En cuanto publicas, quien te sigue recibe la notificación en el móvil. Sin esperar a nadie.',
+          benefit3_h3: 'Llega a quien te sigue, por zona o directamente',
+          benefit3_p:
+            'Alguien puede seguir tu funeraria en concreto, o toda una zona o concello: de las dos formas, tu publicación le llega igual.',
+          benefit4_h3: 'Gestión de condolencias',
+          benefit4_p:
+            'Revisa las condolencias que recibe cada esquela y modera las que no procedan, directamente desde la app. También puedes descargarlas para entregárselas a la familia.',
+          benefit5_h3: 'Varias sedes, una cuenta',
+          benefit5_p:
+            'Gestiona todos tus tanatorios o sedes desde una única cuenta, sin duplicar trabajo.',
+          benefit6_h3: 'Cumple con la protección de datos',
+          benefit6_p:
+            'Tratamos los datos conforme al RGPD: solo se publica lo necesario, y cada usuario controla su propia información.',
+          benefit7_h3: 'Panel de datos',
+          benefit7_p:
+            'Consulta cuántas publicaciones has hecho, cuánta gente te sigue y cuántas condolencias recibes, mes a mes.',
+          benefit8_h3: 'Visibilidad para tu negocio',
+          benefit8_p:
+            'Quien te busca te encuentra: te contacta, te ubica en el mapa y consulta tu archivo de esquelas publicadas.',
+          como_h2: 'Cómo funciona',
+          como_p: 'De la esquela a la notificación, en tres pasos.',
+          step1_h3: 'Publicas la esquela',
+          step1_p:
+            'Rellenas los datos del funeral (o los importas con IA) desde el móvil.',
+          step2_h3: 'Avisamos a quien te sigue',
+          step2_p:
+            'Cada seguidor de tu funeraria recibe la notificación al momento, sin que tengas que hacer nada más.',
+          step3_h3: 'Consultas el panel',
+          step3_p:
+            'Sigues cuánta gente te sigue y cómo funcionan tus publicaciones, todo desde tu cuenta.',
+          planes_h2: 'Planes',
+          planes_p: 'Pensados para negocios de un solo tanatorio o de varios.',
+          planes_note:
+            'Los planes todavía se están terminando de definir — estos son orientativos. Escríbenos y te damos precio y condiciones concretas para tu funeraria o tanatorio.',
+          plan1_h3: 'Sede única',
+          plan_price: 'A consultar',
+          plan1_price_small: 'por tanatorio',
+          plan1_li1: 'Publicaciones ilimitadas',
+          plan1_li2: 'Avisos automáticos a tus seguidores',
+          plan1_li3: 'Importación de esquelas con IA',
+          plan1_li4: 'Alta verificada',
+          plan_btn: 'Hablemos',
+          plan2_badge: 'Más habitual',
+          plan2_h3: 'Varias sedes',
+          plan2_price_small: 'por grupo',
+          plan2_li1: 'Todo lo de "Sede única"',
+          plan2_li2: 'Varios tanatorios en una sola cuenta',
+          plan2_li3: 'Panel de estadísticas por sede',
+          plan2_li4: 'Soporte prioritario',
+          plan3_h3: 'A medida',
+          plan3_price_small: 'grupos grandes',
+          plan3_li1: 'Todo lo de "Varias sedes"',
+          plan3_li2: 'Integración con tu web o sistema actual',
+          plan3_li3: 'Condiciones adaptadas a tu volumen',
+          cta_h2: '¿Damos de alta tu funeraria o tanatorio?',
+          cta_p:
+            'Escríbenos y te contamos cómo empezar. La solicitud de alta se puede hacer también desde la propia app.',
+          contacto_h2: 'Contacto',
+          contacto_p: '¿Dudas o algo que preguntar antes de darte de alta?',
+          footer_hecho_por: 'Hecho por',
+          meta_title: 'TanApp para funerarias y tanatorios',
+          meta_description:
+            'TanApp es la app para que funerarias y tanatorios de Galicia publiquen esquelas en segundos y lleguen directamente a quien las sigue.',
+        },
+        gl: {
+          nav_ventajas: 'Vantaxes',
+          nav_como: 'Como funciona',
+          nav_planes: 'Plans',
+          nav_contacto: 'Contacto',
+          hero_eyebrow: 'Funerarias e Tanatorios',
+          hero_h1: 'Publica esquelas e avisos en segundos.',
+          hero_sub: 'Información directa para quen espera.',
+          hero_lead:
+            'TanApp substitúe as chamadas, os carteis e o xornal: publicas dende o móbil e quen segue a túa funeraria ou zona entérase ao instante.',
+          btn_alta: 'Solicitar a alta',
+          btn_como: 'Ver como funciona',
+          ventajas_h2: 'Por que traballar con TanApp',
+          ventajas_p:
+            'Todo o que hoxe resolves con chamadas, carteis e avisos soltos, nun só sitio.',
+          benefit1_h3: 'Publica unha esquela en segundos',
+          benefit1_p:
+            'Escanea unha esquela xa redactada (en papel ou desde a túa web) e deixa que a IA cubra os datos por ti: nome, datas, igrexa, tanatorio... Revisas e publicas, sen teclear todo a man.',
+          benefit2_h3: 'Avisos ao instante',
+          benefit2_p:
+            'En canto publicas, quen te segue recibe a notificación no móbil. Sen esperar a ninguén.',
+          benefit3_h3: 'Chega a quen te segue, por zona ou directamente',
+          benefit3_p:
+            'Alguén pode seguir a túa funeraria en concreto, ou todo un concello ou zona: das dúas formas, a túa publicación chégalle igual.',
+          benefit4_h3: 'Xestión de condolencias',
+          benefit4_p:
+            'Revisa as condolencias que recibe cada esquela e modera as que non procedan, directamente desde a app. Tamén podes descargalas para entregarllas á familia.',
+          benefit5_h3: 'Varias sedes, unha conta',
+          benefit5_p:
+            'Xestiona todos os teus tanatorios ou sedes desde unha única conta, sen duplicar traballo.',
+          benefit6_h3: 'Cumpre coa protección de datos',
+          benefit6_p:
+            'Tratamos os datos conforme ao RGPD: só se publica o necesario, e cada usuario controla a súa propia información.',
+          benefit7_h3: 'Panel de datos',
+          benefit7_p:
+            'Consulta cantas publicacións fixeches, cantas persoas te seguen e cantas condolencias recibes, mes a mes.',
+          benefit8_h3: 'Visibilidade para o teu negocio',
+          benefit8_p:
+            'Quen te busca atópate: contacta contigo, ubícate no mapa e consulta o teu arquivo de esquelas publicadas.',
+          como_h2: 'Como funciona',
+          como_p: 'Da esquela á notificación, en tres pasos.',
+          step1_h3: 'Publicas a esquela',
+          step1_p:
+            'Cobres os datos do funeral (ou impórtaos con IA) desde o móbil.',
+          step2_h3: 'Avisamos a quen te segue',
+          step2_p:
+            'Cada seguidor da túa funeraria recibe a notificación ao momento, sen que teñas que facer nada máis.',
+          step3_h3: 'Consultas o panel',
+          step3_p:
+            'Segues cantas persoas te seguen e como funcionan as túas publicacións, todo desde a túa conta.',
+          planes_h2: 'Plans',
+          planes_p: 'Pensados para negocios dun só tanatorio ou de varios.',
+          planes_note:
+            'Os plans aínda se están rematando de definir — estes son orientativos. Escríbenos e dámosche prezo e condicións concretas para a túa funeraria ou tanatorio.',
+          plan1_h3: 'Sede única',
+          plan_price: 'A consultar',
+          plan1_price_small: 'por tanatorio',
+          plan1_li1: 'Publicacións ilimitadas',
+          plan1_li2: 'Avisos automáticos aos teus seguidores',
+          plan1_li3: 'Importación de esquelas con IA',
+          plan1_li4: 'Alta verificada',
+          plan_btn: 'Falemos',
+          plan2_badge: 'Máis habitual',
+          plan2_h3: 'Varias sedes',
+          plan2_price_small: 'por grupo',
+          plan2_li1: 'Todo o de "Sede única"',
+          plan2_li2: 'Varios tanatorios nunha soa conta',
+          plan2_li3: 'Panel de estatísticas por sede',
+          plan2_li4: 'Soporte prioritario',
+          plan3_h3: 'A medida',
+          plan3_price_small: 'grupos grandes',
+          plan3_li1: 'Todo o de "Varias sedes"',
+          plan3_li2: 'Integración coa túa web ou sistema actual',
+          plan3_li3: 'Condicións adaptadas ao teu volume',
+          cta_h2: 'Damos de alta a túa funeraria ou tanatorio?',
+          cta_p:
+            'Escríbenos e contámosche como empezar. A solicitude de alta pódese facer tamén desde a propia app.',
+          contacto_h2: 'Contacto',
+          contacto_p: 'Dúbidas ou algo que preguntar antes de darte de alta?',
+          footer_hecho_por: 'Feito por',
+          meta_title: 'TanApp para funerarias e tanatorios',
+          meta_description:
+            'TanApp é a app para que funerarias e tanatorios de Galicia publiquen esquelas en segundos e cheguen directamente a quen as segue.',
+        },
+      };
+
+      function applyLang(lang) {
+        document.documentElement.lang = lang;
+        document.querySelectorAll('[data-i18n]').forEach((el) => {
+          const text = translations[lang][el.getAttribute('data-i18n')];
+          if (text !== undefined) el.textContent = text;
+        });
+        document.title = translations[lang].meta_title;
+        document
+          .querySelector('meta[name="description"]')
+          .setAttribute('content', translations[lang].meta_description);
+        document.querySelectorAll('.lang-btn').forEach((btn) => {
+          btn.classList.toggle('active', btn.dataset.lang === lang);
+        });
+        localStorage.setItem('tanapp-lang', lang);
+      }
+
+      document.querySelectorAll('.lang-btn').forEach((btn) => {
+        btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+      });
+
+      // Galego por defecto; queda memorizado si se cambia a castellano.
+      applyLang(localStorage.getItem('tanapp-lang') === 'es' ? 'es' : 'gl');
+
       document.getElementById('anio').textContent = new Date().getFullYear();
     </script>
   </body>

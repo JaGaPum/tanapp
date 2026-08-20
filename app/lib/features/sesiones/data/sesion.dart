@@ -7,6 +7,7 @@ class Sesion {
   final bool recordar;
   final String estado;
   final String? idClienteSede;
+  final String? dispositivo;
 
   const Sesion({
     required this.idSistemaSesion,
@@ -17,6 +18,7 @@ class Sesion {
     required this.recordar,
     required this.estado,
     this.idClienteSede,
+    this.dispositivo,
   });
 
   bool get abierta => estado == 'ABIERTA';
@@ -33,6 +35,7 @@ class Sesion {
       recordar: map['Recordar'] as bool? ?? false,
       estado: map['Estado'] as String,
       idClienteSede: map['IdClienteSede'] as String?,
+      dispositivo: map['Dispositivo'] as String?,
     );
   }
 }

@@ -8,6 +8,8 @@ import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/error_banner.dart';
 import '../../../../core/widgets/password_field.dart';
+import '../../../../core/widgets/password_requirements.dart';
+import '../../application/auth_providers.dart';
 import '../../data/auth_repository.dart';
 
 class ResetPasswordScreen extends ConsumerStatefulWidget {
@@ -65,6 +67,11 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // El mismo formulario sirve tanto para recuperar contraseña de un usuario ordinario como
+    // para que un cliente (funeraria/tanatorio) recién aprobado ponga la suya por primera vez
+    // (no hay pantalla de alta propia, ver 055/aprobar-solicitud-cliente): a un cliente se le
+    // exige la regla estricta, al resto la básica.
+    final estricta = ref.watch(isClienteProvider);
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.resetPasswordTitle)),
       body: SafeArea(
@@ -94,7 +101,14 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     PasswordField(
                       controller: _passwordController,
                       label: context.l10n.resetPasswordNuevaContrasena,
-                      validator: Validators.password(context),
+                      validator: Validators.password(
+                        context,
+                        estricta: estricta,
+                      ),
+                    ),
+                    PasswordRequirements(
+                      controller: _passwordController,
+                      estricta: estricta,
                     ),
                     const SizedBox(height: 16),
                     PasswordField(

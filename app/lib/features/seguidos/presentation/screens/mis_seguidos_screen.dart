@@ -248,6 +248,7 @@ class _ClienteSeguidoTile extends ConsumerStatefulWidget {
 
 class _ClienteSeguidoTileState extends ConsumerState<_ClienteSeguidoTile> {
   bool _loading = false;
+  bool _loadingSilenciar = false;
 
   Future<void> _dejarDeSeguir() async {
     setState(() => _loading = true);
@@ -264,6 +265,24 @@ class _ClienteSeguidoTileState extends ConsumerState<_ClienteSeguidoTile> {
       ref.invalidate(misSeguidosClientesProvider);
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _alternarSilenciado() async {
+    setState(() => _loadingSilenciar = true);
+    try {
+      final perfil = await ref.read(currentUserProfileProvider.future);
+      if (perfil == null) return;
+      await ref
+          .read(seguidosRepositoryProvider)
+          .actualizarSilenciado(
+            idSistemaUsuario: perfil.idSistemaUsuario,
+            idClienteSede: widget.cliente.idClienteSede,
+            silenciado: !widget.cliente.silenciado,
+          );
+      ref.invalidate(misSeguidosClientesProvider);
+    } finally {
+      if (mounted) setState(() => _loadingSilenciar = false);
     }
   }
 
@@ -351,6 +370,20 @@ class _ClienteSeguidoTileState extends ConsumerState<_ClienteSeguidoTile> {
                 '/publicaciones/${cliente.idClienteSede}',
                 extra: '${cliente.nombreCliente} · ${cliente.nombreSede}',
               ),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              icon: Icon(
+                cliente.silenciado
+                    ? Icons.notifications_off_outlined
+                    : Icons.notifications_active_outlined,
+              ),
+              label: Text(
+                cliente.silenciado
+                    ? context.l10n.seguidosActivarAvisos
+                    : context.l10n.seguidosSilenciar,
+              ),
+              onPressed: _loadingSilenciar ? null : _alternarSilenciado,
             ),
             const SizedBox(height: 12),
             OutlinedButton.icon(

@@ -4,6 +4,8 @@ import '../../../core/l10n/locale_provider.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../sistema_usuarios/data/usuarios_repository.dart';
 import '../data/termino.dart';
+import '../data/termino_aceptacion_detalle.dart';
+import '../data/termino_documento.dart';
 import '../data/terminos_repository.dart';
 
 final terminosPendientesProvider = FutureProvider.autoDispose<List<Termino>>((
@@ -44,4 +46,29 @@ final terminosPendientesDeUsuarioProvider = FutureProvider.autoDispose
       return ref
           .watch(terminosRepositoryProvider)
           .fetchPendientes(perfil.idSistemaUsuario, perfil.roles, 'ES');
+    });
+
+/// Detalle documento a documento (con fecha de aceptación) para la ficha de usuario del admin.
+final terminosDetalleDeUsuarioProvider = FutureProvider.autoDispose
+    .family<List<TerminoAceptacionDetalle>, String>((
+      ref,
+      idSistemaUsuario,
+    ) async {
+      final perfil = await ref
+          .watch(usuariosRepositoryProvider)
+          .fetchPerfilById(idSistemaUsuario);
+      return ref
+          .watch(terminosRepositoryProvider)
+          .fetchDetalleAceptaciones(
+            perfil.idSistemaUsuario,
+            perfil.roles,
+            'ES',
+          );
+    });
+
+/// Para "Configuración > Términos y condiciones" (admin): los documentos activos con su
+/// contenido en todos los idiomas, listos para editar.
+final terminosDocumentosEditablesProvider =
+    FutureProvider.autoDispose<List<TerminoDocumento>>((ref) {
+      return ref.watch(terminosRepositoryProvider).fetchDocumentosEditables();
     });

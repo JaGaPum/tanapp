@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/l10n/l10n_extensions.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_exception.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_button.dart';
@@ -127,6 +126,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Por si se equivoca de opción (particular/funeraria) en la pantalla anterior: sin esto no
+      // hay ninguna forma visible de volver a elegir, solo el gesto/botón "atrás" del sistema.
+      appBar: AppBar(),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -236,31 +238,50 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const SizedBox(height: 24),
                     if (widget.esCliente)
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.plum, width: 1.5),
+                          // Mismo tono suave que la tarjeta de "Tu condolencia"
+                          // (CondolenciasScreen): colorScheme.secondary (vino) al 8%.
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.secondary.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                         child: Column(
                           children: [
-                            const Icon(
-                              Icons.storefront_outlined,
-                              color: AppColors.plum,
-                              size: 32,
+                            Icon(
+                              Icons.business_center_outlined,
+                              color: Theme.of(context).colorScheme.secondary,
+                              size: 40,
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 10),
                             Text(
                               context.l10n.loginEresFunerariaPregunta,
                               textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(fontWeight: FontWeight.bold),
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodyMedium?.copyWith(fontSize: 17),
                             ),
-                            const SizedBox(height: 12),
-                            AppButton(
-                              secondary: true,
-                              label: context.l10n.loginSolicitarAlta,
-                              onPressed: () =>
-                                  context.push('/solicitud-cliente'),
+                            const SizedBox(height: 14),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Theme.of(
+                                    context,
+                                  ).colorScheme.secondary,
+                                  foregroundColor: Theme.of(
+                                    context,
+                                  ).colorScheme.onSecondary,
+                                  textStyle: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                onPressed: () =>
+                                    context.push('/solicitud-cliente'),
+                                child: Text(context.l10n.loginSolicitarAlta),
+                              ),
                             ),
                           ],
                         ),

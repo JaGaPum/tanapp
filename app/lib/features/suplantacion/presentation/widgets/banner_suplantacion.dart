@@ -6,37 +6,46 @@ import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../auth/application/auth_providers.dart';
 import '../../application/suplantacion_providers.dart';
 
-/// Franja fija arriba de la app mientras un administrador está suplantando a otro usuario, para
-/// que nunca se olvide de que no está en su propia cuenta. Solo se muestra cuando hay una
-/// sesión de administrador guardada (ver [sesionAdminGuardadaProvider]).
+/// Franja fija arriba de la app mientras hay una sesión secundaria activa, para que nunca se
+/// olvide de que no se está en la cuenta original. Cubre dos casos (ver [ModoSesionSecundaria]):
+/// un administrador suplantando a otro usuario, o un cliente en su cuenta personal vinculada.
+/// Solo se muestra cuando hay una sesión secundaria guardada (ver [sesionAdminGuardadaProvider]).
 class BannerSuplantacion extends ConsumerWidget {
   const BannerSuplantacion({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (ref.watch(sesionAdminGuardadaProvider) == null) {
+    final secundaria = ref.watch(sesionAdminGuardadaProvider);
+    if (secundaria == null) {
       return const SizedBox.shrink();
     }
+    final esCuentaPropia = secundaria.modo == ModoSesionSecundaria.cuentaPropia;
     final nombre =
         ref.watch(currentUserProfileProvider).value?.nombrePublico ?? '';
 
     return Material(
-      color: Theme.of(context).colorScheme.error,
+      color: esCuentaPropia
+          ? Theme.of(context).colorScheme.secondary
+          : Theme.of(context).colorScheme.error,
       child: SafeArea(
         bottom: false,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Row(
             children: [
-              const Icon(
-                Icons.visibility_outlined,
+              Icon(
+                esCuentaPropia
+                    ? Icons.switch_account_outlined
+                    : Icons.visibility_outlined,
                 color: Colors.white,
                 size: 20,
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  context.l10n.suplantacionBannerTexto(nombre),
+                  esCuentaPropia
+                      ? context.l10n.cuentaPropiaBannerTexto
+                      : context.l10n.suplantacionBannerTexto(nombre),
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -49,7 +58,11 @@ class BannerSuplantacion extends ConsumerWidget {
                   await ref.read(sesionAdminGuardadaProvider.notifier).volver();
                   if (context.mounted) context.go('/home');
                 },
-                child: Text(context.l10n.suplantacionVolver),
+                child: Text(
+                  esCuentaPropia
+                      ? context.l10n.cuentaPropiaVolver
+                      : context.l10n.suplantacionVolver,
+                ),
               ),
             ],
           ),

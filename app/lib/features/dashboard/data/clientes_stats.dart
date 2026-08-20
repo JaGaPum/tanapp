@@ -10,6 +10,8 @@ class ClientesStats {
   final List<MapEntry<String, int>> porTipo;
   final List<ConteoPorPeriodo> publicacionesPorMes;
   final List<ConteoPorPeriodo> avisosPorMes;
+  final List<ConteoPorPeriodo> altasPorMes;
+  final List<ConteoPorPeriodo> bajasPorMes;
   final List<MapEntry<String, int>> topClientesPorPublicaciones;
 
   const ClientesStats({
@@ -22,6 +24,8 @@ class ClientesStats {
     required this.porTipo,
     required this.publicacionesPorMes,
     required this.avisosPorMes,
+    required this.altasPorMes,
+    required this.bajasPorMes,
     required this.topClientesPorPublicaciones,
   });
 }

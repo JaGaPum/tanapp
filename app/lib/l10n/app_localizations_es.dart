@@ -36,6 +36,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get validatorPasswordTooShort => 'Debe tener al menos 8 caracteres';
 
   @override
+  String validatorPasswordTooShortEstricta(int minimo) {
+    return 'Debe tener al menos $minimo caracteres';
+  }
+
+  @override
+  String get validatorPasswordSinLetraYNumero =>
+      'Debe combinar letras y números';
+
+  @override
   String get validatorPasswordMismatch => 'Las contraseñas no coinciden';
 
   @override
@@ -58,6 +67,14 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get passwordFieldLabel => 'Contraseña';
+
+  @override
+  String passwordRequisitoLongitud(int minimo) {
+    return 'Mínimo $minimo caracteres';
+  }
+
+  @override
+  String get passwordRequisitoLetraNumero => 'Combina letras y números';
 
   @override
   String get fieldNombre => 'Nombre';
@@ -193,7 +210,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get loginEresFunerariaPregunta =>
-      '¿Eres una funeraria, tanatorio o parroquia y todavía no tienes cuenta?';
+      '¿Eres una funeraria o tanatorio y todavía no tienes cuenta?';
 
   @override
   String get loginSolicitarAlta => 'Solicitar alta';
@@ -322,6 +339,27 @@ class AppLocalizationsEs extends AppLocalizations {
       'Deseo recibir notificaciones de las publicaciones en mi móvil.';
 
   @override
+  String get accountDarseDeBajaTitulo => 'Darse de baja';
+
+  @override
+  String get accountDarseDeBajaAyuda =>
+      'Al darte de baja tu cuenta se desactiva y se cierra tu sesión. Solo un administrador puede reactivarla.';
+
+  @override
+  String get accountDarseDeBajaMensaje =>
+      '¿Seguro que quieres darte de baja? Tu cuenta se desactivará y se cerrará tu sesión.';
+
+  @override
+  String get accountCuentaPersonalTitulo => 'Tu cuenta personal';
+
+  @override
+  String get accountCuentaPersonalAyuda =>
+      'Como cliente también puedes tener tu propia cuenta personal, separada de la de tu negocio, para seguir clientes y zonas y dejar condolencias como cualquier otro usuario.';
+
+  @override
+  String get accountCuentaPersonalEntrar => 'Entrar en tu cuenta personal';
+
+  @override
   String get terminosTitulo => 'Antes de continuar';
 
   @override
@@ -437,6 +475,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get suplantacionVolver => 'Volver a mi cuenta';
 
   @override
+  String get cuentaPropiaBannerTexto =>
+      'Estás en tu cuenta personal de seguidor';
+
+  @override
+  String get cuentaPropiaVolver => 'Volver a mi cuenta de cliente';
+
+  @override
   String get usuarioIdiomaPreferido => 'Idioma preferido';
 
   @override
@@ -482,6 +527,44 @@ class AppLocalizationsEs extends AppLocalizations {
   String get usuarioTerminosPendientes => 'Pendientes';
 
   @override
+  String get terminosTipoUso => 'Términos de uso';
+
+  @override
+  String get terminosTipoPrivacidad => 'Política de privacidad';
+
+  @override
+  String get terminosCampoTitulo => 'Título';
+
+  @override
+  String get terminosCampoCuerpo => 'Contenido';
+
+  @override
+  String terminosContenidoGuardadoEnIdioma(String idioma) {
+    return 'Contenido en $idioma guardado';
+  }
+
+  @override
+  String get terminosColDocumento => 'Documento';
+
+  @override
+  String get terminosColFecha => 'Fecha';
+
+  @override
+  String get terminosVerTexto => 'Ver texto';
+
+  @override
+  String get terminosRolCliente => 'Cliente';
+
+  @override
+  String get terminosRolUsuarioOrdinario => 'Usuario ordinario';
+
+  @override
+  String get verDetalle => 'Ver detalle';
+
+  @override
+  String get ocultarDetalle => 'Ocultar detalle';
+
+  @override
   String get marcarComoValidado => 'Marcar como validado';
 
   @override
@@ -516,6 +599,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get sesionColRecordar => 'Recordar';
+
+  @override
+  String get sesionColDispositivo => 'Dispositivo';
+
+  @override
+  String get deslizaParaVerMas => 'Desliza para ver más';
 
   @override
   String get sesionEnCurso => 'En curso';
@@ -593,7 +682,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get solicitudIntro =>
-      'Solicita el alta de tu funeraria, tanatorio o parroquia en TanApp. Un administrador revisará tu solicitud antes de darte acceso.';
+      'Solicita el alta de tu funeraria o tanatorio en TanApp. Un administrador revisará tu solicitud antes de darte acceso.';
 
   @override
   String get fieldRazonSocial => 'Razón social';
@@ -694,6 +783,32 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get configuracionTiposClienteTitulo =>
       'Configuración > Tipos de Clientes';
+
+  @override
+  String get tiposActo => 'Tipos de acto';
+
+  @override
+  String get configuracionTiposActoTitulo => 'Configuración > Tipos de acto';
+
+  @override
+  String get noHayTiposActoDadosDeAlta => 'No hay tipos de acto dados de alta';
+
+  @override
+  String get actoTipoNuevo => 'Nuevo tipo de acto';
+
+  @override
+  String get actoTipoEditar => 'Editar tipo de acto';
+
+  @override
+  String get actoTipoActivo => 'Activo';
+
+  @override
+  String get actoTipoEliminarTitulo => 'Eliminar tipo de acto';
+
+  @override
+  String actoTipoEliminarMensaje(String nombre) {
+    return '¿Eliminar \"$nombre\"?';
+  }
 
   @override
   String get configuracionIa => 'Configuración IA';
@@ -950,7 +1065,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get avisos => 'Avisos';
 
   @override
-  String get avisosNuevo => 'Nuevo aviso';
+  String get avisosNuevo => 'Aviso';
 
   @override
   String get avisosFormTitulo => 'Nuevo aviso';
@@ -1023,6 +1138,20 @@ class AppLocalizationsEs extends AppLocalizations {
   String get avisosCancelarSeleccion => 'Cancelar';
 
   @override
+  String get avisosEditarProgramado => 'Editar aviso programado';
+
+  @override
+  String get avisosProgramadosTitulo => 'Programados';
+
+  @override
+  String get avisosCancelarProgramadoTitulo => 'Cancelar aviso programado';
+
+  @override
+  String avisosCancelarProgramadoMensaje(String titulo) {
+    return '¿Seguro que quieres cancelar el aviso programado \"$titulo\"? No se enviará.';
+  }
+
+  @override
   String get seguidosSeleccionaTipo => 'Elige a quién seguir';
 
   @override
@@ -1039,7 +1168,6 @@ class AppLocalizationsEs extends AppLocalizations {
     String _temp0 = intl.Intl.selectLogic(tipoNombre, {
       'Tanatorio': 'Todavía no hay ningún tanatorio activo en este concello',
       'Funeraria': 'Todavía no hay ninguna funeraria activa en este concello',
-      'Parroquia': 'Todavía no hay ninguna parroquia activa en este concello',
       'other': 'Todavía no hay ningún cliente activo en este concello',
     });
     return '$_temp0';
@@ -1050,6 +1178,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get seguidosDejarDeSeguir => 'Dejar de seguir';
+
+  @override
+  String get seguidosSilenciar => 'Desactivar notificaciones';
+
+  @override
+  String get seguidosActivarAvisos => 'Activar notificaciones';
 
   @override
   String get seguidosSiguiendoEtiqueta => 'Siguiendo';
@@ -1064,7 +1198,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get misSeguidosBuscarNombre => 'Buscar por nombre';
 
   @override
-  String get misSeguidosVacio => 'Todavía no sigues a ningún cliente';
+  String get misSeguidosVacio =>
+      'Todavía no sigues a ningún cliente. Usa \"Seguir un cliente nuevo\" para buscar funerarias y tanatorios.';
 
   @override
   String get misSeguidosTabClientes => 'Clientes';
@@ -1092,7 +1227,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get zonaSeguirNueva => 'Seguir una zona nueva';
 
   @override
-  String get misZonasVacio => 'Todavía no sigues ninguna zona';
+  String get misZonasVacio =>
+      'Todavía no sigues ninguna zona. Usa \"Seguir una zona nueva\" para recibir avisos de todo un concello.';
 
   @override
   String get drawerMisSedes => 'Mis sedes/tanatorios';
@@ -1146,6 +1282,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get publicarEscanear => 'Escanear';
+
+  @override
+  String get publicarEscanearAyuda =>
+      '¿Tienes la esquela en papel o en una foto? Escanéala y te rellenamos el formulario.';
 
   @override
   String get publicarManual => 'Manual';
@@ -1211,6 +1351,42 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get publicarNuevaPublicacion => 'Nueva publicación';
+
+  @override
+  String get publicarMisa => 'Misa/Acto';
+
+  @override
+  String get publicarNuevoActo => 'Nueva/o Misa/Acto';
+
+  @override
+  String get publicarEditarActo => 'Editar Misa/Acto';
+
+  @override
+  String get publicarEnMemoriaDe => 'En memoria de';
+
+  @override
+  String get publicarTipoActo => 'Tipo de acto';
+
+  @override
+  String get publicarTipoActoOtroOpcion => 'Otro';
+
+  @override
+  String get publicarTipoActoOtro => 'Especifica el tipo de acto';
+
+  @override
+  String get publicarFechaActo => 'Fecha del acto';
+
+  @override
+  String get publicarHoraActo => 'Hora del acto';
+
+  @override
+  String get publicarActoLabel => 'Acto';
+
+  @override
+  String get publicarMisaLabel => 'Misa';
+
+  @override
+  String get publicarIglesiaLocalizacion => 'Iglesia/Localización';
 
   @override
   String get publicarSeleccionaSede => 'Selecciona la sede/tanatorio';
@@ -1283,13 +1459,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get publicarCompartidoPor => 'Publicado por';
 
   @override
+  String publicarPublicadoPorSede(String nombreCliente, String nombreSede) {
+    return 'Publicado por: $nombreCliente ($nombreSede)';
+  }
+
+  @override
   String get publicarDescargaApp => 'Descarga TanApp:';
 
   @override
   String get publicarCondolencias => 'Enviar condolencias';
 
   @override
-  String get publicarVerCondolencias => 'Ver condolencias';
+  String get publicarVerCondolencias => 'Administrar condolencias';
 
   @override
   String condolenciasCantidad(int n) {
@@ -1392,6 +1573,16 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String publicarMisaVoz(String fecha, String hora) {
+    return 'La misa será el $fecha a las $hora';
+  }
+
+  @override
+  String publicarActoVoz(String fecha, String hora) {
+    return 'El acto será el $fecha a las $hora';
+  }
+
+  @override
   String get tablonAumentarLetra => 'Aumentar tamaño de letra';
 
   @override
@@ -1452,6 +1643,55 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String publicarEliminarMensaje(String nombre) {
     return '¿Seguro que quieres eliminar la publicación de $nombre?';
+  }
+
+  @override
+  String get publicarProgramarTitulo => 'Programar para más tarde';
+
+  @override
+  String get publicarProgramarAyuda =>
+      'En vez de publicarse ahora, se publicará sola en la fecha y hora que elijas.';
+
+  @override
+  String get publicarProgramarFecha => 'Fecha de publicación';
+
+  @override
+  String get publicarProgramarHora => 'Hora de publicación';
+
+  @override
+  String get publicarProgramarEnElPasado =>
+      'La fecha y hora programadas tienen que ser posteriores a ahora.';
+
+  @override
+  String get publicarProgramar => 'Programar';
+
+  @override
+  String get publicarProgramadaOk => 'Publicación programada';
+
+  @override
+  String get publicarProgramacionActualizada => 'Programación actualizada';
+
+  @override
+  String get publicarEditarProgramada => 'Editar publicación programada';
+
+  @override
+  String get publicarProgramadasTitulo => 'Programadas';
+
+  @override
+  String get publicarPublicadasTitulo => 'Publicadas';
+
+  @override
+  String publicarProgramadaPara(String fecha, String hora) {
+    return 'Programada para el $fecha a las $hora';
+  }
+
+  @override
+  String get publicarCancelarProgramadaTitulo =>
+      'Cancelar publicación programada';
+
+  @override
+  String publicarCancelarProgramadaMensaje(String nombre) {
+    return '¿Seguro que quieres cancelar la publicación programada de $nombre? No se publicará.';
   }
 
   @override
@@ -1631,6 +1871,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get dashboardAvisosPorMes => 'Avisos por mes';
+
+  @override
+  String get dashboardAltasPorMes => 'Altas por mes';
+
+  @override
+  String get dashboardBajasPorMes => 'Bajas por mes';
 
   @override
   String get dashboardTopClientes => 'Clientes con más publicaciones';

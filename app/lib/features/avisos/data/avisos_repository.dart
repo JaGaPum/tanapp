@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'aviso_estadistica.dart';
+import 'aviso_programado.dart';
 import 'aviso_recibido.dart';
 import 'cliente_aviso.dart';
 
@@ -23,6 +24,64 @@ class AvisosRepository {
       'Titulo': titulo.trim(),
       'Texto': texto.trim(),
     });
+  }
+
+  static const _selectProgramadoConSede = '*, TClienteSedes(Codigo, Nombre)';
+
+  /// Guarda el aviso en la "cola" (055) en vez de enviarlo ya: un job de la base de datos lo
+  /// mueve solo a "TClienteAvisos" en cuanto llegue [fechaProgramada], disparando el envío
+  /// igual que uno inmediato (056).
+  Future<void> crearAvisoProgramado({
+    required String idClienteSede,
+    required String titulo,
+    required String texto,
+    required DateTime fechaProgramada,
+  }) async {
+    await _client.from('TClienteAvisosProgramados').insert({
+      'IdClienteSede': idClienteSede,
+      'Titulo': titulo.trim(),
+      'Texto': texto.trim(),
+      'FechaProgramada': fechaProgramada.toUtc().toIso8601String(),
+    });
+  }
+
+  Future<void> actualizarAvisoProgramado({
+    required String idClienteAvisoProgramado,
+    required String idClienteSede,
+    required String titulo,
+    required String texto,
+    required DateTime fechaProgramada,
+  }) async {
+    await _client
+        .from('TClienteAvisosProgramados')
+        .update({
+          'IdClienteSede': idClienteSede,
+          'Titulo': titulo.trim(),
+          'Texto': texto.trim(),
+          'FechaProgramada': fechaProgramada.toUtc().toIso8601String(),
+        })
+        .eq('IdClienteAvisoProgramado', idClienteAvisoProgramado);
+  }
+
+  Future<void> eliminarAvisoProgramado(String idClienteAvisoProgramado) async {
+    await _client
+        .from('TClienteAvisosProgramados')
+        .delete()
+        .eq('IdClienteAvisoProgramado', idClienteAvisoProgramado);
+  }
+
+  Future<List<AvisoProgramado>> listAvisosProgramados(
+    List<String> idsClienteSede,
+  ) async {
+    if (idsClienteSede.isEmpty) return [];
+    final data = await _client
+        .from('TClienteAvisosProgramados')
+        .select(_selectProgramadoConSede)
+        .inFilter('IdClienteSede', idsClienteSede)
+        .order('FechaProgramada', ascending: true);
+    return (data as List)
+        .map((e) => AvisoProgramado.fromMap(e as Map<String, dynamic>))
+        .toList();
   }
 
   /// Histórico de avisos enviados desde cualquiera de las sedes indicadas (las del cliente

@@ -33,13 +33,37 @@ class SesionesRepository {
   Future<Sesion> crearSesion({
     required String idSistemaUsuario,
     required bool recordar,
+    required String idDispositivo,
+    String? dispositivo,
   }) async {
     final data = await _client
         .from('TSistemaSesiones')
-        .insert({'IdSistemaUsuario': idSistemaUsuario, 'Recordar': recordar})
+        .insert({
+          'IdSistemaUsuario': idSistemaUsuario,
+          'Recordar': recordar,
+          'IdDispositivo': idDispositivo,
+          'Dispositivo': dispositivo,
+        })
         .select()
         .single();
     return Sesion.fromMap(data);
+  }
+
+  /// Cierra cualquier otra sesión "ABIERTA" de este mismo dispositivo (sea del mismo usuario o
+  /// de otro): así solo puede quedar una sesión abierta por dispositivo (ver 057). Vía RPC
+  /// (SECURITY DEFINER) porque puede hacer falta cerrar la sesión de OTRO usuario, cosa que la
+  /// policy de UPDATE normal no permite.
+  Future<void> cerrarOtrasSesionesDelDispositivo({
+    required String idDispositivo,
+    required String excluirIdSistemaSesion,
+  }) async {
+    await _client.rpc(
+      'FSistemaCerrarSesionesDispositivo',
+      params: {
+        'id_dispositivo': idDispositivo,
+        'id_sistema_sesion_excluir': excluirIdSistemaSesion,
+      },
+    );
   }
 
   Future<void> tocarSesion(String idSistemaSesion) async {
@@ -56,6 +80,19 @@ class SesionesRepository {
     await _client
         .from('TSistemaSesiones')
         .update({'Recordar': recordar})
+        .eq('IdSistemaSesion', idSistemaSesion);
+  }
+
+  /// Deja constancia de qué dispositivo es dueño de esta sesión (ver 057): se llama tanto al
+  /// crear una sesión como al reutilizar una ya existente, para que las filas de antes de esta
+  /// migración (sin "IdDispositivo") también queden vinculadas en cuanto vuelvan a tocarse.
+  Future<void> vincularDispositivo(
+    String idSistemaSesion,
+    String idDispositivo,
+  ) async {
+    await _client
+        .from('TSistemaSesiones')
+        .update({'IdDispositivo': idDispositivo})
         .eq('IdSistemaSesion', idSistemaSesion);
   }
 

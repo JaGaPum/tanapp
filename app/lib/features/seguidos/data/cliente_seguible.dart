@@ -11,6 +11,7 @@ class ClienteSeguible {
   final String provincia;
   final String? telefono;
   final String? fotoUrl;
+  final bool silenciado;
 
   const ClienteSeguible({
     required this.idClienteSede,
@@ -22,10 +23,16 @@ class ClienteSeguible {
     required this.provincia,
     this.telefono,
     this.fotoUrl,
+    this.silenciado = false,
   });
 
   /// [map] es una fila de TClienteSedes con el TSistemaUsuarios (cliente dueño) embebido.
-  factory ClienteSeguible.fromSedeMap(Map<String, dynamic> map) {
+  /// [silenciado] solo aplica a "mis seguidos" (viene de TClienteSeguimientos, no de esta
+  /// fila), así que se pasa aparte en vez de leerse de [map].
+  factory ClienteSeguible.fromSedeMap(
+    Map<String, dynamic> map, {
+    bool silenciado = false,
+  }) {
     final cliente = map['TSistemaUsuarios'] as Map<String, dynamic>;
     return ClienteSeguible(
       idClienteSede: map['IdClienteSede'] as String,
@@ -37,6 +44,7 @@ class ClienteSeguible {
       provincia: map['Provincia'] as String,
       telefono: cliente['Telefono'] as String?,
       fotoUrl: cliente['FotoUrl'] as String?,
+      silenciado: silenciado,
     );
   }
 }

@@ -146,6 +146,18 @@ abstract class AppLocalizations {
   /// **'Debe tener al menos 8 caracteres'**
   String get validatorPasswordTooShort;
 
+  /// No description provided for @validatorPasswordTooShortEstricta.
+  ///
+  /// In es, this message translates to:
+  /// **'Debe tener al menos {minimo} caracteres'**
+  String validatorPasswordTooShortEstricta(int minimo);
+
+  /// No description provided for @validatorPasswordSinLetraYNumero.
+  ///
+  /// In es, this message translates to:
+  /// **'Debe combinar letras y números'**
+  String get validatorPasswordSinLetraYNumero;
+
   /// No description provided for @validatorPasswordMismatch.
   ///
   /// In es, this message translates to:
@@ -193,6 +205,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Contraseña'**
   String get passwordFieldLabel;
+
+  /// No description provided for @passwordRequisitoLongitud.
+  ///
+  /// In es, this message translates to:
+  /// **'Mínimo {minimo} caracteres'**
+  String passwordRequisitoLongitud(int minimo);
+
+  /// No description provided for @passwordRequisitoLetraNumero.
+  ///
+  /// In es, this message translates to:
+  /// **'Combina letras y números'**
+  String get passwordRequisitoLetraNumero;
 
   /// No description provided for @fieldNombre.
   ///
@@ -449,7 +473,7 @@ abstract class AppLocalizations {
   /// No description provided for @loginEresFunerariaPregunta.
   ///
   /// In es, this message translates to:
-  /// **'¿Eres una funeraria, tanatorio o parroquia y todavía no tienes cuenta?'**
+  /// **'¿Eres una funeraria o tanatorio y todavía no tienes cuenta?'**
   String get loginEresFunerariaPregunta;
 
   /// No description provided for @loginSolicitarAlta.
@@ -680,6 +704,42 @@ abstract class AppLocalizations {
   /// **'Deseo recibir notificaciones de las publicaciones en mi móvil.'**
   String get accountNotificacionesPush;
 
+  /// No description provided for @accountDarseDeBajaTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Darse de baja'**
+  String get accountDarseDeBajaTitulo;
+
+  /// No description provided for @accountDarseDeBajaAyuda.
+  ///
+  /// In es, this message translates to:
+  /// **'Al darte de baja tu cuenta se desactiva y se cierra tu sesión. Solo un administrador puede reactivarla.'**
+  String get accountDarseDeBajaAyuda;
+
+  /// No description provided for @accountDarseDeBajaMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Seguro que quieres darte de baja? Tu cuenta se desactivará y se cerrará tu sesión.'**
+  String get accountDarseDeBajaMensaje;
+
+  /// No description provided for @accountCuentaPersonalTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu cuenta personal'**
+  String get accountCuentaPersonalTitulo;
+
+  /// No description provided for @accountCuentaPersonalAyuda.
+  ///
+  /// In es, this message translates to:
+  /// **'Como cliente también puedes tener tu propia cuenta personal, separada de la de tu negocio, para seguir clientes y zonas y dejar condolencias como cualquier otro usuario.'**
+  String get accountCuentaPersonalAyuda;
+
+  /// No description provided for @accountCuentaPersonalEntrar.
+  ///
+  /// In es, this message translates to:
+  /// **'Entrar en tu cuenta personal'**
+  String get accountCuentaPersonalEntrar;
+
   /// No description provided for @terminosTitulo.
   ///
   /// In es, this message translates to:
@@ -878,6 +938,18 @@ abstract class AppLocalizations {
   /// **'Volver a mi cuenta'**
   String get suplantacionVolver;
 
+  /// No description provided for @cuentaPropiaBannerTexto.
+  ///
+  /// In es, this message translates to:
+  /// **'Estás en tu cuenta personal de seguidor'**
+  String get cuentaPropiaBannerTexto;
+
+  /// No description provided for @cuentaPropiaVolver.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver a mi cuenta de cliente'**
+  String get cuentaPropiaVolver;
+
   /// No description provided for @usuarioIdiomaPreferido.
   ///
   /// In es, this message translates to:
@@ -956,6 +1028,78 @@ abstract class AppLocalizations {
   /// **'Pendientes'**
   String get usuarioTerminosPendientes;
 
+  /// No description provided for @terminosTipoUso.
+  ///
+  /// In es, this message translates to:
+  /// **'Términos de uso'**
+  String get terminosTipoUso;
+
+  /// No description provided for @terminosTipoPrivacidad.
+  ///
+  /// In es, this message translates to:
+  /// **'Política de privacidad'**
+  String get terminosTipoPrivacidad;
+
+  /// No description provided for @terminosCampoTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Título'**
+  String get terminosCampoTitulo;
+
+  /// No description provided for @terminosCampoCuerpo.
+  ///
+  /// In es, this message translates to:
+  /// **'Contenido'**
+  String get terminosCampoCuerpo;
+
+  /// No description provided for @terminosContenidoGuardadoEnIdioma.
+  ///
+  /// In es, this message translates to:
+  /// **'Contenido en {idioma} guardado'**
+  String terminosContenidoGuardadoEnIdioma(String idioma);
+
+  /// No description provided for @terminosColDocumento.
+  ///
+  /// In es, this message translates to:
+  /// **'Documento'**
+  String get terminosColDocumento;
+
+  /// No description provided for @terminosColFecha.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha'**
+  String get terminosColFecha;
+
+  /// No description provided for @terminosVerTexto.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver texto'**
+  String get terminosVerTexto;
+
+  /// No description provided for @terminosRolCliente.
+  ///
+  /// In es, this message translates to:
+  /// **'Cliente'**
+  String get terminosRolCliente;
+
+  /// No description provided for @terminosRolUsuarioOrdinario.
+  ///
+  /// In es, this message translates to:
+  /// **'Usuario ordinario'**
+  String get terminosRolUsuarioOrdinario;
+
+  /// No description provided for @verDetalle.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver detalle'**
+  String get verDetalle;
+
+  /// No description provided for @ocultarDetalle.
+  ///
+  /// In es, this message translates to:
+  /// **'Ocultar detalle'**
+  String get ocultarDetalle;
+
   /// No description provided for @marcarComoValidado.
   ///
   /// In es, this message translates to:
@@ -1027,6 +1171,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Recordar'**
   String get sesionColRecordar;
+
+  /// No description provided for @sesionColDispositivo.
+  ///
+  /// In es, this message translates to:
+  /// **'Dispositivo'**
+  String get sesionColDispositivo;
+
+  /// No description provided for @deslizaParaVerMas.
+  ///
+  /// In es, this message translates to:
+  /// **'Desliza para ver más'**
+  String get deslizaParaVerMas;
 
   /// No description provided for @sesionEnCurso.
   ///
@@ -1157,7 +1313,7 @@ abstract class AppLocalizations {
   /// No description provided for @solicitudIntro.
   ///
   /// In es, this message translates to:
-  /// **'Solicita el alta de tu funeraria, tanatorio o parroquia en TanApp. Un administrador revisará tu solicitud antes de darte acceso.'**
+  /// **'Solicita el alta de tu funeraria o tanatorio en TanApp. Un administrador revisará tu solicitud antes de darte acceso.'**
   String get solicitudIntro;
 
   /// No description provided for @fieldRazonSocial.
@@ -1345,6 +1501,54 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Configuración > Tipos de Clientes'**
   String get configuracionTiposClienteTitulo;
+
+  /// No description provided for @tiposActo.
+  ///
+  /// In es, this message translates to:
+  /// **'Tipos de acto'**
+  String get tiposActo;
+
+  /// No description provided for @configuracionTiposActoTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Configuración > Tipos de acto'**
+  String get configuracionTiposActoTitulo;
+
+  /// No description provided for @noHayTiposActoDadosDeAlta.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay tipos de acto dados de alta'**
+  String get noHayTiposActoDadosDeAlta;
+
+  /// No description provided for @actoTipoNuevo.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo tipo de acto'**
+  String get actoTipoNuevo;
+
+  /// No description provided for @actoTipoEditar.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar tipo de acto'**
+  String get actoTipoEditar;
+
+  /// No description provided for @actoTipoActivo.
+  ///
+  /// In es, this message translates to:
+  /// **'Activo'**
+  String get actoTipoActivo;
+
+  /// No description provided for @actoTipoEliminarTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar tipo de acto'**
+  String get actoTipoEliminarTitulo;
+
+  /// No description provided for @actoTipoEliminarMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Eliminar \"{nombre}\"?'**
+  String actoTipoEliminarMensaje(String nombre);
 
   /// No description provided for @configuracionIa.
   ///
@@ -1799,7 +2003,7 @@ abstract class AppLocalizations {
   /// No description provided for @avisosNuevo.
   ///
   /// In es, this message translates to:
-  /// **'Nuevo aviso'**
+  /// **'Aviso'**
   String get avisosNuevo;
 
   /// No description provided for @avisosFormTitulo.
@@ -1898,6 +2102,30 @@ abstract class AppLocalizations {
   /// **'Cancelar'**
   String get avisosCancelarSeleccion;
 
+  /// No description provided for @avisosEditarProgramado.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar aviso programado'**
+  String get avisosEditarProgramado;
+
+  /// No description provided for @avisosProgramadosTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Programados'**
+  String get avisosProgramadosTitulo;
+
+  /// No description provided for @avisosCancelarProgramadoTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Cancelar aviso programado'**
+  String get avisosCancelarProgramadoTitulo;
+
+  /// No description provided for @avisosCancelarProgramadoMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Seguro que quieres cancelar el aviso programado \"{titulo}\"? No se enviará.'**
+  String avisosCancelarProgramadoMensaje(String titulo);
+
   /// No description provided for @seguidosSeleccionaTipo.
   ///
   /// In es, this message translates to:
@@ -1925,7 +2153,7 @@ abstract class AppLocalizations {
   /// No description provided for @seguidosNoHayActivosNesteConcello.
   ///
   /// In es, this message translates to:
-  /// **'{tipoNombre, select, Tanatorio{Todavía no hay ningún tanatorio activo en este concello} Funeraria{Todavía no hay ninguna funeraria activa en este concello} Parroquia{Todavía no hay ninguna parroquia activa en este concello} other{Todavía no hay ningún cliente activo en este concello}}'**
+  /// **'{tipoNombre, select, Tanatorio{Todavía no hay ningún tanatorio activo en este concello} Funeraria{Todavía no hay ninguna funeraria activa en este concello} other{Todavía no hay ningún cliente activo en este concello}}'**
   String seguidosNoHayActivosNesteConcello(String tipoNombre);
 
   /// No description provided for @seguidosSeguir.
@@ -1939,6 +2167,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Dejar de seguir'**
   String get seguidosDejarDeSeguir;
+
+  /// No description provided for @seguidosSilenciar.
+  ///
+  /// In es, this message translates to:
+  /// **'Desactivar notificaciones'**
+  String get seguidosSilenciar;
+
+  /// No description provided for @seguidosActivarAvisos.
+  ///
+  /// In es, this message translates to:
+  /// **'Activar notificaciones'**
+  String get seguidosActivarAvisos;
 
   /// No description provided for @seguidosSiguiendoEtiqueta.
   ///
@@ -1967,7 +2207,7 @@ abstract class AppLocalizations {
   /// No description provided for @misSeguidosVacio.
   ///
   /// In es, this message translates to:
-  /// **'Todavía no sigues a ningún cliente'**
+  /// **'Todavía no sigues a ningún cliente. Usa \"Seguir un cliente nuevo\" para buscar funerarias y tanatorios.'**
   String get misSeguidosVacio;
 
   /// No description provided for @misSeguidosTabClientes.
@@ -2021,7 +2261,7 @@ abstract class AppLocalizations {
   /// No description provided for @misZonasVacio.
   ///
   /// In es, this message translates to:
-  /// **'Todavía no sigues ninguna zona'**
+  /// **'Todavía no sigues ninguna zona. Usa \"Seguir una zona nueva\" para recibir avisos de todo un concello.'**
   String get misZonasVacio;
 
   /// No description provided for @drawerMisSedes.
@@ -2119,6 +2359,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Escanear'**
   String get publicarEscanear;
+
+  /// No description provided for @publicarEscanearAyuda.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Tienes la esquela en papel o en una foto? Escanéala y te rellenamos el formulario.'**
+  String get publicarEscanearAyuda;
 
   /// No description provided for @publicarManual.
   ///
@@ -2221,6 +2467,78 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Nueva publicación'**
   String get publicarNuevaPublicacion;
+
+  /// No description provided for @publicarMisa.
+  ///
+  /// In es, this message translates to:
+  /// **'Misa/Acto'**
+  String get publicarMisa;
+
+  /// No description provided for @publicarNuevoActo.
+  ///
+  /// In es, this message translates to:
+  /// **'Nueva/o Misa/Acto'**
+  String get publicarNuevoActo;
+
+  /// No description provided for @publicarEditarActo.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar Misa/Acto'**
+  String get publicarEditarActo;
+
+  /// No description provided for @publicarEnMemoriaDe.
+  ///
+  /// In es, this message translates to:
+  /// **'En memoria de'**
+  String get publicarEnMemoriaDe;
+
+  /// No description provided for @publicarTipoActo.
+  ///
+  /// In es, this message translates to:
+  /// **'Tipo de acto'**
+  String get publicarTipoActo;
+
+  /// No description provided for @publicarTipoActoOtroOpcion.
+  ///
+  /// In es, this message translates to:
+  /// **'Otro'**
+  String get publicarTipoActoOtroOpcion;
+
+  /// No description provided for @publicarTipoActoOtro.
+  ///
+  /// In es, this message translates to:
+  /// **'Especifica el tipo de acto'**
+  String get publicarTipoActoOtro;
+
+  /// No description provided for @publicarFechaActo.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha del acto'**
+  String get publicarFechaActo;
+
+  /// No description provided for @publicarHoraActo.
+  ///
+  /// In es, this message translates to:
+  /// **'Hora del acto'**
+  String get publicarHoraActo;
+
+  /// No description provided for @publicarActoLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Acto'**
+  String get publicarActoLabel;
+
+  /// No description provided for @publicarMisaLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Misa'**
+  String get publicarMisaLabel;
+
+  /// No description provided for @publicarIglesiaLocalizacion.
+  ///
+  /// In es, this message translates to:
+  /// **'Iglesia/Localización'**
+  String get publicarIglesiaLocalizacion;
 
   /// No description provided for @publicarSeleccionaSede.
   ///
@@ -2354,6 +2672,12 @@ abstract class AppLocalizations {
   /// **'Publicado por'**
   String get publicarCompartidoPor;
 
+  /// No description provided for @publicarPublicadoPorSede.
+  ///
+  /// In es, this message translates to:
+  /// **'Publicado por: {nombreCliente} ({nombreSede})'**
+  String publicarPublicadoPorSede(String nombreCliente, String nombreSede);
+
   /// No description provided for @publicarDescargaApp.
   ///
   /// In es, this message translates to:
@@ -2369,7 +2693,7 @@ abstract class AppLocalizations {
   /// No description provided for @publicarVerCondolencias.
   ///
   /// In es, this message translates to:
-  /// **'Ver condolencias'**
+  /// **'Administrar condolencias'**
   String get publicarVerCondolencias;
 
   /// No description provided for @condolenciasCantidad.
@@ -2528,6 +2852,18 @@ abstract class AppLocalizations {
   /// **'El funeral será el {fecha} a las {hora}'**
   String publicarFuneralVoz(String fecha, String hora);
 
+  /// No description provided for @publicarMisaVoz.
+  ///
+  /// In es, this message translates to:
+  /// **'La misa será el {fecha} a las {hora}'**
+  String publicarMisaVoz(String fecha, String hora);
+
+  /// No description provided for @publicarActoVoz.
+  ///
+  /// In es, this message translates to:
+  /// **'El acto será el {fecha} a las {hora}'**
+  String publicarActoVoz(String fecha, String hora);
+
   /// No description provided for @tablonAumentarLetra.
   ///
   /// In es, this message translates to:
@@ -2623,6 +2959,90 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'¿Seguro que quieres eliminar la publicación de {nombre}?'**
   String publicarEliminarMensaje(String nombre);
+
+  /// No description provided for @publicarProgramarTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Programar para más tarde'**
+  String get publicarProgramarTitulo;
+
+  /// No description provided for @publicarProgramarAyuda.
+  ///
+  /// In es, this message translates to:
+  /// **'En vez de publicarse ahora, se publicará sola en la fecha y hora que elijas.'**
+  String get publicarProgramarAyuda;
+
+  /// No description provided for @publicarProgramarFecha.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha de publicación'**
+  String get publicarProgramarFecha;
+
+  /// No description provided for @publicarProgramarHora.
+  ///
+  /// In es, this message translates to:
+  /// **'Hora de publicación'**
+  String get publicarProgramarHora;
+
+  /// No description provided for @publicarProgramarEnElPasado.
+  ///
+  /// In es, this message translates to:
+  /// **'La fecha y hora programadas tienen que ser posteriores a ahora.'**
+  String get publicarProgramarEnElPasado;
+
+  /// No description provided for @publicarProgramar.
+  ///
+  /// In es, this message translates to:
+  /// **'Programar'**
+  String get publicarProgramar;
+
+  /// No description provided for @publicarProgramadaOk.
+  ///
+  /// In es, this message translates to:
+  /// **'Publicación programada'**
+  String get publicarProgramadaOk;
+
+  /// No description provided for @publicarProgramacionActualizada.
+  ///
+  /// In es, this message translates to:
+  /// **'Programación actualizada'**
+  String get publicarProgramacionActualizada;
+
+  /// No description provided for @publicarEditarProgramada.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar publicación programada'**
+  String get publicarEditarProgramada;
+
+  /// No description provided for @publicarProgramadasTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Programadas'**
+  String get publicarProgramadasTitulo;
+
+  /// No description provided for @publicarPublicadasTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Publicadas'**
+  String get publicarPublicadasTitulo;
+
+  /// No description provided for @publicarProgramadaPara.
+  ///
+  /// In es, this message translates to:
+  /// **'Programada para el {fecha} a las {hora}'**
+  String publicarProgramadaPara(String fecha, String hora);
+
+  /// No description provided for @publicarCancelarProgramadaTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Cancelar publicación programada'**
+  String get publicarCancelarProgramadaTitulo;
+
+  /// No description provided for @publicarCancelarProgramadaMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Seguro que quieres cancelar la publicación programada de {nombre}? No se publicará.'**
+  String publicarCancelarProgramadaMensaje(String nombre);
 
   /// No description provided for @tabPublicaciones.
   ///
@@ -2929,6 +3349,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Avisos por mes'**
   String get dashboardAvisosPorMes;
+
+  /// No description provided for @dashboardAltasPorMes.
+  ///
+  /// In es, this message translates to:
+  /// **'Altas por mes'**
+  String get dashboardAltasPorMes;
+
+  /// No description provided for @dashboardBajasPorMes.
+  ///
+  /// In es, this message translates to:
+  /// **'Bajas por mes'**
+  String get dashboardBajasPorMes;
 
   /// No description provided for @dashboardTopClientes.
   ///

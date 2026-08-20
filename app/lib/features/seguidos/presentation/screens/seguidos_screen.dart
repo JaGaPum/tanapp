@@ -10,11 +10,10 @@ import '../widgets/big_choice_card.dart';
 IconData _iconoTipo(String nombre) => switch (nombre.trim().toLowerCase()) {
   'funeraria' => Icons.local_florist,
   'tanatorio' => Icons.house_outlined,
-  'parroquia' => Icons.church,
   _ => Icons.storefront_outlined,
 };
 
-const _ordenTipos = ['Tanatorio', 'Funeraria', 'Parroquia'];
+const _ordenTipos = ['Tanatorio', 'Funeraria'];
 
 // Tanatorios y funerarias se buscan y siguen igual (a efectos del usuario final son el mismo
 // tipo de sitio), así que en "Buscar" se fusionan en una sola tarjeta que devuelve clientes de

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/l10n/l10n_extensions.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_exception.dart';
 import '../../../../core/utils/text_format.dart';
 import '../../../../core/utils/validators.dart';
@@ -13,6 +14,7 @@ import '../../../../core/widgets/cruz_icon.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_banner.dart';
 import '../../../../core/widgets/sede_sin_renombrar_bloqueo.dart';
+import '../../../acto_tipos/application/acto_tipos_providers.dart';
 import '../../../cliente_sedes/application/cliente_sedes_providers.dart';
 import '../../../configuracion/application/configuracion_providers.dart';
 import '../../../sesiones/application/sesiones_providers.dart';
@@ -24,6 +26,10 @@ import '../../data/publicaciones_repository.dart';
 
 String _formatearHora(TimeOfDay hora) =>
     '${hora.hour.toString().padLeft(2, '0')}:${hora.minute.toString().padLeft(2, '0')}';
+
+/// Valor sintético del desplegable de tipo de acto para "Otro" (no es un id real del catálogo):
+/// al elegirlo se muestra el campo de texto libre "ActoTipoOtro" en vez de un id de catálogo.
+const _actoTipoOtroSentinel = '__otro__';
 
 TimeOfDay? _parsearHora(String? valor) {
   if (valor == null) return null;
@@ -41,6 +47,7 @@ TimeOfDay? _parsearHora(String? valor) {
 /// "Publicacións" sobre una ya existente.
 class PublicacionFormScreen extends ConsumerStatefulWidget {
   final String? idClientePublicacion;
+  final String? idClientePublicacionProgramada;
   final String? idClienteSedeInicial;
   final String? nombreInicial;
   final DateTime? fechaFallecimientoInicial;
@@ -55,9 +62,21 @@ class PublicacionFormScreen extends ConsumerStatefulWidget {
   final String? avisoInicial;
   final String? idClientePublicacionPropuestaInicial;
 
+  /// Solo si se abre para editar una publicación programada existente
+  /// ([idClientePublicacionProgramada] no nulo): la fecha/hora con la que se creó.
+  final DateTime? fechaProgramadaInicial;
+
+  /// 'ESQUELA' (por defecto) o 'ACTO' (misa u otro acto de recuerdo — ver 064): fijo durante toda
+  /// la vida de esta pantalla, decidido por la tarjeta pulsada en Publicar (alta) o por el tipo
+  /// que ya tenía la publicación que se está editando, nunca elegible dentro del propio formulario.
+  final String tipoInicial;
+  final String? idConfiguracionActoTipoInicial;
+  final String? actoTipoOtroInicial;
+
   const PublicacionFormScreen({
     super.key,
     this.idClientePublicacion,
+    this.idClientePublicacionProgramada,
     this.idClienteSedeInicial,
     this.nombreInicial,
     this.fechaFallecimientoInicial,
@@ -71,6 +90,10 @@ class PublicacionFormScreen extends ConsumerStatefulWidget {
     this.observacionesInicial,
     this.avisoInicial,
     this.idClientePublicacionPropuestaInicial,
+    this.fechaProgramadaInicial,
+    this.tipoInicial = 'ESQUELA',
+    this.idConfiguracionActoTipoInicial,
+    this.actoTipoOtroInicial,
   });
 
   @override
@@ -101,15 +124,53 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
   late final _observacionesController = TextEditingController(
     text: widget.observacionesInicial ?? '',
   );
+  late final _actoTipoOtroController = TextEditingController(
+    text: widget.actoTipoOtroInicial ?? '',
+  );
+  late String? _actoTipoSeleccionado =
+      widget.idConfiguracionActoTipoInicial ??
+      (widget.actoTipoOtroInicial != null &&
+              widget.actoTipoOtroInicial!.isNotEmpty
+          ? _actoTipoOtroSentinel
+          : null);
   late DateTime? _fechaFallecimiento = widget.fechaFallecimientoInicial;
   late DateTime? _fechaFuneral = widget.fechaFuneralInicial;
   late TimeOfDay? _horaFuneral = _parsearHora(widget.horaFuneralInicial);
   late String? _idClienteSedeSeleccionada = widget.idClienteSedeInicial;
+  late bool _programar = widget.fechaProgramadaInicial != null;
+  late DateTime? _fechaProgramada = widget.fechaProgramadaInicial;
+  late TimeOfDay? _horaProgramada = widget.fechaProgramadaInicial == null
+      ? null
+      : TimeOfDay(
+          hour: widget.fechaProgramadaInicial!.hour,
+          minute: widget.fechaProgramadaInicial!.minute,
+        );
   bool _intentoEnviar = false;
   bool _loading = false;
   String? _error;
 
   bool get _esEdicion => widget.idClientePublicacion != null;
+  bool get _editandoProgramada => widget.idClientePublicacionProgramada != null;
+  bool get _esActo => widget.tipoInicial == 'ACTO';
+
+  /// Un acto civil (no religioso) no lleva iglesia: se oculta el campo entero en vez de solo
+  /// dejarlo vacío, para no dar a entender que hace falta rellenarlo. Con el catálogo aún sin
+  /// cargar, sin nada elegido todavía, o con "Otro" seleccionado, se deja visible por defecto
+  /// (no se puede saber de antemano si es religioso o no).
+  bool get _mostrarIglesia {
+    if (!_esActo) return true;
+    if (_actoTipoSeleccionado == null ||
+        _actoTipoSeleccionado == _actoTipoOtroSentinel) {
+      return true;
+    }
+    final nombre = ref
+        .read(actoTiposListProvider)
+        .maybeWhen(data: (tipos) => tipos, orElse: () => const [])
+        .where((t) => t.idConfiguracionActoTipo == _actoTipoSeleccionado)
+        .map((t) => t.nombre)
+        .firstOrNull;
+    return nombre == null || nombre.toLowerCase().contains('misa');
+  }
 
   @override
   void initState() {
@@ -135,6 +196,7 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
     _capillaArdienteController.dispose();
     _salaController.dispose();
     _observacionesController.dispose();
+    _actoTipoOtroController.dispose();
     super.dispose();
   }
 
@@ -153,7 +215,9 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
       context: context,
       initialDate: _fechaFuneral ?? _fechaFallecimiento ?? DateTime.now(),
       firstDate: DateTime(DateTime.now().year - 1),
-      lastDate: DateTime(DateTime.now().year + 1),
+      // Un acto (misa de cabo de ano, aniversario...) se suele planificar con mucha más
+      // antelación que un funeral: se le da bastante más margen hacia adelante.
+      lastDate: DateTime(DateTime.now().year + (_esActo ? 5 : 1)),
     );
     if (elegida != null) setState(() => _fechaFuneral = elegida);
   }
@@ -166,24 +230,97 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
     if (elegida != null) setState(() => _horaFuneral = elegida);
   }
 
+  Future<void> _elegirFechaProgramada() async {
+    final elegida = await showDatePicker(
+      context: context,
+      initialDate: _fechaProgramada ?? DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(DateTime.now().year + 1),
+    );
+    if (elegida != null) setState(() => _fechaProgramada = elegida);
+  }
+
+  Future<void> _elegirHoraProgramada() async {
+    final elegida = await showTimePicker(
+      context: context,
+      initialTime: _horaProgramada ?? TimeOfDay.now(),
+    );
+    if (elegida != null) setState(() => _horaProgramada = elegida);
+  }
+
   Future<void> _confirmarYPublicar() async {
     setState(() => _intentoEnviar = true);
     final formValido = _formKey.currentState!.validate();
-    final fechasCompletas =
-        _fechaFallecimiento != null &&
-        _fechaFuneral != null &&
-        _horaFuneral != null;
-    if (!formValido || !fechasCompletas) return;
+    // Un acto (misa u otro, 064) no exige fecha de fallecimiento -puede ser mucho más tarde, o ni
+    // conocerse aquí-, pero sí fecha/hora del propio acto, igual que una esquela con su funeral.
+    final fechasCompletas = _esActo
+        ? (_fechaFuneral != null && _horaFuneral != null)
+        : (_fechaFallecimiento != null &&
+              _fechaFuneral != null &&
+              _horaFuneral != null);
+    final programadaCompleta =
+        !_programar || (_fechaProgramada != null && _horaProgramada != null);
+    final tipoActoCompleto =
+        !_esActo ||
+        (_actoTipoSeleccionado != null &&
+            (_actoTipoSeleccionado != _actoTipoOtroSentinel ||
+                _actoTipoOtroController.text.trim().isNotEmpty));
+    if (!formValido ||
+        !fechasCompletas ||
+        !programadaCompleta ||
+        !tipoActoCompleto) {
+      return;
+    }
     if (_idClienteSedeSeleccionada == null) return;
 
+    DateTime? fechaProgramadaCompleta;
+    if (_programar) {
+      fechaProgramadaCompleta = DateTime(
+        _fechaProgramada!.year,
+        _fechaProgramada!.month,
+        _fechaProgramada!.day,
+        _horaProgramada!.hour,
+        _horaProgramada!.minute,
+      );
+      if (fechaProgramadaCompleta.isBefore(DateTime.now())) {
+        setState(() => _error = context.l10n.publicarProgramarEnElPasado);
+        return;
+      }
+    }
+
     final nombre = formatearTitulo(_nombreController.text);
-    final iglesia = formatearTitulo(_iglesiaController.text);
+    final iglesia = _mostrarIglesia
+        ? formatearTitulo(_iglesiaController.text)
+        : '';
     final lugar = formatearTitulo(_lugarController.text);
     final capillaArdiente = formatearTitulo(_capillaArdienteController.text);
     final sala = formatearTitulo(_salaController.text);
     final observaciones = _observacionesController.text.trim();
     final edad = int.tryParse(_edadController.text.trim());
     final horaFuneral = _formatearHora(_horaFuneral!);
+    final esOtroActoTipo = _actoTipoSeleccionado == _actoTipoOtroSentinel;
+    final idConfiguracionActoTipo = _esActo && !esOtroActoTipo
+        ? _actoTipoSeleccionado
+        : null;
+    final actoTipoOtro = _esActo && esOtroActoTipo
+        ? _actoTipoOtroController.text.trim()
+        : null;
+    final nombreActoTipo = _esActo
+        ? (actoTipoOtro ??
+              ref
+                  .read(actoTiposListProvider)
+                  .maybeWhen(
+                    data: (tipos) => tipos
+                        .where(
+                          (t) =>
+                              t.idConfiguracionActoTipo ==
+                              idConfiguracionActoTipo,
+                        )
+                        .map((t) => t.nombre)
+                        .firstOrNull,
+                    orElse: () => null,
+                  ))
+        : null;
 
     final confirmado = await _mostrarVistaPrevia(
       nombre: nombre,
@@ -193,6 +330,7 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
       capillaArdiente: capillaArdiente,
       sala: sala,
       observaciones: observaciones,
+      nombreActoTipo: nombreActoTipo,
     );
     if (confirmado != true || !mounted) return;
 
@@ -202,6 +340,10 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
     });
     final mensaje = _esEdicion
         ? context.l10n.publicarCambiosGuardados
+        : _editandoProgramada
+        ? context.l10n.publicarProgramacionActualizada
+        : _programar
+        ? context.l10n.publicarProgramadaOk
         : context.l10n.publicarPublicadoOk;
     try {
       final repo = ref.read(publicacionesRepositoryProvider);
@@ -219,6 +361,47 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
           capillaArdiente: capillaArdiente,
           sala: sala,
           observaciones: observaciones,
+          tipo: widget.tipoInicial,
+          idConfiguracionActoTipo: idConfiguracionActoTipo,
+          actoTipoOtro: actoTipoOtro,
+        );
+      } else if (_editandoProgramada) {
+        await repo.actualizarPublicacionProgramada(
+          idClientePublicacionProgramada:
+              widget.idClientePublicacionProgramada!,
+          idClienteSede: _idClienteSedeSeleccionada!,
+          nombreFallecido: nombre,
+          fechaFallecimiento: _fechaFallecimiento,
+          edad: edad,
+          fechaFuneral: _fechaFuneral,
+          horaFuneral: horaFuneral,
+          iglesia: iglesia,
+          lugar: lugar,
+          capillaArdiente: capillaArdiente,
+          sala: sala,
+          observaciones: observaciones,
+          fechaProgramada: fechaProgramadaCompleta!,
+          tipo: widget.tipoInicial,
+          idConfiguracionActoTipo: idConfiguracionActoTipo,
+          actoTipoOtro: actoTipoOtro,
+        );
+      } else if (_programar) {
+        await repo.crearPublicacionProgramada(
+          idClienteSede: _idClienteSedeSeleccionada!,
+          nombreFallecido: nombre,
+          fechaFallecimiento: _fechaFallecimiento,
+          edad: edad,
+          fechaFuneral: _fechaFuneral,
+          horaFuneral: horaFuneral,
+          iglesia: iglesia,
+          lugar: lugar,
+          capillaArdiente: capillaArdiente,
+          sala: sala,
+          observaciones: observaciones,
+          fechaProgramada: fechaProgramadaCompleta!,
+          tipo: widget.tipoInicial,
+          idConfiguracionActoTipo: idConfiguracionActoTipo,
+          actoTipoOtro: actoTipoOtro,
         );
       } else {
         await repo.crearPublicacion(
@@ -233,7 +416,12 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
           capillaArdiente: capillaArdiente,
           sala: sala,
           observaciones: observaciones,
+          tipo: widget.tipoInicial,
+          idConfiguracionActoTipo: idConfiguracionActoTipo,
+          actoTipoOtro: actoTipoOtro,
         );
+      }
+      if (!_esEdicion && !_editandoProgramada) {
         final idPropuesta = widget.idClientePublicacionPropuestaInicial;
         if (idPropuesta != null) {
           await ref
@@ -245,6 +433,7 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
       ref.invalidate(misPublicacionesProvider);
       ref.invalidate(publicacionesTablonProvider);
       ref.invalidate(publicacionesPorSedeProvider(_idClienteSedeSeleccionada!));
+      ref.invalidate(misPublicacionesProgramadasProvider);
       if (mounted) {
         ScaffoldMessenger.of(
           context,
@@ -270,8 +459,11 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
     required String capillaArdiente,
     required String sala,
     required String observaciones,
+    required String? nombreActoTipo,
   }) {
     final filas = <Widget>[
+      if (nombreActoTipo != null)
+        _FilaVistaPrevia(icon: Icons.category_outlined, texto: nombreActoTipo),
       if (_fechaFallecimiento != null || edad != null)
         _FilaVistaPrevia(
           icon: Icons.event_outlined,
@@ -321,7 +513,14 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const CruzIcon(size: 20),
+                  _esActo
+                      ? Icon(
+                          _mostrarIglesia
+                              ? Icons.church_outlined
+                              : Icons.groups_outlined,
+                          size: 20,
+                        )
+                      : const CruzIcon(size: 20),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
@@ -348,7 +547,11 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(
-              _esEdicion ? context.l10n.guardar : context.l10n.publicarPublicar,
+              _esEdicion || _editandoProgramada
+                  ? context.l10n.guardar
+                  : _programar
+                  ? context.l10n.publicarProgramar
+                  : context.l10n.publicarPublicar,
             ),
           ),
         ],
@@ -366,13 +569,24 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
     final importacionWebIaActiva = ref
         .watch(importacionWebIaActivaProvider)
         .maybeWhen(data: (activa) => activa, orElse: () => false);
+    // Se lee aquí (en vez de solo dentro del getter) para que el "watch" haga que este build()
+    // se reconstruya al cargar el catálogo o cambiar de tipo; el getter de abajo reutiliza el
+    // mismo resultado ya cacheado por Riverpod sin volver a suscribirse.
+    ref.watch(actoTiposListProvider);
+    final mostrarIglesia = _mostrarIglesia;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
           _esEdicion
-              ? context.l10n.publicarEditarPublicacion
-              : context.l10n.publicarNuevaPublicacion,
+              ? (_esActo
+                    ? context.l10n.publicarEditarActo
+                    : context.l10n.publicarEditarPublicacion)
+              : _editandoProgramada
+              ? context.l10n.publicarEditarProgramada
+              : (_esActo
+                    ? context.l10n.publicarNuevoActo
+                    : context.l10n.publicarNuevaPublicacion),
         ),
       ),
       body: sedesAsync.when(
@@ -407,22 +621,151 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   if (_error != null) ErrorBanner(message: _error!),
+                  // Escanear/importar web/propuestas son solo para esquelas (leen el formato de
+                  // una esquela real): no tienen sentido al dar de alta un acto.
+                  if (!_esActo && !_esEdicion && !_editandoProgramada) ...[
+                    _EscanearBanner(
+                      onTap: _loading
+                          ? null
+                          : () => context.pushReplacement('/publicar/escanear'),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
                   if (sedes.length > 1) ...[
                     DropdownButtonFormField<String>(
                       initialValue: _idClienteSedeSeleccionada,
                       decoration: InputDecoration(
                         labelText: context.l10n.publicarSeleccionaSede,
+                        filled: true,
+                        fillColor: AppColors.greenLight.withValues(alpha: 0.35),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                       items: sedes
                           .map(
                             (sede) => DropdownMenuItem(
                               value: sede.idClienteSede,
-                              child: Text('${sede.codigo} · ${sede.nombre}'),
+                              child: Text(
+                                '${sede.codigo} · ${sede.nombre}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           )
                           .toList(),
                       onChanged: (value) =>
                           setState(() => _idClienteSedeSeleccionada = value),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  if (!_esEdicion) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.green, width: 2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          SwitchListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(
+                              context.l10n.publicarProgramarTitulo,
+                              style: const TextStyle(
+                                color: AppColors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: Text(context.l10n.publicarProgramarAyuda),
+                            value: _programar,
+                            onChanged: _editandoProgramada
+                                ? null
+                                : (value) => setState(() => _programar = value),
+                          ),
+                          if (_programar) ...[
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: _elegirFechaProgramada,
+                                      child: InputDecorator(
+                                        decoration: InputDecoration(
+                                          labelText: context
+                                              .l10n
+                                              .publicarProgramarFecha,
+                                          errorText:
+                                              _intentoEnviar &&
+                                                  _fechaProgramada == null
+                                              ? context.l10n
+                                                    .validatorRequiredField(
+                                                      context
+                                                          .l10n
+                                                          .publicarProgramarFecha,
+                                                    )
+                                              : null,
+                                        ),
+                                        child: Text(
+                                          _fechaProgramada != null
+                                              ? DateFormat(
+                                                  'dd/MM/yyyy',
+                                                ).format(_fechaProgramada!)
+                                              : '',
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: _elegirHoraProgramada,
+                                      child: InputDecorator(
+                                        decoration: InputDecoration(
+                                          labelText: context
+                                              .l10n
+                                              .publicarProgramarHora,
+                                          errorText:
+                                              _intentoEnviar &&
+                                                  _horaProgramada == null
+                                              ? context.l10n
+                                                    .validatorRequiredField(
+                                                      context
+                                                          .l10n
+                                                          .publicarProgramarHora,
+                                                    )
+                                              : null,
+                                        ),
+                                        child: Text(
+                                          _horaProgramada != null
+                                              ? _formatearHora(_horaProgramada!)
+                                              : '',
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 16),
                   ],
@@ -438,19 +781,48 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
                   const SizedBox(height: 16),
                   AppTextField(
                     controller: _nombreController,
-                    label: context.l10n.publicarNombreFallecido,
+                    label: _esActo
+                        ? context.l10n.publicarEnMemoriaDe
+                        : context.l10n.publicarNombreFallecido,
                     validator: Validators.required(
                       context,
-                      context.l10n.publicarNombreFallecido,
+                      _esActo
+                          ? context.l10n.publicarEnMemoriaDe
+                          : context.l10n.publicarNombreFallecido,
                     ),
                   ),
+                  // Separado de los avisos de arriba (protección de datos) a propósito, para que
+                  // no queden pegados el uno al otro: primero el nombre, luego el tipo de acto.
+                  if (_esActo) ...[
+                    const SizedBox(height: 16),
+                    _TipoActoField(
+                      seleccionado: _actoTipoSeleccionado,
+                      intentoEnviar: _intentoEnviar,
+                      onChanged: (value) =>
+                          setState(() => _actoTipoSeleccionado = value),
+                    ),
+                    if (_actoTipoSeleccionado == _actoTipoOtroSentinel) ...[
+                      const SizedBox(height: 16),
+                      AppTextField(
+                        controller: _actoTipoOtroController,
+                        label: context.l10n.publicarTipoActoOtro,
+                        validator: Validators.required(
+                          context,
+                          context.l10n.publicarTipoActoOtro,
+                        ),
+                      ),
+                    ],
+                  ],
                   const SizedBox(height: 16),
                   InkWell(
                     onTap: _elegirFechaFallecimiento,
                     child: InputDecorator(
                       decoration: InputDecoration(
                         labelText: context.l10n.publicarFechaFallecimiento,
-                        errorText: _intentoEnviar && _fechaFallecimiento == null
+                        errorText:
+                            _intentoEnviar &&
+                                !_esActo &&
+                                _fechaFallecimiento == null
                             ? context.l10n.validatorRequiredField(
                                 context.l10n.publicarFechaFallecimiento,
                               )
@@ -465,49 +837,61 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  AppTextField(
-                    controller: _edadController,
-                    label: context.l10n.publicarEdad,
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return context.l10n.validatorRequiredField(
-                          context.l10n.publicarEdad,
-                        );
-                      }
-                      return int.tryParse(value.trim()) == null
-                          ? context.l10n.publicarEdadInvalida
-                          : null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  AppTextField(
-                    controller: _capillaArdienteController,
-                    label: context.l10n.publicarCapillaArdiente,
-                    validator: Validators.required(
-                      context,
-                      context.l10n.publicarCapillaArdiente,
+                  // Edad no aporta nada en un acto (misa u otro): solo tiene sentido para la
+                  // esquela del propio fallecimiento.
+                  if (!_esActo) ...[
+                    const SizedBox(height: 16),
+                    AppTextField(
+                      controller: _edadController,
+                      label: context.l10n.publicarEdad,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return context.l10n.validatorRequiredField(
+                            context.l10n.publicarEdad,
+                          );
+                        }
+                        return int.tryParse(value.trim()) == null
+                            ? context.l10n.publicarEdadInvalida
+                            : null;
+                      },
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  AppTextField(
-                    controller: _salaController,
-                    label: context.l10n.publicarSala,
-                    validator: Validators.required(
-                      context,
-                      context.l10n.publicarSala,
+                  ],
+                  // Capilla ardiente y sala son del velatorio: no existen en un acto que no es un
+                  // fallecimiento recién ocurrido.
+                  if (!_esActo) ...[
+                    const SizedBox(height: 16),
+                    AppTextField(
+                      controller: _capillaArdienteController,
+                      label: context.l10n.publicarCapillaArdiente,
+                      validator: Validators.required(
+                        context,
+                        context.l10n.publicarCapillaArdiente,
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 16),
+                    AppTextField(
+                      controller: _salaController,
+                      label: context.l10n.publicarSala,
+                      validator: Validators.required(
+                        context,
+                        context.l10n.publicarSala,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 16),
                   InkWell(
                     onTap: _elegirFechaFuneral,
                     child: InputDecorator(
                       decoration: InputDecoration(
-                        labelText: context.l10n.publicarFechaFuneral,
+                        labelText: _esActo
+                            ? context.l10n.publicarFechaActo
+                            : context.l10n.publicarFechaFuneral,
                         errorText: _intentoEnviar && _fechaFuneral == null
                             ? context.l10n.validatorRequiredField(
-                                context.l10n.publicarFechaFuneral,
+                                _esActo
+                                    ? context.l10n.publicarFechaActo
+                                    : context.l10n.publicarFechaFuneral,
                               )
                             : null,
                       ),
@@ -523,10 +907,14 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
                     onTap: _elegirHoraFuneral,
                     child: InputDecorator(
                       decoration: InputDecoration(
-                        labelText: context.l10n.publicarHoraFuneral,
+                        labelText: _esActo
+                            ? context.l10n.publicarHoraActo
+                            : context.l10n.publicarHoraFuneral,
                         errorText: _intentoEnviar && _horaFuneral == null
                             ? context.l10n.validatorRequiredField(
-                                context.l10n.publicarHoraFuneral,
+                                _esActo
+                                    ? context.l10n.publicarHoraActo
+                                    : context.l10n.publicarHoraFuneral,
                               )
                             : null,
                       ),
@@ -537,15 +925,23 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  AppTextField(
-                    controller: _iglesiaController,
-                    label: context.l10n.publicarIglesia,
-                    validator: Validators.required(
-                      context,
-                      context.l10n.publicarIglesia,
+                  if (mostrarIglesia) ...[
+                    const SizedBox(height: 16),
+                    AppTextField(
+                      controller: _iglesiaController,
+                      label: _esActo
+                          ? context.l10n.publicarIglesiaLocalizacion
+                          : context.l10n.publicarIglesia,
+                      // Un acto no religioso no tiene iglesia; en la esquela sigue siendo
+                      // obligatoria, como siempre.
+                      validator: _esActo
+                          ? null
+                          : Validators.required(
+                              context,
+                              context.l10n.publicarIglesia,
+                            ),
                     ),
-                  ),
+                  ],
                   const SizedBox(height: 16),
                   AppTextField(
                     controller: _lugarController,
@@ -563,21 +959,15 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
                   ),
                   const SizedBox(height: 16),
                   AppButton(
-                    label: _esEdicion
+                    label: _esEdicion || _editandoProgramada
                         ? context.l10n.guardar
+                        : _programar
+                        ? context.l10n.publicarProgramar
                         : context.l10n.publicarPublicar,
                     loading: _loading,
                     onPressed: _confirmarYPublicar,
                   ),
-                  if (!_esEdicion) ...[
-                    const SizedBox(height: 12),
-                    OutlinedButton.icon(
-                      icon: const Icon(Icons.document_scanner_outlined),
-                      label: Text(context.l10n.publicarEscanear),
-                      onPressed: _loading
-                          ? null
-                          : () => context.pushReplacement('/publicar/escanear'),
-                    ),
+                  if (!_esActo && !_esEdicion && !_editandoProgramada) ...[
                     if (importacionWebIaActiva) ...[
                       const SizedBox(height: 12),
                       if (!importacionWebConfigurada)
@@ -622,6 +1012,52 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
   }
 }
 
+/// Desplegable del tipo de acto (misa de cabo de ano, aniversario...), del catálogo editable por
+/// el ADMIN (064) más una opción "Otro" que revela un campo de texto libre en el formulario.
+class _TipoActoField extends ConsumerWidget {
+  final String? seleccionado;
+  final bool intentoEnviar;
+  final ValueChanged<String?> onChanged;
+
+  const _TipoActoField({
+    required this.seleccionado,
+    required this.intentoEnviar,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final actoTiposAsync = ref.watch(actoTiposListProvider);
+    return actoTiposAsync.when(
+      data: (actoTipos) => DropdownButtonFormField<String>(
+        initialValue: seleccionado,
+        decoration: InputDecoration(
+          labelText: context.l10n.publicarTipoActo,
+          errorText: intentoEnviar && seleccionado == null
+              ? context.l10n.validatorRequiredField(
+                  context.l10n.publicarTipoActo,
+                )
+              : null,
+        ),
+        items: [
+          for (final actoTipo in actoTipos)
+            DropdownMenuItem(
+              value: actoTipo.idConfiguracionActoTipo,
+              child: Text(actoTipo.nombre),
+            ),
+          DropdownMenuItem(
+            value: _actoTipoOtroSentinel,
+            child: Text(context.l10n.publicarTipoActoOtroOpcion),
+          ),
+        ],
+        onChanged: onChanged,
+      ),
+      loading: () => const LinearProgressIndicator(),
+      error: (e, _) => Text(context.l10n.errorGenerico(e.toString())),
+    );
+  }
+}
+
 class _AvisoBanner extends StatelessWidget {
   final IconData icon;
   final String texto;
@@ -638,10 +1074,69 @@ class _AvisoBanner extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
+          Icon(icon, size: 20, color: AppColors.white),
           const SizedBox(width: 8),
-          Expanded(child: Text(texto)),
+          Expanded(
+            child: Text(texto, style: const TextStyle(color: AppColors.white)),
+          ),
         ],
+      ),
+    );
+  }
+}
+
+/// Banner destacado arriba del formulario manual: para que quien entra a publicar vea de
+/// entrada que puede escanear la esquela en vez de rellenar todo a mano, en vez de tener que
+/// llegar hasta el final del formulario para descubrirlo.
+class _EscanearBanner extends StatelessWidget {
+  final VoidCallback? onTap;
+  const _EscanearBanner({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.green,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.document_scanner_outlined,
+                color: AppColors.white,
+                size: 28,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      context.l10n.publicarEscanear,
+                      style: const TextStyle(
+                        color: AppColors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      context.l10n.publicarEscanearAyuda,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right, color: AppColors.white),
+            ],
+          ),
+        ),
       ),
     );
   }

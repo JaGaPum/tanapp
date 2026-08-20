@@ -7,6 +7,14 @@ class Validators {
 
   static final _emailRegex = RegExp(r'^[\w.+-]+@[\w-]+\.[a-zA-Z]{2,}$');
   static final _digitsRegex = RegExp(r'^\d{6}$');
+  static final _passwordLetraRegex = RegExp(r'[A-Za-z]');
+  static final _passwordNumeroRegex = RegExp(r'[0-9]');
+
+  /// Mínimo de caracteres para una contraseña: [passwordEstrictaMinimo] para CLIENTE (además
+  /// exige combinar letras y números, ver [password]), [passwordBasicoMinimo] para el resto
+  /// (usuario ordinario: lo habitual es que use Google, la contraseña es un respaldo).
+  static const passwordBasicoMinimo = 8;
+  static const passwordEstrictaMinimo = 10;
 
   static String? Function(String?) required(
     BuildContext context,
@@ -32,12 +40,28 @@ class Validators {
     };
   }
 
-  static String? Function(String?) password(BuildContext context) {
+  /// [estricta] es para CLIENTE (gestiona la cuenta de un negocio): exige más longitud y
+  /// combinar letras y números. El resto de usuarios se queda en la regla básica, ya que lo
+  /// esperable es que usen Google como método principal y la contraseña quede de respaldo.
+  static String? Function(String?) password(
+    BuildContext context, {
+    bool estricta = false,
+  }) {
+    final minimo = estricta ? passwordEstrictaMinimo : passwordBasicoMinimo;
     return (value) {
       if (value == null || value.isEmpty) {
         return context.l10n.validatorPasswordRequired;
       }
-      if (value.length < 8) return context.l10n.validatorPasswordTooShort;
+      if (value.length < minimo) {
+        return estricta
+            ? context.l10n.validatorPasswordTooShortEstricta(minimo)
+            : context.l10n.validatorPasswordTooShort;
+      }
+      if (estricta &&
+          (!_passwordLetraRegex.hasMatch(value) ||
+              !_passwordNumeroRegex.hasMatch(value))) {
+        return context.l10n.validatorPasswordSinLetraYNumero;
+      }
       return null;
     };
   }

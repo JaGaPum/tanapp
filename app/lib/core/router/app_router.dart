@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../features/account/presentation/screens/account_screen.dart';
+import '../../features/configuracion/presentation/screens/acto_tipo_detail_screen.dart';
+import '../../features/configuracion/presentation/screens/configuracion_acto_tipos_screen.dart';
 import '../../features/auth/presentation/screens/bienvenida_screen.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
@@ -41,8 +43,7 @@ import '../../features/zonas_seguidas/presentation/screens/zona_concellos_screen
 import '../../features/seguidos/presentation/screens/buscar_cliente_screen.dart';
 import '../../features/zonas_seguidas/presentation/screens/zona_provincias_screen.dart';
 import '../../features/sesiones/application/sesion_policy_service.dart';
-import '../../features/sesiones/data/device_sesion_store.dart';
-import '../../features/sesiones/data/sesiones_repository.dart';
+import '../../features/sesiones/application/sesiones_providers.dart';
 import '../../features/sesiones/presentation/screens/elegir_idioma_screen.dart';
 import '../../features/sesiones/presentation/screens/elegir_sede_screen.dart';
 import '../../features/sistema/presentation/screens/sistema_screen.dart';
@@ -52,6 +53,7 @@ import '../../features/sistema_usuarios/presentation/screens/usuarios_list_scree
 import '../../features/splash/presentation/screens/splash_screen.dart';
 import '../../features/terminos/data/terminos_repository.dart';
 import '../../features/terminos/presentation/screens/aceptar_terminos_screen.dart';
+import '../../features/terminos/presentation/screens/editar_terminos_screen.dart';
 import '../../features/terminos/presentation/screens/ver_terminos_screen.dart';
 import '../l10n/l10n_extensions.dart';
 import '../l10n/locale_provider.dart';
@@ -226,12 +228,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 .read(clienteSedesRepositoryProvider)
                 .listSedesDeUsuario(perfil.idSistemaUsuario);
             if (sedes.length > 1) {
-              final idLocal = await ref.read(deviceSesionStoreProvider).leer();
-              final sesionActual = idLocal == null
-                  ? null
-                  : await ref
-                        .read(sesionesRepositoryProvider)
-                        .fetchPorId(idLocal);
+              // Vía sesionActualProvider (no directo a DeviceSesionStore): si se está
+              // suplantando a este usuario, es la sesión de la suplantación la que hay que
+              // mirar, no la del dispositivo real (que sigue siendo la del admin).
+              final sesionActual = await ref.read(sesionActualProvider.future);
               guard.necesitaElegirSede = sesionActual?.idClienteSede == null;
             } else {
               guard.necesitaElegirSede = false;
@@ -342,8 +342,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           final fechaFallecimiento = datos?['fechaFallecimiento'];
           final edad = datos?['edad'];
           final fechaFuneral = datos?['fechaFuneral'];
+          final fechaProgramada = datos?['fechaProgramada'];
           return PublicacionFormScreen(
             idClientePublicacion: datos?['idClientePublicacion'],
+            idClientePublicacionProgramada:
+                datos?['idClientePublicacionProgramada'],
             idClienteSedeInicial: datos?['idClienteSede'],
             nombreInicial: datos?['nombre'],
             fechaFallecimientoInicial: fechaFallecimiento != null
@@ -362,6 +365,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             avisoInicial: datos?['avisoOcr'],
             idClientePublicacionPropuestaInicial:
                 datos?['idClientePublicacionPropuesta'],
+            fechaProgramadaInicial: fechaProgramada != null
+                ? DateTime.parse(fechaProgramada)
+                : null,
+            tipoInicial: datos?['tipo'] ?? 'ESQUELA',
+            idConfiguracionActoTipoInicial: datos?['idConfiguracionActoTipo'],
+            actoTipoOtroInicial: datos?['actoTipoOtro'],
           );
         },
       ),
@@ -379,7 +388,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/publicar/avisos',
-        builder: (context, state) => const AvisoFormScreen(),
+        builder: (context, state) {
+          final datos = state.extra as Map<String, String?>?;
+          final fechaProgramada = datos?['fechaProgramada'];
+          return AvisoFormScreen(
+            idClienteAvisoProgramado: datos?['idClienteAvisoProgramado'],
+            idClienteSedeInicial: datos?['idClienteSede'],
+            tituloInicial: datos?['titulo'],
+            textoInicial: datos?['texto'],
+            fechaProgramadaInicial: fechaProgramada != null
+                ? DateTime.parse(fechaProgramada)
+                : null,
+          );
+        },
       ),
       GoRoute(
         path: '/publicaciones/:sedeId',
@@ -459,8 +480,28 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ],
           ),
           GoRoute(
+            path: 'tipos-acto',
+            builder: (context, state) => const ConfiguracionActoTiposScreen(),
+            routes: [
+              GoRoute(
+                path: 'nueva',
+                builder: (context, state) => const ActoTipoDetailScreen(),
+              ),
+              GoRoute(
+                path: ':id',
+                builder: (context, state) => ActoTipoDetailScreen(
+                  idConfiguracionActoTipo: state.pathParameters['id']!,
+                ),
+              ),
+            ],
+          ),
+          GoRoute(
             path: 'ia',
             builder: (context, state) => const ConfiguracionIaScreen(),
+          ),
+          GoRoute(
+            path: 'terminos',
+            builder: (context, state) => const EditarTerminosScreen(),
           ),
         ],
       ),

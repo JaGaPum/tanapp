@@ -5,7 +5,9 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../../core/preferences/escala_texto_provider.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/cruz_icon.dart';
+import '../../../acto_tipos/application/acto_tipos_providers.dart';
 import '../../../condolencias/presentation/widgets/condolencias_modal.dart';
 import '../../data/publicacion_con_sede.dart';
 import 'archivar_publicacion_button.dart';
@@ -37,11 +39,53 @@ class PublicacionCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final escala = ref.watch(escalaTextoProvider);
-    return Card(
-      // Blanco (el de por defecto del tema) con sombra en vez de borde negro: la tarjeta se
-      // distingue del fondo por elevación, no por un contorno marcado.
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    final esOscuro = Theme.of(context).brightness == Brightness.dark;
+    final textTheme = Theme.of(context).textTheme;
+    final estiloNombre = textTheme.titleLarge?.copyWith(
+      fontSize: (textTheme.titleLarge?.fontSize ?? 22) + 1,
+    );
+    final estiloConcello = textTheme.titleSmall?.copyWith(
+      fontSize: (textTheme.titleSmall?.fontSize ?? 14) + 1,
+    );
+    final estiloFecha = textTheme.bodySmall?.copyWith(
+      fontSize: (textTheme.bodySmall?.fontSize ?? 12) + 1,
+      color: Theme.of(context).colorScheme.outline,
+    );
+    // El chip dice "Misa" o "Acto" según lo que de verdad sea el tipo elegido (p. ej. "Acto
+    // Civil" no es una misa): se mira el nombre resuelto del catálogo, no el tipo genérico.
+    final nombreActoTipo = nombreActoTipoDe(
+      publicacion,
+      ref
+          .watch(actoTiposListProvider)
+          .maybeWhen(data: (tipos) => tipos, orElse: () => const []),
+    );
+    final esMisa = nombreActoTipo?.toLowerCase().contains('misa') ?? false;
+    // Container en vez de Card: la sombra de Card (elevation) solo se nota por abajo, y aquí
+    // hace falta un poco también por arriba para que la tarjeta no quede pegada a la de encima.
+    // Además del boxShadow (difuso, apenas visible entre tarjeta y tarjeta) se añade un borde
+    // fino para que se note bien el contorno completo de la tarjeta, no solo un degradado leve.
+    return Container(
+      decoration: BoxDecoration(
+        color: esOscuro ? AppColors.darkSurface : AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: esOscuro
+              ? Colors.white.withValues(alpha: 0.14)
+              : Colors.black.withValues(alpha: 0.12),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 6,
+            offset: const Offset(0, -3),
+          ),
+        ],
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: MediaQuery(
@@ -54,14 +98,45 @@ class PublicacionCard extends ConsumerWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  CruzIcon(size: 20 * escala),
+                  publicacion.esActo
+                      ? Icon(
+                          esMisa
+                              ? Icons.church_outlined
+                              : Icons.groups_outlined,
+                          size: 20 * escala,
+                          color: AppColors.black,
+                        )
+                      : CruzIcon(size: 20 * escala),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       publicacion.nombreFallecido,
-                      style: Theme.of(context).textTheme.titleLarge,
+                      style: estiloNombre,
                     ),
                   ),
+                  if (publicacion.esActo) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.secondary,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        esMisa
+                            ? context.l10n.publicarMisaLabel
+                            : context.l10n.publicarActoLabel,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSecondary,
+                          fontSize: 12 * escala,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                  ],
                   EscucharEsquelaButton(publicacion: publicacion),
                   // Archivar es para guardarla en el Arquivo personal de un seguidor: no tiene
                   // sentido que el propio cliente "archive" su propia esquela.
@@ -74,8 +149,11 @@ class PublicacionCard extends ConsumerWidget {
               if (esPropia) ...[
                 const SizedBox(height: 2),
                 Text(
-                  publicacion.concello,
-                  style: Theme.of(context).textTheme.titleSmall,
+                  context.l10n.publicarPublicadoPorSede(
+                    publicacion.nombreCliente,
+                    publicacion.nombreSede,
+                  ),
+                  style: estiloConcello,
                 ),
               ],
               const SizedBox(height: 8),
@@ -92,19 +170,24 @@ class PublicacionCard extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               if (esPropia) ...[
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
+                // Mismo ancho que el botón de condolencias de debajo (a partes iguales entre los
+                // dos), en vez de un Wrap de píldoras compactas: como bloque, queda más ordenado.
+                Row(
                   children: [
-                    OutlinedButton.icon(
-                      icon: const Icon(Icons.edit_outlined),
-                      label: Text(context.l10n.editar),
-                      onPressed: eliminando ? null : onEditar,
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.edit_outlined),
+                        label: Text(context.l10n.editar),
+                        onPressed: eliminando ? null : onEditar,
+                      ),
                     ),
-                    OutlinedButton.icon(
-                      icon: const Icon(Icons.delete_outline),
-                      label: Text(context.l10n.eliminar),
-                      onPressed: eliminando ? null : onEliminar,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.delete_outline),
+                        label: Text(context.l10n.eliminar),
+                        onPressed: eliminando ? null : onEliminar,
+                      ),
                     ),
                   ],
                 ),
@@ -140,9 +223,7 @@ class PublicacionCard extends ConsumerWidget {
                 DateFormat(
                   'dd/MM/yyyy HH:mm',
                 ).format(publicacion.fechaAlta.toLocal()),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.outline,
-                ),
+                style: estiloFecha,
               ),
             ],
           ),

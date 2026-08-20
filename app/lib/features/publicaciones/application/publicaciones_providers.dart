@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/pagination/paginated_notifier.dart';
 import '../../cliente_sedes/application/cliente_sedes_providers.dart';
 import '../data/publicacion_con_sede.dart';
+import '../data/publicacion_programada.dart';
 import '../data/publicaciones_por_mes.dart';
 import '../data/publicaciones_repository.dart';
 
@@ -79,6 +80,17 @@ final misPublicacionesArchivadasProvider =
       PublicacionesArchivadasNotifier,
       PaginaResultado<PublicacionConSede>
     >(PublicacionesArchivadasNotifier.new);
+
+/// Publicaciones programadas (055) de todas mis sedes, pendientes de que llegue su fecha.
+final misPublicacionesProgramadasProvider =
+    FutureProvider.autoDispose<List<PublicacionProgramada>>((ref) async {
+      final sedes = await ref.watch(misSedesProvider.future);
+      return ref
+          .watch(publicacionesRepositoryProvider)
+          .listPublicacionesProgramadas(
+            sedes.map((s) => s.idClienteSede).toList(),
+          );
+    });
 
 /// Actividad de publicaciones de los últimos meses, para la gráfica del Panel de Datos.
 final publicacionesPorMesProvider =

@@ -31,6 +31,8 @@ final clientesStatsProvider = FutureProvider.autoDispose<ClientesStats>((
           ..sort((a, b) => b.value.compareTo(a.value)),
     publicacionesPorMes: stats.publicacionesPorMes,
     avisosPorMes: stats.avisosPorMes,
+    altasPorMes: stats.altasPorMes,
+    bajasPorMes: stats.bajasPorMes,
     topClientesPorPublicaciones: stats.topClientesPorPublicaciones,
   );
 });
@@ -55,6 +57,8 @@ final usuariosStatsProvider = FutureProvider.autoDispose<UsuariosStats>((
             .toList()
           ..sort((a, b) => b.value.compareTo(a.value)),
     topConcellos: stats.topConcellos,
+    altasPorMes: stats.altasPorMes,
+    bajasPorMes: stats.bajasPorMes,
   );
 });
 

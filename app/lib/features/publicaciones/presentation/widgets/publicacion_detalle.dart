@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/l10n/l10n_extensions.dart';
+import '../../../acto_tipos/application/acto_tipos_providers.dart';
 import '../../data/publicacion_con_sede.dart';
 
 /// Pinta los campos estructurados de una publicación, agrupados por evento (falleció -> velorio
 /// -> entierro) y con una etiqueta de texto delante de cada dato (no solo el icono), para que
 /// se entienda de un vistazo sin tener que interpretar iconos. Omite los campos vacíos.
-class PublicacionDetalle extends StatelessWidget {
+///
+/// Para un acto (misa u otro, 064) los grupos de "velorio" no aplican -sus campos vienen vacíos
+/// de por sí- y se antepone una fila con el tipo de acto.
+class PublicacionDetalle extends ConsumerWidget {
   final PublicacionConSede publicacion;
 
   /// Se pinta al final de la fila de "Lugar" (alineado a la derecha), en vez de en su propia
@@ -20,13 +25,33 @@ class PublicacionDetalle extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final p = publicacion;
+    final textTheme = Theme.of(context).textTheme;
+    final estiloTexto = textTheme.bodyLarge?.copyWith(
+      fontSize: (textTheme.bodyLarge?.fontSize ?? 16) + 1,
+    );
+    final nombreActoTipo = nombreActoTipoDe(
+      p,
+      ref
+          .watch(actoTiposListProvider)
+          .maybeWhen(data: (tipos) => tipos, orElse: () => const []),
+    );
+    // Un acto civil (no religioso) no muestra iglesia, aunque hubiera algo guardado ahí.
+    final esMisa = nombreActoTipo?.toLowerCase().contains('misa') ?? false;
+    final mostrarIglesia = !p.esActo || esMisa;
 
     final basico = <Widget>[
+      if (nombreActoTipo != null)
+        _Fila(
+          icon: Icons.category_outlined,
+          style: estiloTexto,
+          texto: nombreActoTipo,
+        ),
       if (p.fechaFallecimiento != null || p.edad != null)
         _Fila(
           icon: Icons.event_outlined,
+          style: estiloTexto,
           texto: [
             if (p.fechaFallecimiento != null)
               context.l10n.publicarFallecioEl(
@@ -41,12 +66,14 @@ class PublicacionDetalle extends StatelessWidget {
       if (p.capillaArdiente != null)
         _Fila(
           icon: Icons.local_florist_outlined,
+          style: estiloTexto,
           etiqueta: context.l10n.publicarVelatorioLabel,
           texto: p.capillaArdiente!,
         ),
       if (p.sala != null)
         _Fila(
           icon: Icons.meeting_room_outlined,
+          style: estiloTexto,
           etiqueta: context.l10n.publicarSala,
           texto: p.sala!,
         ),
@@ -56,22 +83,29 @@ class PublicacionDetalle extends StatelessWidget {
       if (p.fechaFuneral != null || p.horaFuneral != null)
         _Fila(
           icon: Icons.schedule,
-          etiqueta: context.l10n.publicarEntierroLabel,
+          style: estiloTexto,
+          etiqueta: p.esActo
+              ? context.l10n.publicarActoLabel
+              : context.l10n.publicarEntierroLabel,
           texto: [
             if (p.fechaFuneral != null)
               DateFormat('dd/MM/yyyy').format(p.fechaFuneral!),
             if (p.horaFuneral != null) p.horaFuneral!,
           ].join(' · '),
         ),
-      if (p.iglesia != null)
+      if (p.iglesia != null && mostrarIglesia)
         _Fila(
           icon: Icons.church_outlined,
-          etiqueta: context.l10n.publicarIglesia,
+          style: estiloTexto,
+          etiqueta: p.esActo
+              ? context.l10n.publicarIglesiaLocalizacion
+              : context.l10n.publicarIglesia,
           texto: p.iglesia!,
         ),
       if (p.lugar != null)
         _Fila(
           icon: Icons.place_outlined,
+          style: estiloTexto,
           etiqueta: context.l10n.publicarLugar,
           texto: p.lugar!,
           trailing: trailingLugar,
@@ -89,7 +123,7 @@ class PublicacionDetalle extends StatelessWidget {
         for (final fila in enterro) ...[fila, const SizedBox(height: 4)],
         if (p.observaciones != null) ...[
           const SizedBox(height: 4),
-          Text(p.observaciones!, style: Theme.of(context).textTheme.bodyLarge),
+          Text(p.observaciones!, style: estiloTexto),
         ],
       ],
     );
@@ -101,11 +135,13 @@ class _Fila extends StatelessWidget {
   final String? etiqueta;
   final String texto;
   final Widget? trailing;
+  final TextStyle? style;
   const _Fila({
     required this.icon,
     this.etiqueta,
     required this.texto,
     this.trailing,
+    this.style,
   });
 
   @override
@@ -118,7 +154,7 @@ class _Fila extends StatelessWidget {
         Expanded(
           child: RichText(
             text: TextSpan(
-              style: Theme.of(context).textTheme.bodyLarge,
+              style: style ?? Theme.of(context).textTheme.bodyLarge,
               children: [
                 if (etiqueta != null)
                   TextSpan(

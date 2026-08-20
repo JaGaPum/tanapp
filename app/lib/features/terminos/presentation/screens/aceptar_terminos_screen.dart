@@ -6,6 +6,7 @@ import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../auth/application/auth_providers.dart';
 import '../../../sesiones/application/sesion_policy_service.dart';
 import '../../application/terminos_providers.dart';
+import '../../data/termino.dart';
 import '../../data/terminos_repository.dart';
 
 /// Pantalla de bloqueo: no se puede navegar a ningún otro sitio hasta aceptar todos los
@@ -22,13 +23,13 @@ class _AceptarTerminosScreenState extends ConsumerState<AceptarTerminosScreen> {
   final Set<String> _aceptados = {};
   bool _guardando = false;
 
-  Future<void> _continuar(List<String> idsSistemaTermino) async {
+  Future<void> _continuar(List<Termino> terminos) async {
     setState(() => _guardando = true);
     try {
       final perfil = await ref.read(currentUserProfileProvider.future);
       await ref
           .read(terminosRepositoryProvider)
-          .aceptar(perfil!.idSistemaUsuario, idsSistemaTermino);
+          .aceptar(perfil!.idSistemaUsuario, terminos);
       ref.read(sesionBootstrapGuardProvider).necesitaAceptarTerminos = false;
       if (!mounted) return;
       context.go('/home');
@@ -49,7 +50,6 @@ class _AceptarTerminosScreenState extends ConsumerState<AceptarTerminosScreen> {
       body: SafeArea(
         child: pendientesAsync.when(
           data: (pendientes) {
-            final ids = pendientes.map((t) => t.idSistemaTermino).toList();
             final todosAceptados = pendientes.every(
               (t) => _aceptados.contains(t.idSistemaTermino),
             );
@@ -114,7 +114,7 @@ class _AceptarTerminosScreenState extends ConsumerState<AceptarTerminosScreen> {
                     width: double.infinity,
                     child: FilledButton(
                       onPressed: (todosAceptados && !_guardando)
-                          ? () => _continuar(ids)
+                          ? () => _continuar(pendientes)
                           : null,
                       child: _guardando
                           ? const SizedBox(

@@ -19,7 +19,6 @@ import '../../../panel_datos/presentation/screens/panel_datos_screen.dart';
 import '../../../publicaciones/presentation/screens/mis_publicaciones_screen.dart';
 import '../../../publicar/presentation/screens/publicar_screen.dart';
 import '../../../seguidos/presentation/screens/mis_seguidos_screen.dart';
-import '../../../seguidos/presentation/screens/seguidos_screen.dart';
 import '../../../sesiones/presentation/widgets/sede_actual_banner.dart';
 import '../../../suplantacion/presentation/widgets/banner_suplantacion.dart';
 import '../../../tablon/presentation/screens/tablon_screen.dart';
@@ -34,10 +33,10 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen>
     with WidgetsBindingObserver {
   // Índice de la pestaña "Avisos" dentro de la barra inferior de un usuario ordinario/seguidor
-  // (TablonScreen, SeguidosScreen, MisSeguidosScreen, ArchivoScreen, AvisosScreen): solo un
-  // seguidor puede recibir un push de aviso (es a quien el trigger le crea el destinatario), así
-  // que al tocar esa notificación siempre es esta la pestaña a la que hay que saltar.
-  static const _tabIndexAvisosSeguidor = 4;
+  // (TablonScreen, MisSeguidosScreen, ArchivoScreen, AvisosScreen): solo un seguidor puede
+  // recibir un push de aviso (es a quien el trigger le crea el destinatario), así que al tocar
+  // esa notificación siempre es esta la pestaña a la que hay que saltar.
+  static const _tabIndexAvisosSeguidor = 3;
 
   int _tabIndex = 0;
   String? _idSesionAnterior;
@@ -82,8 +81,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       final mensajeInicial = await FirebaseMessaging.instance
           .getInitialMessage();
       if (mensajeInicial != null) _abrirDesdeNotificacion(mensajeInicial);
-    } catch (_) {
-      // Sin conexión o Firebase no disponible: no es crítico.
+    } catch (e) {
+      // Sin conexión o Firebase no disponible: no es crítico, pero se deja constancia para
+      // poder diagnosticar por qué un dispositivo concreto no llega a registrar su token.
+      debugPrint('No se pudo inicializar el push: $e');
     }
   }
 
@@ -198,7 +199,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       index: _tabIndex,
                       children: const [
                         TablonScreen(),
-                        SeguidosScreen(),
                         MisSeguidosScreen(),
                         ArchivoScreen(),
                         AvisosScreen(),
@@ -264,10 +264,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 BottomNavigationBarItem(
                   icon: const Icon(Icons.dynamic_feed_outlined),
                   label: context.l10n.tablon,
-                ),
-                BottomNavigationBarItem(
-                  icon: const Icon(Icons.search),
-                  label: context.l10n.seguidos,
                 ),
                 BottomNavigationBarItem(
                   icon: const Icon(Icons.hearing),

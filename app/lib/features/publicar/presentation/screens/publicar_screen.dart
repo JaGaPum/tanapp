@@ -61,6 +61,18 @@ class PublicarScreen extends ConsumerWidget {
                         width: anchoTarjeta,
                         height: anchoTarjeta,
                         child: BigChoiceCard(
+                          icon: const Icon(Icons.groups_outlined, size: 48),
+                          label: context.l10n.publicarMisa,
+                          onTap: () => context.push(
+                            '/publicar/manual',
+                            extra: const {'tipo': 'ACTO'},
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: anchoTarjeta,
+                        height: anchoTarjeta,
+                        child: BigChoiceCard(
                           icon: const Icon(Icons.campaign_outlined, size: 48),
                           label: context.l10n.avisosNuevo,
                           onTap: () => context.push('/publicar/avisos'),

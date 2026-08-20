@@ -56,7 +56,7 @@ class SedeActualBanner extends ConsumerWidget {
         .firstOrNull;
 
     return Material(
-      color: AppColors.plumLight,
+      color: AppColors.greenLight,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Row(
@@ -71,7 +71,10 @@ class SedeActualBanner extends ConsumerWidget {
             ),
             TextButton(
               onPressed: () => _cambiar(context, ref),
-              child: Text(context.l10n.sedeActualCambiar),
+              child: Text(
+                context.l10n.sedeActualCambiar,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),

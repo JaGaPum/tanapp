@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'esquela_escaneada.dart';
 import 'publicacion_con_sede.dart';
+import 'publicacion_programada.dart';
 import 'publicaciones_por_mes.dart';
 
 class PublicacionesRepository {
@@ -29,6 +30,9 @@ class PublicacionesRepository {
     String? capillaArdiente,
     String? sala,
     String? observaciones,
+    String tipo = 'ESQUELA',
+    String? idConfiguracionActoTipo,
+    String? actoTipoOtro,
   }) async {
     await _client.from('TClientePublicaciones').insert({
       'IdClienteSede': idClienteSede,
@@ -42,6 +46,9 @@ class PublicacionesRepository {
       'CapillaArdiente': _oNull(capillaArdiente),
       'Sala': _oNull(sala),
       'Observaciones': _oNull(observaciones),
+      'Tipo': tipo,
+      'IdConfiguracionActoTipo': idConfiguracionActoTipo,
+      'ActoTipoOtro': _oNull(actoTipoOtro),
     });
   }
 
@@ -140,6 +147,9 @@ class PublicacionesRepository {
     String? capillaArdiente,
     String? sala,
     String? observaciones,
+    String tipo = 'ESQUELA',
+    String? idConfiguracionActoTipo,
+    String? actoTipoOtro,
   }) async {
     await _client
         .from('TClientePublicaciones')
@@ -155,6 +165,9 @@ class PublicacionesRepository {
           'CapillaArdiente': _oNull(capillaArdiente),
           'Sala': _oNull(sala),
           'Observaciones': _oNull(observaciones),
+          'Tipo': tipo,
+          'IdConfiguracionActoTipo': idConfiguracionActoTipo,
+          'ActoTipoOtro': _oNull(actoTipoOtro),
         })
         .eq('IdClientePublicacion', idClientePublicacion);
   }
@@ -164,6 +177,109 @@ class PublicacionesRepository {
         .from('TClientePublicaciones')
         .delete()
         .eq('IdClientePublicacion', idClientePublicacion);
+  }
+
+  static const _selectProgramadaConSede = '*, TClienteSedes(Codigo, Nombre)';
+
+  /// Guarda la publicación en la "cola" (055) en vez de publicarla ya: un job de la base de
+  /// datos la mueve sola a "TClientePublicaciones" en cuanto llegue [fechaProgramada] (056).
+  Future<void> crearPublicacionProgramada({
+    required String idClienteSede,
+    required String nombreFallecido,
+    DateTime? fechaFallecimiento,
+    int? edad,
+    DateTime? fechaFuneral,
+    String? horaFuneral,
+    String? iglesia,
+    String? lugar,
+    String? capillaArdiente,
+    String? sala,
+    String? observaciones,
+    required DateTime fechaProgramada,
+    String tipo = 'ESQUELA',
+    String? idConfiguracionActoTipo,
+    String? actoTipoOtro,
+  }) async {
+    await _client.from('TClientePublicacionesProgramadas').insert({
+      'IdClienteSede': idClienteSede,
+      'NombreFallecido': nombreFallecido.trim(),
+      'FechaFallecimiento': fechaFallecimiento?.toIso8601String(),
+      'Edad': edad,
+      'FechaFuneral': fechaFuneral?.toIso8601String(),
+      'HoraFuneral': _oNull(horaFuneral),
+      'Iglesia': _oNull(iglesia),
+      'Lugar': _oNull(lugar),
+      'CapillaArdiente': _oNull(capillaArdiente),
+      'Sala': _oNull(sala),
+      'Observaciones': _oNull(observaciones),
+      'FechaProgramada': fechaProgramada.toUtc().toIso8601String(),
+      'Tipo': tipo,
+      'IdConfiguracionActoTipo': idConfiguracionActoTipo,
+      'ActoTipoOtro': _oNull(actoTipoOtro),
+    });
+  }
+
+  Future<void> actualizarPublicacionProgramada({
+    required String idClientePublicacionProgramada,
+    required String idClienteSede,
+    required String nombreFallecido,
+    DateTime? fechaFallecimiento,
+    int? edad,
+    DateTime? fechaFuneral,
+    String? horaFuneral,
+    String? iglesia,
+    String? lugar,
+    String? capillaArdiente,
+    String? sala,
+    String? observaciones,
+    required DateTime fechaProgramada,
+    String tipo = 'ESQUELA',
+    String? idConfiguracionActoTipo,
+    String? actoTipoOtro,
+  }) async {
+    await _client
+        .from('TClientePublicacionesProgramadas')
+        .update({
+          'IdClienteSede': idClienteSede,
+          'NombreFallecido': nombreFallecido.trim(),
+          'FechaFallecimiento': fechaFallecimiento?.toIso8601String(),
+          'Edad': edad,
+          'FechaFuneral': fechaFuneral?.toIso8601String(),
+          'HoraFuneral': _oNull(horaFuneral),
+          'Iglesia': _oNull(iglesia),
+          'Lugar': _oNull(lugar),
+          'CapillaArdiente': _oNull(capillaArdiente),
+          'Sala': _oNull(sala),
+          'Observaciones': _oNull(observaciones),
+          'FechaProgramada': fechaProgramada.toUtc().toIso8601String(),
+          'Tipo': tipo,
+          'IdConfiguracionActoTipo': idConfiguracionActoTipo,
+          'ActoTipoOtro': _oNull(actoTipoOtro),
+        })
+        .eq('IdClientePublicacionProgramada', idClientePublicacionProgramada);
+  }
+
+  Future<void> eliminarPublicacionProgramada(
+    String idClientePublicacionProgramada,
+  ) async {
+    await _client
+        .from('TClientePublicacionesProgramadas')
+        .delete()
+        .eq('IdClientePublicacionProgramada', idClientePublicacionProgramada);
+  }
+
+  Future<List<PublicacionProgramada>> listPublicacionesProgramadas(
+    List<String> idsClienteSede,
+  ) async {
+    if (idsClienteSede.isEmpty) return [];
+    final data = await _client
+        .from('TClientePublicacionesProgramadas')
+        .select(_selectProgramadaConSede)
+        .inFilter('IdClienteSede', idsClienteSede)
+        .order('FechaProgramada', ascending: true);
+    return (data as List)
+        .map((e) => PublicacionProgramada.fromMap(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<Set<String>> listMisArchivadasIds() async {
