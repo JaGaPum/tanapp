@@ -8,6 +8,7 @@ import '../../../../core/utils/app_exception.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../../core/widgets/apple_sign_in_button.dart';
 import '../../../../core/widgets/error_banner.dart';
 import '../../../../core/widgets/facebook_sign_in_button.dart';
 import '../../../../core/widgets/google_sign_in_button.dart';
@@ -39,6 +40,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _loading = false;
   bool _loadingGoogle = false;
   bool _loadingFacebook = false;
+  bool _loadingApple = false;
   String? _error;
 
   @override
@@ -147,17 +149,41 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  Future<void> _submitApple() async {
+    setState(() {
+      _loadingApple = true;
+      _error = null;
+    });
+    final authRepo = ref.read(authRepositoryProvider);
+    try {
+      await authRepo.signInWithApple();
+    } catch (e) {
+      if (mounted) {
+        setState(
+          () => _error = e is AppException
+              ? e.message
+              : context.l10n.errorInesperado,
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loadingApple = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Interruptores globales del admin (073): por defecto Google activo y Facebook no (p. ej.
-    // mientras Facebook está pendiente de que Meta apruebe la app). "orElse: () => false" es a
-    // propósito -mientras carga o si falla, mejor no ofrecer un botón que pueda estar
-    // desactivado, que mostrarlo de más un instante-.
+    // Interruptores globales del admin (073/074): por defecto Google activo, Facebook y Apple no
+    // (p. ej. mientras están pendientes de la revisión de Meta o de dar de alta la cuenta de
+    // Apple Developer). "orElse: () => false" es a propósito -mientras carga o si falla, mejor no
+    // ofrecer un botón que pueda estar desactivado, que mostrarlo de más un instante-.
     final googleActivo = ref
         .watch(googleLoginActivoProvider)
         .maybeWhen(data: (activo) => activo, orElse: () => false);
     final facebookActivo = ref
         .watch(facebookLoginActivoProvider)
+        .maybeWhen(data: (activo) => activo, orElse: () => false);
+    final appleActivo = ref
+        .watch(appleLoginActivoProvider)
         .maybeWhen(data: (activo) => activo, orElse: () => false);
     return Scaffold(
       // Por si se equivoca de opción (particular/funeraria) en la pantalla anterior: sin esto no
@@ -245,12 +271,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     // Las cuentas de funeraria/tanatorio las da de alta un ADMIN con un email y
                     // contraseña concretos, no son cuentas personales: no tiene sentido ofrecer
-                    // aquí un login con Google/Facebook. Cada botón, además, tiene su propio
-                    // interruptor global (073, Configuración > Login): puede que ninguno de los
-                    // dos esté activo, así que el separador "o" solo se muestra si al menos uno
-                    // lo está.
+                    // aquí un login con Google/Facebook/Apple. Cada botón, además, tiene su
+                    // propio interruptor global (073/074, Configuración > Login): puede que
+                    // ninguno esté activo, así que el separador "o" solo se muestra si al menos
+                    // uno lo está.
                     if (!widget.esCliente &&
-                        (googleActivo || facebookActivo)) ...[
+                        (googleActivo || facebookActivo || appleActivo)) ...[
                       const SizedBox(height: 16),
                       Row(
                         children: [
@@ -273,14 +299,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               : context.l10n.googleContinuar,
                           onPressed: _loadingGoogle ? null : _submitGoogle,
                         ),
-                        if (facebookActivo) const SizedBox(height: 12),
+                        if (facebookActivo || appleActivo)
+                          const SizedBox(height: 12),
                       ],
-                      if (facebookActivo)
+                      if (facebookActivo) ...[
                         FacebookSignInButton(
                           label: _loadingFacebook
                               ? context.l10n.googleConectando
                               : context.l10n.facebookContinuar,
                           onPressed: _loadingFacebook ? null : _submitFacebook,
+                        ),
+                        if (appleActivo) const SizedBox(height: 12),
+                      ],
+                      if (appleActivo)
+                        AppleSignInButton(
+                          label: _loadingApple
+                              ? context.l10n.googleConectando
+                              : context.l10n.appleContinuar,
+                          onPressed: _loadingApple ? null : _submitApple,
                         ),
                     ],
                     const SizedBox(height: 24),

@@ -137,6 +137,20 @@ class AuthRepository {
     }
   }
 
+  /// Solo para usuario ordinario (nunca cliente, ver login_screen.dart): mismo circuito que
+  /// Google/Facebook, exigido por Apple (guía 4.8 de App Store Review) al ofrecer login con otros
+  /// proveedores de terceros en una app publicada en la App Store.
+  Future<void> signInWithApple() async {
+    try {
+      await _client.auth.signInWithOAuth(
+        OAuthProvider.apple,
+        redirectTo: kIsWeb ? null : 'io.supabase.tanapp://login-callback',
+      );
+    } catch (e) {
+      throw mapSupabaseError(e);
+    }
+  }
+
   Future<void> signOut() async {
     await _client.auth.signOut();
   }

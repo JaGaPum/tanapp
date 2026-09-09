@@ -66,6 +66,8 @@
   "googleRegistrarse": "Regístrate con Google",
   "facebookContinuar": "Continuar con Facebook",
   "facebookRegistrarse": "Regístrate con Facebook",
+  "appleContinuar": "Continuar con Apple",
+  "appleRegistrarse": "Regístrate con Apple",
   "o": "o",
 
   "drawerMiCuenta": "Mi cuenta",
@@ -364,6 +366,8 @@
   "configuracionLoginGoogleDescripcion": "Si lo desactivas, el botón \"Continuar con Google\" desaparece de las pantallas de acceso y registro de usuario ordinario.",
   "configuracionLoginFacebookLabel": "Iniciar sesión con Facebook",
   "configuracionLoginFacebookDescripcion": "Si lo desactivas, el botón \"Continuar con Facebook\" desaparece de las pantallas de acceso y registro de usuario ordinario.",
+  "configuracionLoginAppleLabel": "Iniciar sesión con Apple",
+  "configuracionLoginAppleDescripcion": "Si lo desactivas, el botón \"Continuar con Apple\" desaparece de las pantallas de acceso y registro de usuario ordinario.",
   "noHayTiposClienteDadosDeAlta": "No hay tipos de cliente dados de alta",
   "clienteTipoNuevo": "Nuevo tipo de cliente",
   "clienteTipoEditar": "Editar tipo de cliente",

@@ -156,6 +156,12 @@ class AppLocalizationsGl extends AppLocalizations {
   String get facebookRegistrarse => 'Rexístrate con Facebook';
 
   @override
+  String get appleContinuar => 'Continuar con Apple';
+
+  @override
+  String get appleRegistrarse => 'Rexístrate con Apple';
+
+  @override
   String get o => 'ou';
 
   @override
@@ -889,6 +895,13 @@ class AppLocalizationsGl extends AppLocalizations {
   @override
   String get configuracionLoginFacebookDescripcion =>
       'Se o desactivas, o botón \"Continuar con Facebook\" desaparece das pantallas de acceso e rexistro de usuario ordinario.';
+
+  @override
+  String get configuracionLoginAppleLabel => 'Iniciar sesión con Apple';
+
+  @override
+  String get configuracionLoginAppleDescripcion =>
+      'Se o desactivas, o botón \"Continuar con Apple\" desaparece das pantallas de acceso e rexistro de usuario ordinario.';
 
   @override
   String get noHayTiposClienteDadosDeAlta =>

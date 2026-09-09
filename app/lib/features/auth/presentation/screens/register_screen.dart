@@ -7,6 +7,7 @@ import '../../../../core/utils/app_exception.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../../core/widgets/apple_sign_in_button.dart';
 import '../../../../core/widgets/error_banner.dart';
 import '../../../../core/widgets/facebook_sign_in_button.dart';
 import '../../../../core/widgets/google_sign_in_button.dart';
@@ -37,6 +38,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool _loading = false;
   bool _loadingGoogle = false;
   bool _loadingFacebook = false;
+  bool _loadingApple = false;
   String? _error;
 
   @override
@@ -120,14 +122,35 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
   }
 
+  Future<void> _submitApple() async {
+    setState(() {
+      _loadingApple = true;
+      _error = null;
+    });
+    try {
+      await ref.read(authRepositoryProvider).signInWithApple();
+    } catch (e) {
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.errorInesperado,
+      );
+    } finally {
+      if (mounted) setState(() => _loadingApple = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Mismos interruptores globales que login_screen.dart (073).
+    // Mismos interruptores globales que login_screen.dart (073/074).
     final googleActivo = ref
         .watch(googleLoginActivoProvider)
         .maybeWhen(data: (activo) => activo, orElse: () => false);
     final facebookActivo = ref
         .watch(facebookLoginActivoProvider)
+        .maybeWhen(data: (activo) => activo, orElse: () => false);
+    final appleActivo = ref
+        .watch(appleLoginActivoProvider)
         .maybeWhen(data: (activo) => activo, orElse: () => false);
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.registerTitle)),
@@ -208,7 +231,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       loading: _loading,
                       onPressed: _submit,
                     ),
-                    if (googleActivo || facebookActivo) ...[
+                    if (googleActivo || facebookActivo || appleActivo) ...[
                       const SizedBox(height: 16),
                       Row(
                         children: [
@@ -231,14 +254,24 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               : context.l10n.googleRegistrarse,
                           onPressed: _loadingGoogle ? null : _submitGoogle,
                         ),
-                        if (facebookActivo) const SizedBox(height: 12),
+                        if (facebookActivo || appleActivo)
+                          const SizedBox(height: 12),
                       ],
-                      if (facebookActivo)
+                      if (facebookActivo) ...[
                         FacebookSignInButton(
                           label: _loadingFacebook
                               ? context.l10n.googleConectando
                               : context.l10n.facebookRegistrarse,
                           onPressed: _loadingFacebook ? null : _submitFacebook,
+                        ),
+                        if (appleActivo) const SizedBox(height: 12),
+                      ],
+                      if (appleActivo)
+                        AppleSignInButton(
+                          label: _loadingApple
+                              ? context.l10n.googleConectando
+                              : context.l10n.appleRegistrarse,
+                          onPressed: _loadingApple ? null : _submitApple,
                         ),
                     ],
                     const SizedBox(height: 16),

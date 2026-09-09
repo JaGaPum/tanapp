@@ -368,6 +368,18 @@ abstract class AppLocalizations {
   /// **'Regístrate con Facebook'**
   String get facebookRegistrarse;
 
+  /// No description provided for @appleContinuar.
+  ///
+  /// In es, this message translates to:
+  /// **'Continuar con Apple'**
+  String get appleContinuar;
+
+  /// No description provided for @appleRegistrarse.
+  ///
+  /// In es, this message translates to:
+  /// **'Regístrate con Apple'**
+  String get appleRegistrarse;
+
   /// No description provided for @o.
   ///
   /// In es, this message translates to:
@@ -1687,6 +1699,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Si lo desactivas, el botón \"Continuar con Facebook\" desaparece de las pantallas de acceso y registro de usuario ordinario.'**
   String get configuracionLoginFacebookDescripcion;
+
+  /// No description provided for @configuracionLoginAppleLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Iniciar sesión con Apple'**
+  String get configuracionLoginAppleLabel;
+
+  /// No description provided for @configuracionLoginAppleDescripcion.
+  ///
+  /// In es, this message translates to:
+  /// **'Si lo desactivas, el botón \"Continuar con Apple\" desaparece de las pantallas de acceso y registro de usuario ordinario.'**
+  String get configuracionLoginAppleDescripcion;
 
   /// No description provided for @noHayTiposClienteDadosDeAlta.
   ///

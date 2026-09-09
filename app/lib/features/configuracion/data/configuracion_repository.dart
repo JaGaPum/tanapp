@@ -199,6 +199,30 @@ class ConfiguracionRepository {
       );
     }
   }
+
+  /// Igual que [fetchGoogleLoginActivo] pero para Apple (074), empieza en false hasta que la
+  /// cuenta de Apple Developer y el proveedor en Supabase estén configurados.
+  Future<bool> fetchAppleLoginActivo() async {
+    final data = await _client
+        .from('TConfiguracionGlobal')
+        .select('AppleLoginActivo')
+        .single();
+    return data['AppleLoginActivo'] as bool;
+  }
+
+  Future<void> actualizarAppleLoginActivo(bool activo) async {
+    final data = await _client
+        .from('TConfiguracionGlobal')
+        .update({'AppleLoginActivo': activo})
+        .not('IdConfiguracionGlobal', 'is', null)
+        .select();
+    if ((data as List).isEmpty) {
+      throw Exception(
+        'No se pudo actualizar la configuración global: tu usuario no tiene permiso de administrador '
+        '(revisa que tenga el rol ADMIN) o falta aplicar la migración 074.',
+      );
+    }
+  }
 }
 
 final configuracionRepositoryProvider = Provider<ConfiguracionRepository>((

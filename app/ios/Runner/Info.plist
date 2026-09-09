@@ -26,6 +26,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Tanapp necesita la cámara para escanear esquelas y añadir la foto de tu cuenta.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Tanapp necesita acceso a tus fotos para escanear esquelas y elegir la foto de tu cuenta.</string>
 	<!-- Deep link de vuelta del login con Google (ver signInWithGoogle() en
 	     auth_repository.dart): tras autenticarse en el navegador, Supabase redirige aquí para
 	     que la app retome la sesión. -->

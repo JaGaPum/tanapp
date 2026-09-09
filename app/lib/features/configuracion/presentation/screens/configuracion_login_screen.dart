@@ -48,10 +48,31 @@ class ConfiguracionLoginScreen extends ConsumerWidget {
     }
   }
 
+  Future<void> _toggleApple(
+    BuildContext context,
+    WidgetRef ref,
+    bool activo,
+  ) async {
+    try {
+      await ref
+          .read(configuracionRepositoryProvider)
+          .actualizarAppleLoginActivo(activo);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.errorGenerico(e.toString()))),
+        );
+      }
+    } finally {
+      ref.invalidate(appleLoginActivoProvider);
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final googleActivoAsync = ref.watch(googleLoginActivoProvider);
     final facebookActivoAsync = ref.watch(facebookLoginActivoProvider);
+    final appleActivoAsync = ref.watch(appleLoginActivoProvider);
 
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.configuracionLoginTitulo)),
@@ -92,6 +113,29 @@ class ConfiguracionLoginScreen extends ConsumerWidget {
                   ),
                   value: activo,
                   onChanged: (valor) => _toggleFacebook(context, ref, valor),
+                ),
+                loading: () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+                error: (e, _) => Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(context.l10n.errorGenerico(e.toString())),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Card(
+              child: appleActivoAsync.when(
+                data: (activo) => SwitchListTile(
+                  title: Text(context.l10n.configuracionLoginAppleLabel),
+                  subtitle: Text(
+                    context.l10n.configuracionLoginAppleDescripcion,
+                  ),
+                  value: activo,
+                  onChanged: (valor) => _toggleApple(context, ref, valor),
                 ),
                 loading: () => const Center(
                   child: Padding(

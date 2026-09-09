@@ -40,3 +40,7 @@ final googleLoginActivoProvider = FutureProvider.autoDispose<bool>((ref) {
 final facebookLoginActivoProvider = FutureProvider.autoDispose<bool>((ref) {
   return ref.watch(configuracionRepositoryProvider).fetchFacebookLoginActivo();
 });
+
+final appleLoginActivoProvider = FutureProvider.autoDispose<bool>((ref) {
+  return ref.watch(configuracionRepositoryProvider).fetchAppleLoginActivo();
+});
