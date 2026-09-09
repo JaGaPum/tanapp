@@ -356,6 +356,18 @@ abstract class AppLocalizations {
   /// **'Regístrate con Google'**
   String get googleRegistrarse;
 
+  /// No description provided for @facebookContinuar.
+  ///
+  /// In es, this message translates to:
+  /// **'Continuar con Facebook'**
+  String get facebookContinuar;
+
+  /// No description provided for @facebookRegistrarse.
+  ///
+  /// In es, this message translates to:
+  /// **'Regístrate con Facebook'**
+  String get facebookRegistrarse;
+
   /// No description provided for @o.
   ///
   /// In es, this message translates to:
@@ -433,6 +445,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Accede o da de alta tu negocio en TanApp'**
   String get bienvenidaOpcionClienteSubtitulo;
+
+  /// No description provided for @bienvenidaEntrando.
+  ///
+  /// In es, this message translates to:
+  /// **'Iniciando sesión…'**
+  String get bienvenidaEntrando;
 
   /// No description provided for @loginRecordarme.
   ///
@@ -925,6 +943,60 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Suplantar'**
   String get suplantarConfirmar;
+
+  /// No description provided for @suplantarCuentaPersonal.
+  ///
+  /// In es, this message translates to:
+  /// **'Suplantar cuenta personal'**
+  String get suplantarCuentaPersonal;
+
+  /// No description provided for @usuarioEsCuentaPersonalDe.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta es la cuenta personal de {nombre} (cliente)'**
+  String usuarioEsCuentaPersonalDe(String nombre);
+
+  /// No description provided for @usuarioVerFichaCliente.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver ficha del cliente'**
+  String get usuarioVerFichaCliente;
+
+  /// No description provided for @usuarioForzarCambioContrasenaTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Obligar a cambiar contraseña'**
+  String get usuarioForzarCambioContrasenaTitulo;
+
+  /// No description provided for @usuarioForzarCambioContrasenaMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'\"{nombre}\" tendrá que fijar una contraseña nueva la próxima vez que entre, antes de poder usar el resto de la app. ¿Continuar?'**
+  String usuarioForzarCambioContrasenaMensaje(String nombre);
+
+  /// No description provided for @usuarioForzarCambioContrasenaConfirmar.
+  ///
+  /// In es, this message translates to:
+  /// **'Obligar'**
+  String get usuarioForzarCambioContrasenaConfirmar;
+
+  /// No description provided for @usuarioForzarCambioContrasenaHecho.
+  ///
+  /// In es, this message translates to:
+  /// **'Se le pedirá una contraseña nueva en su próximo acceso'**
+  String get usuarioForzarCambioContrasenaHecho;
+
+  /// No description provided for @usuarioForzarCambioContrasenaPendiente.
+  ///
+  /// In es, this message translates to:
+  /// **'Pendiente'**
+  String get usuarioForzarCambioContrasenaPendiente;
+
+  /// No description provided for @usuarioForzarCambioContrasenaAccion.
+  ///
+  /// In es, this message translates to:
+  /// **'Obligar a cambiar contraseña'**
+  String get usuarioForzarCambioContrasenaAccion;
 
   /// No description provided for @suplantacionBannerTexto.
   ///
@@ -1586,6 +1658,36 @@ abstract class AppLocalizations {
   /// **'Si está activado, al escanear una esquela la foto se analiza con IA en vez del reconocimiento de texto local. Si la desactivas (o falla), se sigue usando el escaneo local de siempre.'**
   String get configuracionIaEscaneoEsquelaDescripcion;
 
+  /// No description provided for @configuracionLoginTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Login'**
+  String get configuracionLoginTitulo;
+
+  /// No description provided for @configuracionLoginGoogleLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Iniciar sesión con Google'**
+  String get configuracionLoginGoogleLabel;
+
+  /// No description provided for @configuracionLoginGoogleDescripcion.
+  ///
+  /// In es, this message translates to:
+  /// **'Si lo desactivas, el botón \"Continuar con Google\" desaparece de las pantallas de acceso y registro de usuario ordinario.'**
+  String get configuracionLoginGoogleDescripcion;
+
+  /// No description provided for @configuracionLoginFacebookLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Iniciar sesión con Facebook'**
+  String get configuracionLoginFacebookLabel;
+
+  /// No description provided for @configuracionLoginFacebookDescripcion.
+  ///
+  /// In es, this message translates to:
+  /// **'Si lo desactivas, el botón \"Continuar con Facebook\" desaparece de las pantallas de acceso y registro de usuario ordinario.'**
+  String get configuracionLoginFacebookDescripcion;
+
   /// No description provided for @noHayTiposClienteDadosDeAlta.
   ///
   /// In es, this message translates to:
@@ -2102,6 +2204,12 @@ abstract class AppLocalizations {
   /// **'Cancelar'**
   String get avisosCancelarSeleccion;
 
+  /// No description provided for @avisosSeleccionar.
+  ///
+  /// In es, this message translates to:
+  /// **'Seleccionar'**
+  String get avisosSeleccionar;
+
   /// No description provided for @avisosEditarProgramado.
   ///
   /// In es, this message translates to:
@@ -2125,6 +2233,102 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'¿Seguro que quieres cancelar el aviso programado \"{titulo}\"? No se enviará.'**
   String avisosCancelarProgramadoMensaje(String titulo);
+
+  /// No description provided for @avisosTabRecibidos.
+  ///
+  /// In es, this message translates to:
+  /// **'Recibidos'**
+  String get avisosTabRecibidos;
+
+  /// No description provided for @avisosTabRecordatorios.
+  ///
+  /// In es, this message translates to:
+  /// **'Recordatorios'**
+  String get avisosTabRecordatorios;
+
+  /// No description provided for @recordatorioBoton.
+  ///
+  /// In es, this message translates to:
+  /// **'Recordatorio'**
+  String get recordatorioBoton;
+
+  /// No description provided for @recordatorioModalTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Recordatorios'**
+  String get recordatorioModalTitulo;
+
+  /// No description provided for @recordatorioVacio.
+  ///
+  /// In es, this message translates to:
+  /// **'No tienes ningún recordatorio para esta publicación.'**
+  String get recordatorioVacio;
+
+  /// No description provided for @recordatorioMaximoAlcanzado.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya tienes el máximo de 2 recordatorios para esta publicación.'**
+  String get recordatorioMaximoAlcanzado;
+
+  /// No description provided for @recordatorioAnadir.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir recordatorio'**
+  String get recordatorioAnadir;
+
+  /// No description provided for @recordatorioFechaInvalida.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige una fecha y hora posteriores a ahora y anteriores al evento.'**
+  String get recordatorioFechaInvalida;
+
+  /// No description provided for @recordatorioEliminarTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar recordatorio'**
+  String get recordatorioEliminarTitulo;
+
+  /// No description provided for @recordatorioEliminarMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Eliminar este recordatorio? Esta acción no se puede deshacer.'**
+  String get recordatorioEliminarMensaje;
+
+  /// No description provided for @recordatorioProgramadoPara.
+  ///
+  /// In es, this message translates to:
+  /// **'Te avisaremos el {fecha}'**
+  String recordatorioProgramadoPara(String fecha);
+
+  /// No description provided for @recordatorioListaVacia.
+  ///
+  /// In es, this message translates to:
+  /// **'No tienes recordatorios configurados.'**
+  String get recordatorioListaVacia;
+
+  /// No description provided for @recordatorioRecibidoTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Recordatorio'**
+  String get recordatorioRecibidoTitulo;
+
+  /// No description provided for @recordatorioRecibidoTexto.
+  ///
+  /// In es, this message translates to:
+  /// **'Tenías un recordatorio pendiente de esta publicación.'**
+  String get recordatorioRecibidoTexto;
+
+  /// No description provided for @recordatorioRecibidoSeccion.
+  ///
+  /// In es, this message translates to:
+  /// **'Recordatorios'**
+  String get recordatorioRecibidoSeccion;
+
+  /// No description provided for @recordatorioTipoEsquela.
+  ///
+  /// In es, this message translates to:
+  /// **'Esquela'**
+  String get recordatorioTipoEsquela;
 
   /// No description provided for @seguidosSeleccionaTipo.
   ///
@@ -2528,12 +2732,6 @@ abstract class AppLocalizations {
   /// **'Acto'**
   String get publicarActoLabel;
 
-  /// No description provided for @publicarMisaLabel.
-  ///
-  /// In es, this message translates to:
-  /// **'Misa'**
-  String get publicarMisaLabel;
-
   /// No description provided for @publicarIglesiaLocalizacion.
   ///
   /// In es, this message translates to:
@@ -2798,6 +2996,18 @@ abstract class AppLocalizations {
   /// **'Solo podrá verla quien ha publicado la esquela.'**
   String get condolenciasPrivadaAyuda;
 
+  /// No description provided for @condolenciasNoAdmite.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta publicación no admite condolencias.'**
+  String get condolenciasNoAdmite;
+
+  /// No description provided for @condolenciasSoloPrivadasAviso.
+  ///
+  /// In es, this message translates to:
+  /// **'Quien ha publicado esta esquela ha decidido que todas las condolencias sean privadas: solo esa persona podrá verla.'**
+  String get condolenciasSoloPrivadasAviso;
+
   /// No description provided for @condolenciasModerarEliminarTitulo.
   ///
   /// In es, this message translates to:
@@ -2887,6 +3097,42 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'¿Es correcto?'**
   String get publicarVistaPreviaTitulo;
+
+  /// No description provided for @publicarCondolenciasPreguntaTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Condolencias'**
+  String get publicarCondolenciasPreguntaTitulo;
+
+  /// No description provided for @publicarAdmiteCondolencias.
+  ///
+  /// In es, this message translates to:
+  /// **'Admitir condolencias'**
+  String get publicarAdmiteCondolencias;
+
+  /// No description provided for @publicarAdmiteCondolenciasAyuda.
+  ///
+  /// In es, this message translates to:
+  /// **'Los seguidores podrán dejar mensajes de pésame en esta esquela.'**
+  String get publicarAdmiteCondolenciasAyuda;
+
+  /// No description provided for @publicarCondolenciasPrivadas.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo condolencias privadas'**
+  String get publicarCondolenciasPrivadas;
+
+  /// No description provided for @publicarCondolenciasPrivadasAyuda.
+  ///
+  /// In es, this message translates to:
+  /// **'Todas las condolencias que se dejen aquí serán privadas: solo tú podrás verlas.'**
+  String get publicarCondolenciasPrivadasAyuda;
+
+  /// No description provided for @publicarCondolenciasContinuar.
+  ///
+  /// In es, this message translates to:
+  /// **'Continuar'**
+  String get publicarCondolenciasContinuar;
 
   /// No description provided for @publicarFallecioEl.
   ///
@@ -3175,6 +3421,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Todavía no ves ninguna esquela aquí: sigue a un cliente o a una zona en \"Seguindo\" para que aparezcan sus publicaciones.'**
   String get tablonVacioSinSeguir;
+
+  /// No description provided for @tablonHayNuevas.
+  ///
+  /// In es, this message translates to:
+  /// **'Hay nuevas publicaciones'**
+  String get tablonHayNuevas;
 
   /// No description provided for @filtrar.
   ///

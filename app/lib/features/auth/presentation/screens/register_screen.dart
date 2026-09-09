@@ -8,10 +8,12 @@ import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/error_banner.dart';
+import '../../../../core/widgets/facebook_sign_in_button.dart';
 import '../../../../core/widgets/google_sign_in_button.dart';
 import '../../../../core/widgets/password_field.dart';
 import '../../../../core/widgets/password_requirements.dart';
 import '../../../../core/widgets/provincia_concello_fields.dart';
+import '../../../configuracion/application/configuracion_providers.dart';
 import '../../data/auth_repository.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -34,6 +36,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   String? _concelloSeleccionado;
   bool _loading = false;
   bool _loadingGoogle = false;
+  bool _loadingFacebook = false;
   String? _error;
 
   @override
@@ -99,8 +102,33 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
   }
 
+  Future<void> _submitFacebook() async {
+    setState(() {
+      _loadingFacebook = true;
+      _error = null;
+    });
+    try {
+      await ref.read(authRepositoryProvider).signInWithFacebook();
+    } catch (e) {
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.errorInesperado,
+      );
+    } finally {
+      if (mounted) setState(() => _loadingFacebook = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Mismos interruptores globales que login_screen.dart (073).
+    final googleActivo = ref
+        .watch(googleLoginActivoProvider)
+        .maybeWhen(data: (activo) => activo, orElse: () => false);
+    final facebookActivo = ref
+        .watch(facebookLoginActivoProvider)
+        .maybeWhen(data: (activo) => activo, orElse: () => false);
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.registerTitle)),
       body: SafeArea(
@@ -180,27 +208,39 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       loading: _loading,
                       onPressed: _submit,
                     ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        const Expanded(child: Divider()),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Text(
-                            context.l10n.o,
-                            style: Theme.of(context).textTheme.bodySmall,
+                    if (googleActivo || facebookActivo) ...[
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          const Expanded(child: Divider()),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Text(
+                              context.l10n.o,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
                           ),
+                          const Expanded(child: Divider()),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      if (googleActivo) ...[
+                        GoogleSignInButton(
+                          label: _loadingGoogle
+                              ? context.l10n.googleConectando
+                              : context.l10n.googleRegistrarse,
+                          onPressed: _loadingGoogle ? null : _submitGoogle,
                         ),
-                        const Expanded(child: Divider()),
+                        if (facebookActivo) const SizedBox(height: 12),
                       ],
-                    ),
-                    const SizedBox(height: 16),
-                    GoogleSignInButton(
-                      label: _loadingGoogle
-                          ? context.l10n.googleConectando
-                          : context.l10n.googleRegistrarse,
-                      onPressed: _loadingGoogle ? null : _submitGoogle,
-                    ),
+                      if (facebookActivo)
+                        FacebookSignInButton(
+                          label: _loadingFacebook
+                              ? context.l10n.googleConectando
+                              : context.l10n.facebookRegistrarse,
+                          onPressed: _loadingFacebook ? null : _submitFacebook,
+                        ),
+                    ],
                     const SizedBox(height: 16),
                     Center(
                       child: TextButton(

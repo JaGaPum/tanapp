@@ -15,6 +15,7 @@ import '../../../avisos/presentation/screens/avisos_enviados_screen.dart';
 import '../../../avisos/presentation/screens/avisos_screen.dart';
 import '../../../clientes_solicitudes/application/solicitudes_providers.dart';
 import '../../../notificaciones_push/application/push_service.dart';
+import '../../../recordatorios/application/recordatorios_providers.dart';
 import '../../../panel_datos/presentation/screens/panel_datos_screen.dart';
 import '../../../publicaciones/presentation/screens/mis_publicaciones_screen.dart';
 import '../../../publicar/presentation/screens/publicar_screen.dart';
@@ -64,6 +65,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     if (state == AppLifecycleState.resumed) {
       ref.invalidate(avisosNoLeidosCountProvider);
       ref.invalidate(misAvisosRecibidosProvider);
+      ref.invalidate(recordatoriosNoLeidosCountProvider);
+      // Faltaban estos dos: un recordatorio puede dispararse con la app en segundo plano (el
+      // cron y el push no dependen de que la app esté abierta); sin refrescarlos aquí, al
+      // volver se seguía viendo el estado de antes de que se disparara -"Recordatorios" con el
+      // ya enviado, "Recibidos" sin él- hasta tocar otra cosa que sí refrescara por su cuenta.
+      ref.invalidate(recordatoriosEnviadosProvider);
+      ref.invalidate(misRecordatoriosPendientesProvider);
     }
   }
 
@@ -93,6 +101,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       ref.invalidate(avisosNoLeidosCountProvider);
       ref.invalidate(misAvisosRecibidosProvider);
     }
+    if (message.data['idClientePublicacionRecordatorio'] != null) {
+      ref.invalidate(recordatoriosEnviadosProvider);
+      // Ese mismo recordatorio deja de estar pendiente en cuanto se envía: sin esto seguía
+      // viéndose en "Recordatorios" hasta que algo más refrescara esa lista por su cuenta.
+      ref.invalidate(misRecordatoriosPendientesProvider);
+      ref.invalidate(recordatoriosNoLeidosCountProvider);
+    }
   }
 
   void _abrirDesdeNotificacion(RemoteMessage message) {
@@ -103,6 +118,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       ref.invalidate(misAvisosRecibidosProvider);
       // Solo un seguidor (no un cliente) tiene esta pestaña en esa posición; si por lo que sea
       // llega este dato con otro tipo de cuenta, no tocamos el índice para no salirnos de rango.
+      final esCliente = ref.read(isClienteProvider);
+      final esOrdinario = ref.read(esUsuarioOrdinarioProvider);
+      if (!esCliente && esOrdinario) {
+        setState(() => _tabIndex = _tabIndexAvisosSeguidor);
+      }
+      return;
+    }
+    final idClientePublicacionRecordatorio =
+        message.data['idClientePublicacionRecordatorio'];
+    final idClientePublicacion = message.data['idClientePublicacion'];
+    if (idClientePublicacionRecordatorio != null &&
+        idClientePublicacionRecordatorio.isNotEmpty &&
+        idClientePublicacion != null &&
+        idClientePublicacion.isNotEmpty) {
+      ref.invalidate(recordatoriosEnviadosProvider);
+      ref.invalidate(misRecordatoriosPendientesProvider);
+      ref.invalidate(recordatoriosNoLeidosCountProvider);
+      // Avisos > Recibidos, mostrando solo la publicación de este recordatorio (no la lista
+      // entera de la sede): AvisosScreen está escuchando este provider y, en cuanto se monte,
+      // abre esa publicación sola y marca el recordatorio como leído.
+      ref.read(recordatorioNotificacionTocadaProvider.notifier).fijar((
+        idClientePublicacion: idClientePublicacion,
+        idClientePublicacionRecordatorio: idClientePublicacionRecordatorio,
+      ));
       final esCliente = ref.read(isClienteProvider);
       final esOrdinario = ref.read(esUsuarioOrdinarioProvider);
       if (!esCliente && esOrdinario) {
@@ -128,6 +167,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final esUsuarioOrdinario = ref.watch(esUsuarioOrdinarioProvider);
     final isAdmin = ref.watch(isAdminProvider);
     final avisosNoLeidos = ref.watch(avisosNoLeidosCountProvider).value ?? 0;
+    final recordatoriosNoLeidos =
+        ref.watch(recordatoriosNoLeidosCountProvider).value ?? 0;
     // Un admin suele tener también el rol USUARIO_ORDINARIO, así que al suplantar a otro
     // usuario ordinario la rama de pestañas mostrada no cambia y el IndexedStack de abajo no se
     // reconstruye por sí solo: sin esta key, TablonScreen/SeguidosScreen/etc. seguirían vivos
@@ -155,7 +196,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         ? ref.watch(solicitudesPendientesCountProvider).value ?? 0
         : 0;
     final pendientes =
-        pendientesSolicitudes + (mostrarTabsOrdinario ? avisosNoLeidos : 0);
+        pendientesSolicitudes +
+        (mostrarTabsOrdinario ? avisosNoLeidos + recordatoriosNoLeidos : 0);
 
     return Scaffold(
       appBar: AppBar(
@@ -276,6 +318,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 BottomNavigationBarItem(
                   icon: Badge(
                     isLabelVisible: pendientes > 0,
+                    label: Text(pendientes > 99 ? '99+' : '$pendientes'),
                     backgroundColor: Theme.of(context).colorScheme.error,
                     child: const Icon(Icons.notifications_outlined),
                   ),

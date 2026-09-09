@@ -27,6 +27,7 @@ import '../../features/configuracion/presentation/screens/configuracion_cliente_
 import '../../features/configuracion/presentation/screens/configuracion_comunicaciones_screen.dart';
 import '../../features/configuracion/presentation/screens/configuracion_concellos_screen.dart';
 import '../../features/configuracion/presentation/screens/configuracion_ia_screen.dart';
+import '../../features/configuracion/presentation/screens/configuracion_login_screen.dart';
 import '../../features/configuracion/presentation/screens/configuracion_provincias_screen.dart';
 import '../../features/configuracion/presentation/screens/configuracion_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
@@ -139,7 +140,39 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         guard.necesitaAceptarTerminos = null;
         guard.necesitaElegirIdioma = null;
         guard.necesitaElegirSede = null;
+        guard.necesitaCambiarContrasena = null;
+        guard.enRecuperacionContrasena = false;
         return isPublic ? null : '/bienvenida';
+      }
+
+      // El ADMIN puede obligar a un usuario a cambiar su contraseña (ficha de usuario, 068): se
+      // comprueba una sola vez por carga de la app, igual que términos/idioma/sede, y activa el
+      // mismo flag que ya fuerza "/reset-password" durante una recuperación normal.
+      if (guard.necesitaCambiarContrasena == null) {
+        try {
+          final perfil = await ref
+              .read(usuariosRepositoryProvider)
+              .fetchPerfilByAuthId(session.user.id);
+          guard.necesitaCambiarContrasena =
+              perfil?.debeCambiarContrasena ?? false;
+          if (guard.necesitaCambiarContrasena == true) {
+            guard.enRecuperacionContrasena = true;
+          }
+        } catch (e) {
+          debugPrint('No se pudo comprobar si debe cambiar la contraseña: $e');
+        }
+      }
+
+      // El evento de recuperación de contraseña puede disparar este "redirect" (se reevalúa en
+      // cuanto cambia el estado de auth, vía "refreshStream") antes de que
+      // "verify_otp_screen.dart" termine su propia navegación a "/reset-password": sin este
+      // corte, ganaba la comprobación genérica de abajo y mandaba a "/home" sin pasar por fijar
+      // la contraseña nueva. "enRecuperacionContrasena" (no el evento de auth en sí, que sigue
+      // siendo "passwordRecovery" mucho después de guardarla) es lo único fiable para saber si
+      // todavía toca forzar esta pantalla -y también cubre el caso de arriba, forzado por el
+      // ADMIN en vez de por una recuperación real-.
+      if (guard.enRecuperacionContrasena && location != '/reset-password') {
+        return '/reset-password';
       }
 
       if (isPublic && location != '/reset-password') {
@@ -209,7 +242,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       }
 
       final necesitaElegirIdioma = guard.necesitaElegirIdioma ?? false;
-      if (necesitaElegirIdioma && location != '/elegir-idioma') {
+      // "/reset-password" queda fuera, mismo motivo que en el guard de términos de arriba: no se
+      // debe cortar a mitad a quien todavía está fijando su contraseña nueva tras recuperarla.
+      if (necesitaElegirIdioma &&
+          location != '/elegir-idioma' &&
+          location != '/reset-password') {
         return '/elegir-idioma';
       }
       if (!necesitaElegirIdioma && location == '/elegir-idioma') {
@@ -245,7 +282,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       }
 
       final necesitaElegirSede = guard.necesitaElegirSede ?? false;
-      if (necesitaElegirSede && location != '/elegir-sede') {
+      // Mismo motivo que arriba: sin esta excepción, un CLIENTE con más de una sede que acaba de
+      // recuperar su contraseña se saltaba "/reset-password" entero -acababa en "/elegir-sede" y
+      // de ahí a "/home" sin haber llegado nunca a fijar la contraseña nueva-.
+      if (necesitaElegirSede &&
+          location != '/elegir-sede' &&
+          location != '/reset-password') {
         return '/elegir-sede';
       }
       if (!necesitaElegirSede && location == '/elegir-sede') {
@@ -371,6 +413,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             tipoInicial: datos?['tipo'] ?? 'ESQUELA',
             idConfiguracionActoTipoInicial: datos?['idConfiguracionActoTipo'],
             actoTipoOtroInicial: datos?['actoTipoOtro'],
+            admiteCondolenciasInicial: datos?['admiteCondolencias'] != 'false',
+            condolenciasSoloPrivadasInicial:
+                datos?['condolenciasSoloPrivadas'] == 'true',
           );
         },
       ),
@@ -498,6 +543,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'ia',
             builder: (context, state) => const ConfiguracionIaScreen(),
+          ),
+          GoRoute(
+            path: 'login',
+            builder: (context, state) => const ConfiguracionLoginScreen(),
           ),
           GoRoute(
             path: 'terminos',

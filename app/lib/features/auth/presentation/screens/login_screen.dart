@@ -9,9 +9,11 @@ import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/error_banner.dart';
+import '../../../../core/widgets/facebook_sign_in_button.dart';
 import '../../../../core/widgets/google_sign_in_button.dart';
 import '../../../../core/widgets/password_field.dart';
 import '../../../../core/widgets/xaga_labs_logo.dart';
+import '../../../configuracion/application/configuracion_providers.dart';
 import '../../../sesiones/application/sesion_policy_service.dart';
 import '../../../sistema_usuarios/data/usuarios_repository.dart';
 import '../../data/auth_repository.dart';
@@ -36,6 +38,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _recordar = false;
   bool _loading = false;
   bool _loadingGoogle = false;
+  bool _loadingFacebook = false;
   String? _error;
 
   @override
@@ -123,8 +126,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  Future<void> _submitFacebook() async {
+    setState(() {
+      _loadingFacebook = true;
+      _error = null;
+    });
+    final authRepo = ref.read(authRepositoryProvider);
+    try {
+      await authRepo.signInWithFacebook();
+    } catch (e) {
+      if (mounted) {
+        setState(
+          () => _error = e is AppException
+              ? e.message
+              : context.l10n.errorInesperado,
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loadingFacebook = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Interruptores globales del admin (073): por defecto Google activo y Facebook no (p. ej.
+    // mientras Facebook está pendiente de que Meta apruebe la app). "orElse: () => false" es a
+    // propósito -mientras carga o si falla, mejor no ofrecer un botón que pueda estar
+    // desactivado, que mostrarlo de más un instante-.
+    final googleActivo = ref
+        .watch(googleLoginActivoProvider)
+        .maybeWhen(data: (activo) => activo, orElse: () => false);
+    final facebookActivo = ref
+        .watch(facebookLoginActivoProvider)
+        .maybeWhen(data: (activo) => activo, orElse: () => false);
     return Scaffold(
       // Por si se equivoca de opción (particular/funeraria) en la pantalla anterior: sin esto no
       // hay ninguna forma visible de volver a elegir, solo el gesto/botón "atrás" del sistema.
@@ -211,8 +245,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     // Las cuentas de funeraria/tanatorio las da de alta un ADMIN con un email y
                     // contraseña concretos, no son cuentas personales: no tiene sentido ofrecer
-                    // aquí un login con Google.
-                    if (!widget.esCliente) ...[
+                    // aquí un login con Google/Facebook. Cada botón, además, tiene su propio
+                    // interruptor global (073, Configuración > Login): puede que ninguno de los
+                    // dos esté activo, así que el separador "o" solo se muestra si al menos uno
+                    // lo está.
+                    if (!widget.esCliente &&
+                        (googleActivo || facebookActivo)) ...[
                       const SizedBox(height: 16),
                       Row(
                         children: [
@@ -228,12 +266,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      GoogleSignInButton(
-                        label: _loadingGoogle
-                            ? context.l10n.googleConectando
-                            : context.l10n.googleContinuar,
-                        onPressed: _loadingGoogle ? null : _submitGoogle,
-                      ),
+                      if (googleActivo) ...[
+                        GoogleSignInButton(
+                          label: _loadingGoogle
+                              ? context.l10n.googleConectando
+                              : context.l10n.googleContinuar,
+                          onPressed: _loadingGoogle ? null : _submitGoogle,
+                        ),
+                        if (facebookActivo) const SizedBox(height: 12),
+                      ],
+                      if (facebookActivo)
+                        FacebookSignInButton(
+                          label: _loadingFacebook
+                              ? context.l10n.googleConectando
+                              : context.l10n.facebookContinuar,
+                          onPressed: _loadingFacebook ? null : _submitFacebook,
+                        ),
                     ],
                     const SizedBox(height: 24),
                     if (widget.esCliente)

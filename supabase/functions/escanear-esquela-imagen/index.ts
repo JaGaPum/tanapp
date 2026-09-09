@@ -21,9 +21,22 @@
 //      Supabase automáticamente.
 //   5. Aplicar antes las migraciones 041-043 y activar el interruptor global en la app, en
 //      Configuración > IA.
+//
+// IMPORTANTE: también se llama desde un navegador (Flutter Web, pantalla de escanear), así que
+// hace falta responder a la petición de verificación previa CORS (OPTIONS) e incluir las
+// cabeceras CORS en TODAS las respuestas; si no, el navegador bloquea la petición entera antes
+// de que llegue a mandarse -por eso, sin esto, un escaneo desde la web caía en silencio al OCR
+// local (que tampoco funciona en web, al no tener ML Kit), sin que llegase a verse ni una
+// invocación en los logs de esta función-.
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import Anthropic from 'npm:@anthropic-ai/sdk@0.32.1';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
 
 // Fotos de móvil ya comprimidas por la app (calidad 90 en image_picker) rondan 1-3 MB; 8 MB en
 // base64 da margen de sobra sin arriesgarse a mandar una foto sin comprimir por error.
@@ -32,7 +45,7 @@ const MAX_BYTES_IMAGEN_BASE64 = 8 * 1024 * 1024;
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { 'Content-Type': 'application/json' },
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
 }
 
@@ -53,6 +66,10 @@ function extraerAuthUserId(authHeader: string | null): string | null {
 }
 
 Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
   try {
     return await handle(req);
   } catch (e) {

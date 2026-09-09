@@ -64,6 +64,8 @@
   "googleContinuar": "Continuar con Google",
   "googleConectando": "Conectando…",
   "googleRegistrarse": "Regístrate con Google",
+  "facebookContinuar": "Continuar con Facebook",
+  "facebookRegistrarse": "Regístrate con Facebook",
   "o": "o",
 
   "drawerMiCuenta": "Mi cuenta",
@@ -79,6 +81,7 @@
   "bienvenidaOpcionParticularSubtitulo": "Sigue esquelas, avisos y funerales de tu zona",
   "bienvenidaOpcionClienteTitulo": "Soy una funeraria o tanatorio",
   "bienvenidaOpcionClienteSubtitulo": "Accede o da de alta tu negocio en TanApp",
+  "bienvenidaEntrando": "Iniciando sesión…",
   "loginRecordarme": "Recordarme",
   "loginOlvidasteContrasena": "¿Olvidaste tu contraseña?",
   "loginYaTengoCodigo": "¿Ya tienes un código?",
@@ -194,6 +197,21 @@
     "placeholders": { "nombre": { "type": "String" } }
   },
   "suplantarConfirmar": "Suplantar",
+  "suplantarCuentaPersonal": "Suplantar cuenta personal",
+  "usuarioEsCuentaPersonalDe": "Esta es la cuenta personal de {nombre} (cliente)",
+  "@usuarioEsCuentaPersonalDe": {
+    "placeholders": { "nombre": { "type": "String" } }
+  },
+  "usuarioVerFichaCliente": "Ver ficha del cliente",
+  "usuarioForzarCambioContrasenaTitulo": "Obligar a cambiar contraseña",
+  "usuarioForzarCambioContrasenaMensaje": "\"{nombre}\" tendrá que fijar una contraseña nueva la próxima vez que entre, antes de poder usar el resto de la app. ¿Continuar?",
+  "@usuarioForzarCambioContrasenaMensaje": {
+    "placeholders": { "nombre": { "type": "String" } }
+  },
+  "usuarioForzarCambioContrasenaConfirmar": "Obligar",
+  "usuarioForzarCambioContrasenaHecho": "Se le pedirá una contraseña nueva en su próximo acceso",
+  "usuarioForzarCambioContrasenaPendiente": "Pendiente",
+  "usuarioForzarCambioContrasenaAccion": "Obligar a cambiar contraseña",
   "suplantacionBannerTexto": "Estás viendo la app como {nombre}",
   "@suplantacionBannerTexto": {
     "placeholders": { "nombre": { "type": "String" } }
@@ -341,6 +359,11 @@
   "configuracionIaImportacionWebDescripcion": "Si la desactivas, ningún cliente podrá activar la importación automática de su web ni ver propuestas, aunque ya la tuviera configurada.",
   "configuracionIaEscaneoEsquelaLabel": "Escaneo de esquelas con IA",
   "configuracionIaEscaneoEsquelaDescripcion": "Si está activado, al escanear una esquela la foto se analiza con IA en vez del reconocimiento de texto local. Si la desactivas (o falla), se sigue usando el escaneo local de siempre.",
+  "configuracionLoginTitulo": "Login",
+  "configuracionLoginGoogleLabel": "Iniciar sesión con Google",
+  "configuracionLoginGoogleDescripcion": "Si lo desactivas, el botón \"Continuar con Google\" desaparece de las pantallas de acceso y registro de usuario ordinario.",
+  "configuracionLoginFacebookLabel": "Iniciar sesión con Facebook",
+  "configuracionLoginFacebookDescripcion": "Si lo desactivas, el botón \"Continuar con Facebook\" desaparece de las pantallas de acceso y registro de usuario ordinario.",
   "noHayTiposClienteDadosDeAlta": "No hay tipos de cliente dados de alta",
   "clienteTipoNuevo": "Nuevo tipo de cliente",
   "clienteTipoEditar": "Editar tipo de cliente",
@@ -475,6 +498,7 @@
     "placeholders": { "count": { "type": "int" } }
   },
   "avisosCancelarSeleccion": "Cancelar",
+  "avisosSeleccionar": "Seleccionar",
   "avisosEditarProgramado": "Editar aviso programado",
   "avisosProgramadosTitulo": "Programados",
   "avisosCancelarProgramadoTitulo": "Cancelar aviso programado",
@@ -482,6 +506,26 @@
   "@avisosCancelarProgramadoMensaje": {
     "placeholders": { "titulo": { "type": "String" } }
   },
+
+  "avisosTabRecibidos": "Recibidos",
+  "avisosTabRecordatorios": "Recordatorios",
+  "recordatorioBoton": "Recordatorio",
+  "recordatorioModalTitulo": "Recordatorios",
+  "recordatorioVacio": "No tienes ningún recordatorio para esta publicación.",
+  "recordatorioMaximoAlcanzado": "Ya tienes el máximo de 2 recordatorios para esta publicación.",
+  "recordatorioAnadir": "Añadir recordatorio",
+  "recordatorioFechaInvalida": "Elige una fecha y hora posteriores a ahora y anteriores al evento.",
+  "recordatorioEliminarTitulo": "Eliminar recordatorio",
+  "recordatorioEliminarMensaje": "¿Eliminar este recordatorio? Esta acción no se puede deshacer.",
+  "recordatorioProgramadoPara": "Te avisaremos el {fecha}",
+  "@recordatorioProgramadoPara": {
+    "placeholders": { "fecha": { "type": "String" } }
+  },
+  "recordatorioListaVacia": "No tienes recordatorios configurados.",
+  "recordatorioRecibidoTitulo": "Recordatorio",
+  "recordatorioRecibidoTexto": "Tenías un recordatorio pendiente de esta publicación.",
+  "recordatorioRecibidoSeccion": "Recordatorios",
+  "recordatorioTipoEsquela": "Esquela",
 
   "seguidosSeleccionaTipo": "Elige a quién seguir",
   "seguidosSeleccionaProvincia": "Elige la provincia",
@@ -569,7 +613,6 @@
   "publicarFechaActo": "Fecha del acto",
   "publicarHoraActo": "Hora del acto",
   "publicarActoLabel": "Acto",
-  "publicarMisaLabel": "Misa",
   "publicarIglesiaLocalizacion": "Iglesia/Localización",
   "publicarSeleccionaSede": "Selecciona la sede/tanatorio",
   "publicarSinSedes": "Todavía no tienes ninguna sede/tanatorio. Da de alta una en \"Miñas sedes\" antes de publicar.",
@@ -627,6 +670,8 @@
   "condolenciasAnonimaAyuda": "Tu nombre no se mostrará a nadie, ni siquiera a quien ha publicado la esquela.",
   "condolenciasPrivadaTitulo": "Condolencia privada",
   "condolenciasPrivadaAyuda": "Solo podrá verla quien ha publicado la esquela.",
+  "condolenciasNoAdmite": "Esta publicación no admite condolencias.",
+  "condolenciasSoloPrivadasAviso": "Quien ha publicado esta esquela ha decidido que todas las condolencias sean privadas: solo esa persona podrá verla.",
   "condolenciasModerarEliminarTitulo": "Eliminar condolencia",
   "condolenciasModerarEliminarMensaje": "Se ocultará esta condolencia y se avisará a quien la escribió de que ha sido retirada por no ajustarse a las normas de uso. ¿Continuar?",
   "condolenciasModerarEditarTitulo": "Editar condolencia",
@@ -651,6 +696,12 @@
   "tablonDisminuirLetra": "Disminuir tamaño de letra",
   "publicarEdadInvalida": "Introduce un número entero válido",
   "publicarVistaPreviaTitulo": "¿Es correcto?",
+  "publicarCondolenciasPreguntaTitulo": "Condolencias",
+  "publicarAdmiteCondolencias": "Admitir condolencias",
+  "publicarAdmiteCondolenciasAyuda": "Los seguidores podrán dejar mensajes de pésame en esta esquela.",
+  "publicarCondolenciasPrivadas": "Solo condolencias privadas",
+  "publicarCondolenciasPrivadasAyuda": "Todas las condolencias que se dejen aquí serán privadas: solo tú podrás verlas.",
+  "publicarCondolenciasContinuar": "Continuar",
   "publicarFallecioEl": "Falleció el {fecha}",
   "@publicarFallecioEl": {
     "placeholders": { "fecha": { "type": "String" } }
@@ -724,6 +775,7 @@
   "tablonBuscar": "Buscar por texto, cliente o concello",
   "tablonSinResultados": "No se ha encontrado ninguna esquela con ese texto.",
   "tablonVacioSinSeguir": "Todavía no ves ninguna esquela aquí: sigue a un cliente o a una zona en \"Seguindo\" para que aparezcan sus publicaciones.",
+  "tablonHayNuevas": "Hay nuevas publicaciones",
 
   "filtrar": "Filtrar",
 

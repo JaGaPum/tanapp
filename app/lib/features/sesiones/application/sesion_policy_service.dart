@@ -202,6 +202,19 @@ class SesionBootstrapGuard {
   /// Si el usuario (no ADMIN) todavía no ha pasado por "Elige tu idioma", justo después de
   /// aceptar términos (null = aún sin calcular). Mismo criterio que los dos de arriba.
   bool? necesitaElegirIdioma;
+
+  /// Si el ADMIN le ha marcado "DebeCambiarContrasena" (068, null = aún sin calcular). Cuando es
+  /// true se activa [enRecuperacionContrasena] para forzar "/reset-password" con el mismo
+  /// mecanismo de abajo, sin tener que volver a consultar la base de datos en cada "redirect".
+  bool? necesitaCambiarContrasena;
+
+  /// true entre que se valida el código de "olvidé mi contraseña" y que se guarda la nueva: lo
+  /// pone `verify_otp_screen.dart` y lo quita `reset_password_screen.dart` al terminar. Mientras
+  /// esté activo, el router fuerza "/reset-password" pase lo que pase (ver `app_router.dart`),
+  /// para que a nadie se le pueda colar sin fijar la contraseña nueva primero -no se usa el
+  /// último evento de auth para esto porque sigue siendo "passwordRecovery" un buen rato después
+  /// de guardar la contraseña, y detectar el evento nuevo llegaría con retraso-.
+  bool enRecuperacionContrasena = false;
 }
 
 final sesionBootstrapGuardProvider = Provider<SesionBootstrapGuard>(

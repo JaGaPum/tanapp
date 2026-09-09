@@ -9,6 +9,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/paginated_list_view.dart';
 import '../../../publicaciones/application/publicaciones_providers.dart';
 import '../../../publicaciones/data/publicacion_con_sede.dart';
+import '../../../publicaciones/data/publicaciones_repository.dart';
 import '../../../publicaciones/presentation/widgets/publicacion_card.dart';
 
 const _intervaloActualizacion = Duration(seconds: 30);
@@ -28,21 +29,19 @@ class _TablonScreenState extends ConsumerState<TablonScreen>
   Timer? _debounce;
   String _terminoBuscado = '';
   bool _mostrarFiltros = false;
+  bool _hayNuevas = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _timer = Timer.periodic(
-      _intervaloActualizacion,
-      (_) => ref.invalidate(publicacionesTablonProvider),
-    );
+    _timer = Timer.periodic(_intervaloActualizacion, (_) => _comprobarNuevas());
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      ref.invalidate(publicacionesTablonProvider);
+      _comprobarNuevas();
     }
   }
 
@@ -53,6 +52,33 @@ class _TablonScreenState extends ConsumerState<TablonScreen>
     WidgetsBinding.instance.removeObserver(this);
     _busquedaController.dispose();
     super.dispose();
+  }
+
+  /// Al estilo Twitter: no recarga la lista sola (perdería el scroll y las páginas ya cargadas),
+  /// solo mira si lo primero que hay ahora mismo en el servidor es distinto de lo primero que ya
+  /// se tiene cargado, y si es así, muestra el botón para que sea el propio usuario quien decida
+  /// cuándo saltar arriba a verlas.
+  Future<void> _comprobarNuevas() async {
+    if (_hayNuevas || _terminoBuscado.isNotEmpty) return;
+    final actuales = ref.read(publicacionesTablonProvider).items;
+    if (actuales.isEmpty) return;
+    try {
+      final ultimas = await ref
+          .read(publicacionesRepositoryProvider)
+          .listTablonPersonalizado(offset: 0, limit: 1);
+      if (!mounted || ultimas.isEmpty) return;
+      if (ultimas.first.idClientePublicacion !=
+          actuales.first.idClientePublicacion) {
+        setState(() => _hayNuevas = true);
+      }
+    } catch (_) {
+      // Silencioso: es solo una comprobación en segundo plano, no debe interrumpir al usuario.
+    }
+  }
+
+  void _cargarNuevas() {
+    setState(() => _hayNuevas = false);
+    ref.invalidate(publicacionesTablonProvider);
   }
 
   void _alCambiarBusqueda() {
@@ -120,41 +146,87 @@ class _TablonScreenState extends ConsumerState<TablonScreen>
           ],
           const SizedBox(height: 16),
           Expanded(
-            child: publicacionesAsync.cargandoInicial
-                ? const Center(child: CircularProgressIndicator())
-                : publicacionesAsync.error != null
-                ? Center(
-                    child: Text(
-                      context.l10n.errorGenerico(
-                        publicacionesAsync.error.toString(),
+            child: Stack(
+              alignment: Alignment.topCenter,
+              children: [
+                publicacionesAsync.cargandoInicial
+                    ? const Center(child: CircularProgressIndicator())
+                    : publicacionesAsync.error != null
+                    ? Center(
+                        child: Text(
+                          context.l10n.errorGenerico(
+                            publicacionesAsync.error.toString(),
+                          ),
+                        ),
+                      )
+                    : publicacionesAsync.items.isEmpty
+                    ? EmptyState(
+                        message: buscando
+                            ? context.l10n.tablonSinResultados
+                            : context.l10n.tablonVacioSinSeguir,
+                        icon: Icons.dynamic_feed_outlined,
+                      )
+                    : PaginatedListView<PublicacionConSede>(
+                        items: publicacionesAsync.items,
+                        cargandoMas: publicacionesAsync.cargandoMas,
+                        hasMore: publicacionesAsync.hasMore,
+                        onCargarMas: () => buscando
+                            ? ref
+                                  .read(
+                                    busquedaPublicacionesProvider(
+                                      _terminoBuscado,
+                                    ).notifier,
+                                  )
+                                  .cargarMas()
+                            : ref
+                                  .read(publicacionesTablonProvider.notifier)
+                                  .cargarMas(),
+                        itemBuilder: (context, publicacion) =>
+                            PublicacionCard(publicacion: publicacion),
+                      ),
+                // Al estilo Twitter: no reemplaza la lista sola, solo ofrece saltar arriba a
+                // verlas cuando el propio usuario lo decida (ver "_comprobarNuevas").
+                if (_hayNuevas && !buscando)
+                  Positioned(
+                    top: 8,
+                    child: Material(
+                      elevation: 4,
+                      borderRadius: BorderRadius.circular(20),
+                      color: Theme.of(context).colorScheme.primary,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(20),
+                        onTap: _cargarNuevas,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 10,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.arrow_upward,
+                                size: 18,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                context.l10n.tablonHayNuevas,
+                                style: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                  )
-                : publicacionesAsync.items.isEmpty
-                ? EmptyState(
-                    message: buscando
-                        ? context.l10n.tablonSinResultados
-                        : context.l10n.tablonVacioSinSeguir,
-                    icon: Icons.dynamic_feed_outlined,
-                  )
-                : PaginatedListView<PublicacionConSede>(
-                    items: publicacionesAsync.items,
-                    cargandoMas: publicacionesAsync.cargandoMas,
-                    hasMore: publicacionesAsync.hasMore,
-                    onCargarMas: () => buscando
-                        ? ref
-                              .read(
-                                busquedaPublicacionesProvider(
-                                  _terminoBuscado,
-                                ).notifier,
-                              )
-                              .cargarMas()
-                        : ref
-                              .read(publicacionesTablonProvider.notifier)
-                              .cargarMas(),
-                    itemBuilder: (context, publicacion) =>
-                        PublicacionCard(publicacion: publicacion),
                   ),
+              ],
+            ),
           ),
         ],
       ),

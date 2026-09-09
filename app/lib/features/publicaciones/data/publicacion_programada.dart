@@ -24,6 +24,12 @@ class PublicacionProgramada {
   final String? idConfiguracionActoTipo;
   final String? actoTipoOtro;
 
+  /// Ver [PublicacionConSede.admiteCondolencias]/[PublicacionConSede.condolenciasSoloPrivadas]
+  /// (069) — se guardan ya aquí para que al llegar su fecha se publiquen con la configuración
+  /// que el cliente eligió, no con la de por defecto.
+  final bool admiteCondolencias;
+  final bool condolenciasSoloPrivadas;
+
   bool get esActo => tipo == 'ACTO';
 
   const PublicacionProgramada({
@@ -45,6 +51,8 @@ class PublicacionProgramada {
     this.tipo = 'ESQUELA',
     this.idConfiguracionActoTipo,
     this.actoTipoOtro,
+    this.admiteCondolencias = true,
+    this.condolenciasSoloPrivadas = false,
   });
 
   factory PublicacionProgramada.fromMap(Map<String, dynamic> map) {
@@ -76,6 +84,9 @@ class PublicacionProgramada {
       tipo: map['Tipo'] as String? ?? 'ESQUELA',
       idConfiguracionActoTipo: map['IdConfiguracionActoTipo'] as String?,
       actoTipoOtro: map['ActoTipoOtro'] as String?,
+      admiteCondolencias: map['AdmiteCondolencias'] as bool? ?? true,
+      condolenciasSoloPrivadas:
+          map['CondolenciasSoloPrivadas'] as bool? ?? false,
     );
   }
 }

@@ -30,7 +30,30 @@ class PublicacionConSede {
   /// Solo cuando el cliente ha elegido "Otro" en vez de un tipo del catálogo.
   final String? actoTipoOtro;
 
+  /// Si esta esquela admite condolencias (069). Un acto (misa u otro) nunca las admite, tenga lo
+  /// que tenga esta columna -no viene de aquí, ver [esActo]-.
+  final bool admiteCondolencias;
+
+  /// Si está activo, cada condolencia que se deje aquí es privada sin que quien la escribe tenga
+  /// que marcarlo (el trigger "FSistemaValidarCondolencia" en 069 lo fuerza igualmente).
+  final bool condolenciasSoloPrivadas;
+
   bool get esActo => tipo == 'ACTO';
+
+  /// Fecha y hora combinadas del evento (funeral o acto), o null si falta cualquiera de las dos
+  /// (070): la usa el botón de "recordatorio" de la tarjeta para decidir si tiene sentido
+  /// ofrecerlo, y para acotar el selector de fecha/hora del recordatorio.
+  DateTime? get fechaHoraEvento {
+    final fecha = fechaFuneral;
+    final hora = horaFuneral;
+    if (fecha == null || hora == null) return null;
+    final partes = hora.split(':');
+    if (partes.length < 2) return null;
+    final horas = int.tryParse(partes[0]);
+    final minutos = int.tryParse(partes[1]);
+    if (horas == null || minutos == null) return null;
+    return DateTime(fecha.year, fecha.month, fecha.day, horas, minutos);
+  }
 
   const PublicacionConSede({
     required this.idClientePublicacion,
@@ -54,6 +77,8 @@ class PublicacionConSede {
     this.tipo = 'ESQUELA',
     this.idConfiguracionActoTipo,
     this.actoTipoOtro,
+    this.admiteCondolencias = true,
+    this.condolenciasSoloPrivadas = false,
   });
 
   factory PublicacionConSede.fromMap(Map<String, dynamic> map) {
@@ -89,6 +114,9 @@ class PublicacionConSede {
       tipo: map['Tipo'] as String? ?? 'ESQUELA',
       idConfiguracionActoTipo: map['IdConfiguracionActoTipo'] as String?,
       actoTipoOtro: map['ActoTipoOtro'] as String?,
+      admiteCondolencias: map['AdmiteCondolencias'] as bool? ?? true,
+      condolenciasSoloPrivadas:
+          map['CondolenciasSoloPrivadas'] as bool? ?? false,
     );
   }
 
@@ -125,6 +153,13 @@ class PublicacionConSede {
       tipo: map['Tipo'] as String? ?? 'ESQUELA',
       idConfiguracionActoTipo: map['IdConfiguracionActoTipo'] as String?,
       actoTipoOtro: map['ActoTipoOtro'] as String?,
+      // El RPC no devuelve estas dos columnas todavía (no hace falta para el tablón/búsqueda,
+      // que no muestran el botón de condolencias distinto según esto, solo según [esActo]): se
+      // asume el valor por defecto, y quien de verdad las necesita (el formulario de edición) lee
+      // por [PublicacionConSede.fromMap], que sí las trae.
+      admiteCondolencias: map['AdmiteCondolencias'] as bool? ?? true,
+      condolenciasSoloPrivadas:
+          map['CondolenciasSoloPrivadas'] as bool? ?? false,
     );
   }
 }

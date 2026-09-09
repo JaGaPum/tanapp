@@ -65,6 +65,15 @@ class ConfiguracionScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Card(
             child: ListTile(
+              leading: const Icon(Icons.login),
+              title: Text(context.l10n.configuracionLoginTitulo),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/admin/configuracion/login'),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Card(
+            child: ListTile(
               leading: const Icon(Icons.gavel_outlined),
               title: Text(context.l10n.usuarioTerminosTitulo),
               trailing: const Icon(Icons.chevron_right),

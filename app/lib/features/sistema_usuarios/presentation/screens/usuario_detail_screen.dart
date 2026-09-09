@@ -413,11 +413,14 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
     }
   }
 
-  Future<void> _suplantar() async {
+  /// [idObjetivo] no siempre es la propia ficha: para un CLIENTE con cuenta personal vinculada
+  /// (063), el botón de abajo la pasa en vez de "widget.perfil.idSistemaUsuario", para poder
+  /// suplantar cualquiera de las dos identidades desde una única ficha (la del cliente).
+  Future<void> _suplantar(String idObjetivo, String nombreObjetivo) async {
     final confirmado = await showConfirmDialog(
       context,
       title: context.l10n.suplantarUsuario,
-      message: context.l10n.suplantarMensaje(widget.perfil.nombreCompleto),
+      message: context.l10n.suplantarMensaje(nombreObjetivo),
       confirmLabel: context.l10n.suplantarConfirmar,
     );
     if (!confirmado) return;
@@ -428,7 +431,7 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
     try {
       await ref
           .read(sesionAdminGuardadaProvider.notifier)
-          .suplantar(widget.perfil.idSistemaUsuario);
+          .suplantar(idObjetivo);
       if (mounted) context.go('/home');
     } catch (e) {
       setState(
@@ -438,6 +441,37 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
       );
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _forzarCambioContrasena() async {
+    final confirmado = await showConfirmDialog(
+      context,
+      title: context.l10n.usuarioForzarCambioContrasenaTitulo,
+      message: context.l10n.usuarioForzarCambioContrasenaMensaje(
+        widget.perfil.nombreCompleto,
+      ),
+      confirmLabel: context.l10n.usuarioForzarCambioContrasenaConfirmar,
+    );
+    if (!confirmado) return;
+    try {
+      await ref
+          .read(usuariosRepositoryProvider)
+          .forzarCambioContrasena(widget.perfil.idSistemaUsuario);
+      _invalidateUsuario();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.l10n.usuarioForzarCambioContrasenaHecho),
+          ),
+        );
+      }
+    } catch (e) {
+      setState(
+        () => _error = e is AppException
+            ? e.message
+            : context.l10n.errorInesperado,
+      );
     }
   }
 
@@ -471,6 +505,10 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
     final miPerfil = ref.watch(currentUserProfileProvider).value;
     final puedeSuplantar =
         !widget.perfil.roles.contains('ADMIN') &&
+        miPerfil?.idSistemaUsuario != widget.perfil.idSistemaUsuario;
+    // A diferencia de suplantar, sí se puede obligar a otro ADMIN a cambiar su contraseña; solo
+    // no tiene sentido sobre uno mismo (para eso ya está "Mi cuenta").
+    final puedeForzarCambioContrasena =
         miPerfil?.idSistemaUsuario != widget.perfil.idSistemaUsuario;
     final esCliente = widget.perfil.roles.contains('CLIENTE');
     final labelNombre = esCliente
@@ -1032,13 +1070,96 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                       error: (e, _) =>
                           Text(context.l10n.errorCargarSesiones(e.toString())),
                     ),
+              if (!esCliente)
+                ref
+                    .watch(
+                      clientePorOrdinarioVinculadoProvider(
+                        widget.perfil.idSistemaUsuario,
+                      ),
+                    )
+                    .maybeWhen(
+                      data: (cliente) => cliente == null
+                          ? const SizedBox.shrink()
+                          : Padding(
+                              padding: const EdgeInsets.only(top: 32),
+                              child: Card(
+                                child: ListTile(
+                                  leading: const Icon(Icons.link),
+                                  title: Text(
+                                    context.l10n.usuarioEsCuentaPersonalDe(
+                                      cliente.nombreCompleto,
+                                    ),
+                                  ),
+                                  trailing: TextButton(
+                                    onPressed: () => context.push(
+                                      '/admin/usuarios/${cliente.idSistemaUsuario}',
+                                    ),
+                                    child: Text(
+                                      context.l10n.usuarioVerFichaCliente,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                      orElse: () => const SizedBox.shrink(),
+                    ),
+              if (puedeForzarCambioContrasena) ...[
+                const SizedBox(height: 32),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      context.l10n.usuarioForzarCambioContrasenaTitulo,
+                      style: _sectionTitleStyle(context),
+                    ),
+                    if (widget.perfil.debeCambiarContrasena)
+                      Chip(
+                        avatar: Icon(
+                          Icons.warning_amber_outlined,
+                          color: Theme.of(context).colorScheme.error,
+                          size: 18,
+                        ),
+                        label: Text(
+                          context.l10n.usuarioForzarCambioContrasenaPendiente,
+                        ),
+                      )
+                    else
+                      TextButton(
+                        onPressed: _forzarCambioContrasena,
+                        child: Text(
+                          context.l10n.usuarioForzarCambioContrasenaAccion,
+                        ),
+                      ),
+                  ],
+                ),
+              ],
               if (puedeSuplantar) ...[
                 const SizedBox(height: 40),
                 OutlinedButton.icon(
                   icon: const Icon(Icons.visibility_outlined),
                   label: Text(context.l10n.suplantarUsuario),
-                  onPressed: _loading ? null : _suplantar,
+                  onPressed: _loading
+                      ? null
+                      : () => _suplantar(
+                          widget.perfil.idSistemaUsuario,
+                          widget.perfil.nombreCompleto,
+                        ),
                 ),
+                if (esCliente &&
+                    widget.perfil.idSistemaUsuarioOrdinarioVinculado !=
+                        null) ...[
+                  const SizedBox(height: 10),
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.switch_account_outlined),
+                    label: Text(context.l10n.suplantarCuentaPersonal),
+                    onPressed: _loading
+                        ? null
+                        : () => _suplantar(
+                            widget.perfil.idSistemaUsuarioOrdinarioVinculado!,
+                            widget.perfil.nombreCompleto,
+                          ),
+                  ),
+                ],
               ],
               const SizedBox(height: 40),
               OutlinedButton.icon(

@@ -30,3 +30,13 @@ final escaneoEsquelaIaActivaProvider = FutureProvider.autoDispose<bool>((ref) {
       .watch(configuracionRepositoryProvider)
       .fetchEscaneoEsquelaIaActiva();
 });
+
+/// Interruptores globales de los botones de login social (073): se leen también desde la
+/// pantalla de login, antes de haber iniciado sesión.
+final googleLoginActivoProvider = FutureProvider.autoDispose<bool>((ref) {
+  return ref.watch(configuracionRepositoryProvider).fetchGoogleLoginActivo();
+});
+
+final facebookLoginActivoProvider = FutureProvider.autoDispose<bool>((ref) {
+  return ref.watch(configuracionRepositoryProvider).fetchFacebookLoginActivo();
+});

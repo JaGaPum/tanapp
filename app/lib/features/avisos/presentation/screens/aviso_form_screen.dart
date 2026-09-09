@@ -207,15 +207,19 @@ class _AvisoFormScreenState extends ConsumerState<AvisoFormScreen> {
                         labelText: context.l10n.publicarSeleccionaSede,
                         filled: true,
                         fillColor: AppColors.greenLight.withValues(alpha: 0.35),
-                        border: OutlineInputBorder(
+                        // UnderlineInputBorder en vez de OutlineInputBorder: con "outline" la
+                        // etiqueta se coloca a caballo del borde (mitad dentro, mitad fuera) aunque
+                        // el borde sea invisible, dando la sensación de que está montada encima del
+                        // combo en vez de flotando dentro de él (ver publicacion_form_screen.dart).
+                        border: UnderlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
                         ),
-                        enabledBorder: OutlineInputBorder(
+                        enabledBorder: UnderlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
                         ),
-                        focusedBorder: OutlineInputBorder(
+                        focusedBorder: UnderlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
                         ),

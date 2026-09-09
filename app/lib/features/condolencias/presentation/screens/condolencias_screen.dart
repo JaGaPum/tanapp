@@ -10,6 +10,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/paginated_list_view.dart';
 import '../../../../core/widgets/vela_icon.dart';
 import '../../../cliente_sedes/application/cliente_sedes_providers.dart';
+import '../../../publicaciones/application/publicaciones_providers.dart';
 import '../../application/condolencias_providers.dart';
 import '../../data/condolencia.dart';
 import '../../data/condolencias_repository.dart';
@@ -91,20 +92,26 @@ class _CuerpoState extends ConsumerState<_Cuerpo> {
     setState(() => _guardando = true);
     try {
       final repo = ref.read(condolenciasRepositoryProvider);
+      // Si el cliente ha forzado "solo privadas" (069) se manda ya así, aunque el trigger
+      // "FSistemaValidarCondolencia" lo aseguraría igualmente del lado del servidor.
+      final config = await ref.read(
+        configCondolenciasProvider(widget.idClientePublicacion).future,
+      );
+      final privada = config.soloPrivadas ? true : _privada;
       if (propia != null) {
         await repo.actualizarCondolencia(
           idClientePublicacionCondolencia:
               propia.idClientePublicacionCondolencia,
           texto: texto,
           anonima: _anonima,
-          privada: _privada,
+          privada: privada,
         );
       } else {
         await repo.crearCondolencia(
           idClientePublicacion: widget.idClientePublicacion,
           texto: texto,
           anonima: _anonima,
-          privada: _privada,
+          privada: privada,
         );
       }
       await _refrescar();
@@ -204,6 +211,15 @@ class _CuerpoState extends ConsumerState<_Cuerpo> {
     final resultado = ref.watch(
       condolenciasProvider(widget.idClientePublicacion),
     );
+    // Mientras carga o si falla se asume el valor por defecto (admite, no forzadas privadas): un
+    // acto nunca llega a abrir esta pantalla (069), así que no hay un "no admite" por defecto que
+    // proteger aquí.
+    final config = ref
+        .watch(configCondolenciasProvider(widget.idClientePublicacion))
+        .maybeWhen(
+          data: (c) => c,
+          orElse: () => (admiteCondolencias: true, soloPrivadas: false),
+        );
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -232,6 +248,8 @@ class _CuerpoState extends ConsumerState<_Cuerpo> {
                 controller: _textoController,
                 anonima: _anonima,
                 privada: _privada,
+                admiteCondolencias: config.admiteCondolencias,
+                soloPrivadas: config.soloPrivadas,
                 onAnonimaChanged: (v) => setState(() => _anonima = v),
                 onPrivadaChanged: (v) => setState(() => _privada = v),
                 onEditar: () => setState(() => _editando = true),
@@ -280,6 +298,12 @@ class _MiCondolencia extends StatelessWidget {
   final TextEditingController controller;
   final bool anonima;
   final bool privada;
+
+  /// Configuración de esta esquela (069): si no admite condolencias, y de admitirlas, si han de
+  /// ser todas privadas sin que quien escribe pueda elegir lo contrario.
+  final bool admiteCondolencias;
+  final bool soloPrivadas;
+
   final ValueChanged<bool> onAnonimaChanged;
   final ValueChanged<bool> onPrivadaChanged;
   final VoidCallback onEditar;
@@ -294,6 +318,8 @@ class _MiCondolencia extends StatelessWidget {
     required this.controller,
     required this.anonima,
     required this.privada,
+    required this.admiteCondolencias,
+    required this.soloPrivadas,
     required this.onAnonimaChanged,
     required this.onPrivadaChanged,
     required this.onEditar,
@@ -315,7 +341,11 @@ class _MiCondolencia extends StatelessWidget {
         ),
       );
     }
-    final mostrarFormulario = editando || propia == null;
+    // Si todavía no ha dejado la suya y la publicación no admite condolencias (069), no tiene
+    // sentido mostrarle el formulario: se le informa y ya está. Una que ya existiera antes de
+    // desactivarlo se sigue viendo/gestionando igual que siempre, sin bloquear nada retroactivo.
+    final noAdmiteTodavia = !admiteCondolencias && propia == null;
+    final mostrarFormulario = !noAdmiteTodavia && (editando || propia == null);
     return Card(
       color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.08),
       child: Padding(
@@ -327,12 +357,16 @@ class _MiCondolencia extends StatelessWidget {
               context.l10n.condolenciasTuCondolencia,
               style: Theme.of(context).textTheme.titleSmall,
             ),
-            if (!mostrarFormulario && propia!.moderadaEditada) ...[
+            if (!mostrarFormulario &&
+                propia != null &&
+                propia!.moderadaEditada) ...[
               const SizedBox(height: 8),
               _AvisoModeracion(texto: context.l10n.condolenciasAvisoEditada),
             ],
             const SizedBox(height: 8),
-            if (mostrarFormulario) ...[
+            if (noAdmiteTodavia)
+              _InfoNota(texto: context.l10n.condolenciasNoAdmite)
+            else if (mostrarFormulario) ...[
               TextField(
                 controller: controller,
                 maxLines: 4,
@@ -348,14 +382,24 @@ class _MiCondolencia extends StatelessWidget {
                 title: Text(context.l10n.condolenciasAnonimaTitulo),
                 subtitle: Text(context.l10n.condolenciasAnonimaAyuda),
               ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                controlAffinity: ListTileControlAffinity.leading,
-                value: privada,
-                onChanged: (v) => onPrivadaChanged(v ?? false),
-                title: Text(context.l10n.condolenciasPrivadaTitulo),
-                subtitle: Text(context.l10n.condolenciasPrivadaAyuda),
-              ),
+              // Si el cliente ha forzado que todas sean privadas (069) no se deja elegir: se
+              // informa de por qué en vez de mostrar un checkbox que no haría nada.
+              if (soloPrivadas)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: _InfoNota(
+                    texto: context.l10n.condolenciasSoloPrivadasAviso,
+                  ),
+                )
+              else
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  value: privada,
+                  onChanged: (v) => onPrivadaChanged(v ?? false),
+                  title: Text(context.l10n.condolenciasPrivadaTitulo),
+                  subtitle: Text(context.l10n.condolenciasPrivadaAyuda),
+                ),
               const SizedBox(height: 12),
               Row(
                 children: [
@@ -412,6 +456,29 @@ class _MiCondolencia extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Nota informativa neutra sobre la configuración de condolencias de esta esquela (069): que no
+/// se admiten, o que han de ser todas privadas. A diferencia de [_AvisoModeracion] no es un
+/// aviso de que algo ha ido mal, así que no usa su color de énfasis.
+class _InfoNota extends StatelessWidget {
+  final String texto;
+  const _InfoNota({required this.texto});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Theme.of(context).colorScheme.onSurfaceVariant;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(Icons.info_outline, size: 20, color: color),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(texto, style: TextStyle(color: color)),
+        ),
+      ],
     );
   }
 }

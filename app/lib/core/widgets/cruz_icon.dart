@@ -1,22 +1,30 @@
 import 'package:flutter/material.dart';
 
-/// Cruz sencilla dibujada a mano, siempre negra: se usa junto al nombre del fallecido en las
+/// Cruz sencilla dibujada a mano, negra por defecto: se usa junto al nombre del fallecido en las
 /// esquelas. No se usa el carácter Unicode "✝" porque algunos móviles lo pintan de color
-/// (el emoji de Noto Color Emoji sale morado) en vez de negro.
+/// (el emoji de Noto Color Emoji sale morado) en vez de negro. [color] es configurable para
+/// cuando hace falta en blanco (p. ej. dentro del sello de la tarjeta, sobre fondo negro).
 class CruzIcon extends StatelessWidget {
   final double size;
-  const CruzIcon({super.key, this.size = 20});
+  final Color color;
+  const CruzIcon({super.key, this.size = 20, this.color = Colors.black});
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(size: Size(size, size), painter: _CruzPainter());
+    return CustomPaint(
+      size: Size(size, size),
+      painter: _CruzPainter(color: color),
+    );
   }
 }
 
 class _CruzPainter extends CustomPainter {
+  final Color color;
+  const _CruzPainter({required this.color});
+
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.black;
+    final paint = Paint()..color = color;
     final barW = size.width * 0.18;
 
     canvas.drawRect(
@@ -35,5 +43,6 @@ class _CruzPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _CruzPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _CruzPainter oldDelegate) =>
+      color != oldDelegate.color;
 }

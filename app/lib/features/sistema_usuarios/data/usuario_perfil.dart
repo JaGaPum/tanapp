@@ -31,6 +31,13 @@ class UsuarioPerfil {
   final bool notificacionesPushActivas;
   final bool escaneoEsquelaIaActiva;
   final bool idiomaConfirmado;
+  final bool debeCambiarContrasena;
+
+  /// Si es CLIENTE, el id de su cuenta personal USUARIO_ORDINARIO vinculada (063), o null si
+  /// todavía no se ha creado ninguna. Para una cuenta que no es CLIENTE, siempre null (no puede
+  /// tener una vinculada propia, aunque sí puede SER la vinculada de otra — ver
+  /// [UsuariosRepository.fetchClientePorOrdinarioVinculado]).
+  final String? idSistemaUsuarioOrdinarioVinculado;
   final List<RolAsignado> rolesAsignados;
 
   const UsuarioPerfil({
@@ -52,6 +59,8 @@ class UsuarioPerfil {
     required this.notificacionesPushActivas,
     required this.escaneoEsquelaIaActiva,
     required this.idiomaConfirmado,
+    this.debeCambiarContrasena = false,
+    this.idSistemaUsuarioOrdinarioVinculado,
     required this.rolesAsignados,
   });
 
@@ -105,6 +114,9 @@ class UsuarioPerfil {
           map['NotificacionesPushActivas'] as bool? ?? true,
       escaneoEsquelaIaActiva: map['EscaneoEsquelaIaActiva'] as bool? ?? true,
       idiomaConfirmado: map['IdiomaConfirmado'] as bool? ?? false,
+      debeCambiarContrasena: map['DebeCambiarContrasena'] as bool? ?? false,
+      idSistemaUsuarioOrdinarioVinculado:
+          map['IdSistemaUsuarioOrdinarioVinculado'] as String?,
       rolesAsignados: roles,
     );
   }

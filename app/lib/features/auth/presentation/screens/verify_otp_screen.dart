@@ -112,7 +112,13 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
         final usuariosRepo = ref.read(usuariosRepositoryProvider);
         final sesionPolicy = ref.read(sesionPolicyServiceProvider);
         final cuentaDesactivadaMensaje = context.l10n.cuentaDesactivada;
-        ref.read(sesionBootstrapGuardProvider).completado = true;
+        final guard = ref.read(sesionBootstrapGuardProvider);
+        guard.completado = true;
+        // Con esto activo, el router fuerza "/reset-password" aunque su propio "redirect" se
+        // reevalúe (por el evento "passwordRecovery" de auth) antes de que este método llegue al
+        // "context.go" de más abajo -si no, esa reevaluación de en medio ganaba la carrera y
+        // mandaba a "/home" directamente, sin fijar la contraseña nueva (ver `app_router.dart`).
+        guard.enRecuperacionContrasena = true;
         await repo.verifyRecoveryOtp(
           email: widget.email,
           token: _otpController.text,

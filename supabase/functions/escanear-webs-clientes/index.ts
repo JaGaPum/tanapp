@@ -26,9 +26,20 @@
 //   5. Rellena y ejecuta el bloque "cron.schedule" comentado al final de
 //      db/028_propuestas_publicaciones.sql (con la URL real del proyecto y el mismo
 //      CRON_SHARED_SECRET) para que se dispare sola una vez al día.
+//
+// IMPORTANTE: la vía 2 (botón "Ejecutar ahora") se llama desde un navegador (Flutter Web), así
+// que hace falta responder a la petición de verificación previa CORS (OPTIONS) e incluir las
+// cabeceras CORS en TODAS las respuestas; si no, el navegador bloquea la petición entera antes
+// de que llegue a mandarse. El cron (vía 1) no pasa por un navegador, así que no le afecta.
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import Anthropic from 'npm:@anthropic-ai/sdk@0.32.1';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
 
 // Algunas webs traen bastante HTML (menús, cabecera, scripts) antes de llegar al listado real
 // de esquelas: un límite bajo cortaba el texto justo antes de esa parte. 150 000 caracteres cubre
@@ -38,11 +49,15 @@ const MAX_CARACTERES_PAGINA = 150000;
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { 'Content-Type': 'application/json' },
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
 }
 
 Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
   try {
     return await handle(req);
   } catch (e) {

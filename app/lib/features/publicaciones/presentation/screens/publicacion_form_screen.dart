@@ -73,6 +73,12 @@ class PublicacionFormScreen extends ConsumerStatefulWidget {
   final String? idConfiguracionActoTipoInicial;
   final String? actoTipoOtroInicial;
 
+  /// Solo para esquelas (069): si admite condolencias, y si estas han de ser todas privadas. Un
+  /// acto nunca las admite, tenga lo que tenga esto (ver [_esActo]), así que no hace falta
+  /// preguntarlo en ese caso.
+  final bool admiteCondolenciasInicial;
+  final bool condolenciasSoloPrivadasInicial;
+
   const PublicacionFormScreen({
     super.key,
     this.idClientePublicacion,
@@ -94,6 +100,8 @@ class PublicacionFormScreen extends ConsumerStatefulWidget {
     this.tipoInicial = 'ESQUELA',
     this.idConfiguracionActoTipoInicial,
     this.actoTipoOtroInicial,
+    this.admiteCondolenciasInicial = true,
+    this.condolenciasSoloPrivadasInicial = false,
   });
 
   @override
@@ -145,6 +153,8 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
           hour: widget.fechaProgramadaInicial!.hour,
           minute: widget.fechaProgramadaInicial!.minute,
         );
+  late bool _admiteCondolencias = widget.admiteCondolenciasInicial;
+  late bool _condolenciasSoloPrivadas = widget.condolenciasSoloPrivadasInicial;
   bool _intentoEnviar = false;
   bool _loading = false;
   String? _error;
@@ -334,6 +344,14 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
     );
     if (confirmado != true || !mounted) return;
 
+    // Un acto nunca admite condolencias (069): no tiene sentido preguntarlo. En edición se
+    // pregunta igual, pero con lo que ya tenía configurado como valor de partida, para que el
+    // cliente pueda cambiarlo si quiere en vez de tener que fijarlo para siempre al publicar.
+    if (!_esActo) {
+      final continuar = await _preguntarCondolencias();
+      if (!continuar || !mounted) return;
+    }
+
     setState(() {
       _loading = true;
       _error = null;
@@ -364,6 +382,8 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
           tipo: widget.tipoInicial,
           idConfiguracionActoTipo: idConfiguracionActoTipo,
           actoTipoOtro: actoTipoOtro,
+          admiteCondolencias: _admiteCondolencias,
+          condolenciasSoloPrivadas: _condolenciasSoloPrivadas,
         );
       } else if (_editandoProgramada) {
         await repo.actualizarPublicacionProgramada(
@@ -384,6 +404,8 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
           tipo: widget.tipoInicial,
           idConfiguracionActoTipo: idConfiguracionActoTipo,
           actoTipoOtro: actoTipoOtro,
+          admiteCondolencias: _admiteCondolencias,
+          condolenciasSoloPrivadas: _condolenciasSoloPrivadas,
         );
       } else if (_programar) {
         await repo.crearPublicacionProgramada(
@@ -402,6 +424,8 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
           tipo: widget.tipoInicial,
           idConfiguracionActoTipo: idConfiguracionActoTipo,
           actoTipoOtro: actoTipoOtro,
+          admiteCondolencias: _admiteCondolencias,
+          condolenciasSoloPrivadas: _condolenciasSoloPrivadas,
         );
       } else {
         await repo.crearPublicacion(
@@ -419,6 +443,8 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
           tipo: widget.tipoInicial,
           idConfiguracionActoTipo: idConfiguracionActoTipo,
           actoTipoOtro: actoTipoOtro,
+          admiteCondolencias: _admiteCondolencias,
+          condolenciasSoloPrivadas: _condolenciasSoloPrivadas,
         );
       }
       if (!_esEdicion && !_editandoProgramada) {
@@ -559,6 +585,64 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
     );
   }
 
+  /// Tras confirmar la vista previa de una esquela (nunca para un acto, ver [_esActo]), pregunta
+  /// si admite condolencias y, de admitirlas, si han de ser todas privadas — antes de publicar de
+  /// verdad. Devuelve false si se cancela, en cuyo caso no se debe seguir con la publicación.
+  Future<bool> _preguntarCondolencias() async {
+    var admite = _admiteCondolencias;
+    var soloPrivadas = _condolenciasSoloPrivadas;
+    final confirmado = await showDialog<bool>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setStateDialog) => AlertDialog(
+          title: Text(context.l10n.publicarCondolenciasPreguntaTitulo),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(context.l10n.publicarAdmiteCondolencias),
+                subtitle: Text(context.l10n.publicarAdmiteCondolenciasAyuda),
+                value: admite,
+                onChanged: (value) => setStateDialog(() {
+                  admite = value;
+                  if (!value) soloPrivadas = false;
+                }),
+              ),
+              if (admite)
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(context.l10n.publicarCondolenciasPrivadas),
+                  subtitle: Text(
+                    context.l10n.publicarCondolenciasPrivadasAyuda,
+                  ),
+                  value: soloPrivadas,
+                  onChanged: (value) =>
+                      setStateDialog(() => soloPrivadas = value),
+                ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(context.l10n.confirmDialogCancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(context.l10n.publicarCondolenciasContinuar),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (confirmado != true) return false;
+    setState(() {
+      _admiteCondolencias = admite;
+      _condolenciasSoloPrivadas = soloPrivadas;
+    });
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     final sedesAsync = ref.watch(misSedesProvider);
@@ -638,15 +722,22 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
                         labelText: context.l10n.publicarSeleccionaSede,
                         filled: true,
                         fillColor: AppColors.greenLight.withValues(alpha: 0.35),
-                        border: OutlineInputBorder(
+                        // UnderlineInputBorder en vez de OutlineInputBorder: con este último,
+                        // aunque el borde sea invisible ("BorderSide.none"), Flutter sigue
+                        // colocando la etiqueta a caballo del borde (mitad dentro, mitad fuera de
+                        // la caja) porque así es como se dibuja un campo "outline" -pensado para
+                        // que la línea del borde se "corte" ahí-; al no haber línea visible que lo
+                        // justifique, se veía como si la etiqueta estuviera montada encima del
+                        // combo en vez de flotando dentro de él.
+                        border: UnderlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
                         ),
-                        enabledBorder: OutlineInputBorder(
+                        enabledBorder: UnderlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
                         ),
-                        focusedBorder: OutlineInputBorder(
+                        focusedBorder: UnderlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
                         ),

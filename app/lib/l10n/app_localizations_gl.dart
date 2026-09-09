@@ -150,6 +150,12 @@ class AppLocalizationsGl extends AppLocalizations {
   String get googleRegistrarse => 'Rexístrate con Google';
 
   @override
+  String get facebookContinuar => 'Continuar con Facebook';
+
+  @override
+  String get facebookRegistrarse => 'Rexístrate con Facebook';
+
+  @override
   String get o => 'ou';
 
   @override
@@ -189,6 +195,9 @@ class AppLocalizationsGl extends AppLocalizations {
   @override
   String get bienvenidaOpcionClienteSubtitulo =>
       'Accede ou dá de alta o teu negocio en TanApp';
+
+  @override
+  String get bienvenidaEntrando => 'Iniciando sesión…';
 
   @override
   String get loginRecordarme => 'Lembrarme';
@@ -464,6 +473,40 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get suplantarConfirmar => 'Suplantar';
+
+  @override
+  String get suplantarCuentaPersonal => 'Suplantar conta persoal';
+
+  @override
+  String usuarioEsCuentaPersonalDe(String nombre) {
+    return 'Esta é a conta persoal de $nombre (cliente)';
+  }
+
+  @override
+  String get usuarioVerFichaCliente => 'Ver ficha do cliente';
+
+  @override
+  String get usuarioForzarCambioContrasenaTitulo =>
+      'Obrigar a cambiar contrasinal';
+
+  @override
+  String usuarioForzarCambioContrasenaMensaje(String nombre) {
+    return '\"$nombre\" terá que fixar un contrasinal novo a próxima vez que entre, antes de poder usar o resto da app. Continuar?';
+  }
+
+  @override
+  String get usuarioForzarCambioContrasenaConfirmar => 'Obrigar';
+
+  @override
+  String get usuarioForzarCambioContrasenaHecho =>
+      'Pedirémoslle un contrasinal novo no seu próximo acceso';
+
+  @override
+  String get usuarioForzarCambioContrasenaPendiente => 'Pendente';
+
+  @override
+  String get usuarioForzarCambioContrasenaAccion =>
+      'Obrigar a cambiar contrasinal';
 
   @override
   String suplantacionBannerTexto(String nombre) {
@@ -831,6 +874,23 @@ class AppLocalizationsGl extends AppLocalizations {
       'Se está activado, ao escanear unha esquela a foto analízase con IA en vez do recoñecemento de texto local. Se a desactivas (ou falla), séguese usando o escaneo local de sempre.';
 
   @override
+  String get configuracionLoginTitulo => 'Login';
+
+  @override
+  String get configuracionLoginGoogleLabel => 'Iniciar sesión con Google';
+
+  @override
+  String get configuracionLoginGoogleDescripcion =>
+      'Se o desactivas, o botón \"Continuar con Google\" desaparece das pantallas de acceso e rexistro de usuario ordinario.';
+
+  @override
+  String get configuracionLoginFacebookLabel => 'Iniciar sesión con Facebook';
+
+  @override
+  String get configuracionLoginFacebookDescripcion =>
+      'Se o desactivas, o botón \"Continuar con Facebook\" desaparece das pantallas de acceso e rexistro de usuario ordinario.';
+
+  @override
   String get noHayTiposClienteDadosDeAlta =>
       'Non hai tipos de cliente dados de alta';
 
@@ -1136,6 +1196,9 @@ class AppLocalizationsGl extends AppLocalizations {
   String get avisosCancelarSeleccion => 'Cancelar';
 
   @override
+  String get avisosSeleccionar => 'Seleccionar';
+
+  @override
   String get avisosEditarProgramado => 'Editar aviso programado';
 
   @override
@@ -1148,6 +1211,61 @@ class AppLocalizationsGl extends AppLocalizations {
   String avisosCancelarProgramadoMensaje(String titulo) {
     return 'Seguro que queres cancelar o aviso programado \"$titulo\"? Non se enviará.';
   }
+
+  @override
+  String get avisosTabRecibidos => 'Recibidos';
+
+  @override
+  String get avisosTabRecordatorios => 'Recordatorios';
+
+  @override
+  String get recordatorioBoton => 'Recordatorio';
+
+  @override
+  String get recordatorioModalTitulo => 'Recordatorios';
+
+  @override
+  String get recordatorioVacio =>
+      'Non tes ningún recordatorio para esta publicación.';
+
+  @override
+  String get recordatorioMaximoAlcanzado =>
+      'Xa tes o máximo de 2 recordatorios para esta publicación.';
+
+  @override
+  String get recordatorioAnadir => 'Engadir recordatorio';
+
+  @override
+  String get recordatorioFechaInvalida =>
+      'Escolle unha data e hora posteriores a agora e anteriores ao evento.';
+
+  @override
+  String get recordatorioEliminarTitulo => 'Eliminar recordatorio';
+
+  @override
+  String get recordatorioEliminarMensaje =>
+      'Eliminar este recordatorio? Esta acción non se pode desfacer.';
+
+  @override
+  String recordatorioProgramadoPara(String fecha) {
+    return 'Avisarémosche o $fecha';
+  }
+
+  @override
+  String get recordatorioListaVacia => 'Non tes recordatorios configurados.';
+
+  @override
+  String get recordatorioRecibidoTitulo => 'Recordatorio';
+
+  @override
+  String get recordatorioRecibidoTexto =>
+      'Tiñas un recordatorio pendente desta publicación.';
+
+  @override
+  String get recordatorioRecibidoSeccion => 'Recordatorios';
+
+  @override
+  String get recordatorioTipoEsquela => 'Esquela';
 
   @override
   String get seguidosSeleccionaTipo => 'Escolle a quen seguir';
@@ -1381,9 +1499,6 @@ class AppLocalizationsGl extends AppLocalizations {
   String get publicarActoLabel => 'Acto';
 
   @override
-  String get publicarMisaLabel => 'Misa';
-
-  @override
   String get publicarIglesiaLocalizacion => 'Igrexa/Localización';
 
   @override
@@ -1538,6 +1653,14 @@ class AppLocalizationsGl extends AppLocalizations {
       'Só poderá vela quen publicou a esquela.';
 
   @override
+  String get condolenciasNoAdmite =>
+      'Esta publicación non admite condolencias.';
+
+  @override
+  String get condolenciasSoloPrivadasAviso =>
+      'Quen publicou esta esquela decidiu que todas as condolencias sexan privadas: só esa persoa poderá velas.';
+
+  @override
   String get condolenciasModerarEliminarTitulo => 'Eliminar condolencia';
 
   @override
@@ -1592,6 +1715,26 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get publicarVistaPreviaTitulo => 'É correcto?';
+
+  @override
+  String get publicarCondolenciasPreguntaTitulo => 'Condolencias';
+
+  @override
+  String get publicarAdmiteCondolencias => 'Admitir condolencias';
+
+  @override
+  String get publicarAdmiteCondolenciasAyuda =>
+      'Os seguidores poderán deixar mensaxes de pésame nesta esquela.';
+
+  @override
+  String get publicarCondolenciasPrivadas => 'Só condolencias privadas';
+
+  @override
+  String get publicarCondolenciasPrivadasAyuda =>
+      'Todas as condolencias que se deixen aquí serán privadas: só ti poderás velas.';
+
+  @override
+  String get publicarCondolenciasContinuar => 'Continuar';
 
   @override
   String publicarFallecioEl(String fecha) {
@@ -1771,6 +1914,9 @@ class AppLocalizationsGl extends AppLocalizations {
   @override
   String get tablonVacioSinSeguir =>
       'Aínda non ves ningunha esquela aquí: segue a un cliente ou a unha zona en \"Seguindo\" para que aparezan as súas publicacións.';
+
+  @override
+  String get tablonHayNuevas => 'Hai novas publicacións';
 
   @override
   String get filtrar => 'Filtrar';

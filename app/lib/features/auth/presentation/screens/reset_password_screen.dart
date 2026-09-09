@@ -9,6 +9,8 @@ import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/error_banner.dart';
 import '../../../../core/widgets/password_field.dart';
 import '../../../../core/widgets/password_requirements.dart';
+import '../../../sesiones/application/sesion_policy_service.dart';
+import '../../../sistema_usuarios/data/usuarios_repository.dart';
 import '../../application/auth_providers.dart';
 import '../../data/auth_repository.dart';
 
@@ -44,6 +46,16 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
       final repo = ref.read(authRepositoryProvider);
       final actualizadaMensaje = context.l10n.resetPasswordActualizada;
       await repo.updatePassword(newPassword: _passwordController.text);
+      // Contraseña ya guardada: se quita el flag que fuerza esta pantalla (ver
+      // `verify_otp_screen.dart`/`app_router.dart`), si no el router mandaría de vuelta aquí
+      // mismo en cuanto se navegue a "/home" -sigue activo hasta que se apaga explícitamente,
+      // no se puede deducir del último evento de auth, que sigue siendo "passwordRecovery"-.
+      ref.read(sesionBootstrapGuardProvider).enRecuperacionContrasena = false;
+      // Por si estaba aquí porque el ADMIN se lo exigió (068, no por una recuperación real): se
+      // apaga también en la base de datos, si no volvería a tocar en el próximo login.
+      await ref
+          .read(usuariosRepositoryProvider)
+          .limpiarDebeCambiarContrasenaPropia();
       // Ya hay una sesión válida (la abrió "verifyRecoveryOtp" antes de llegar aquí, con su
       // TSistemaSesiones ya registrada por el router): en vez de cerrarla y mandar a /login a
       // volver a autenticarse, se entra directo. Si hace falta aceptar términos o elegir sede,

@@ -66,3 +66,12 @@ final usuarioDetailProvider = FutureProvider.autoDispose
       final repo = ref.watch(usuariosRepositoryProvider);
       return repo.fetchPerfilById(id);
     });
+
+/// Ficha del CLIENTE al que pertenece esta cuenta (si es la personal vinculada de alguno, 063),
+/// o null. Se usa en la ficha de una cuenta USUARIO_ORDINARIO para poder ir de vuelta a la ficha
+/// del cliente y suplantarlo desde allí.
+final clientePorOrdinarioVinculadoProvider = FutureProvider.autoDispose
+    .family<UsuarioPerfil?, String>((ref, id) async {
+      final repo = ref.watch(usuariosRepositoryProvider);
+      return repo.fetchClientePorOrdinarioVinculado(id);
+    });

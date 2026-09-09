@@ -35,6 +35,22 @@ class UsuariosRepository {
     return UsuarioPerfil.fromMap(data);
   }
 
+  /// Si [idSistemaUsuario] es la cuenta personal USUARIO_ORDINARIO vinculada de algún CLIENTE
+  /// (063), devuelve la ficha de ese cliente; si no, null. Es la vía inversa a
+  /// [UsuarioPerfil.idSistemaUsuarioOrdinarioVinculado] (que va del cliente hacia su vinculada),
+  /// para poder enlazar también en ese sentido desde la ficha de la cuenta personal.
+  Future<UsuarioPerfil?> fetchClientePorOrdinarioVinculado(
+    String idSistemaUsuario,
+  ) async {
+    final data = await _client
+        .from('TSistemaUsuarios')
+        .select(_perfilSelect)
+        .eq('IdSistemaUsuarioOrdinarioVinculado', idSistemaUsuario)
+        .maybeSingle();
+    if (data == null) return null;
+    return UsuarioPerfil.fromMap(data);
+  }
+
   Future<List<UsuarioPerfil>> listUsuarios({
     String? busqueda,
     String? rolCodigo,
@@ -186,6 +202,27 @@ class UsuariosRepository {
         .from('TSistemaUsuarios')
         .update({'EscaneoEsquelaIaActiva': activa})
         .eq('IdSistemaUsuario', idSistemaUsuario);
+  }
+
+  /// El ADMIN obliga a este usuario a fijar una contraseña nueva la próxima vez que entre (068):
+  /// el router lo detecta y le fuerza "/reset-password" antes de dejarle usar el resto de la app.
+  Future<void> forzarCambioContrasena(String idSistemaUsuario) async {
+    await _client
+        .from('TSistemaUsuarios')
+        .update({'DebeCambiarContrasena': true})
+        .eq('IdSistemaUsuario', idSistemaUsuario);
+  }
+
+  /// La quita el propio usuario (ver `reset_password_screen.dart`) en cuanto guarda la
+  /// contraseña nueva, filtrando por su sesión actual en vez de por id: esta pantalla no
+  /// necesita cargar antes el perfil entero solo para poder llamar a este método.
+  Future<void> limpiarDebeCambiarContrasenaPropia() async {
+    final authId = _client.auth.currentUser?.id;
+    if (authId == null) return;
+    await _client
+        .from('TSistemaUsuarios')
+        .update({'DebeCambiarContrasena': false})
+        .eq('IdAuthSupabase', authId);
   }
 
   Future<void> confirmarEmail(String idSistemaUsuario) async {

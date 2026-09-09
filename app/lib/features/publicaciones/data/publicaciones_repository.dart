@@ -18,6 +18,18 @@ class PublicacionesRepository {
   static const _selectConSede =
       '*, TClienteSedes(Nombre, Concello, Provincia, TSistemaUsuarios(Nombre)), numCondolencias:FSistemaContarCondolencias';
 
+  /// Una publicación suelta por su id (070): la usa la pestaña de Avisos para mostrar "solo la
+  /// publicación en cuestión" cuando se toca la notificación de un recordatorio, sin tener que
+  /// llevar al usuario a la lista entera de la sede.
+  Future<PublicacionConSede?> obtenerPorId(String idClientePublicacion) async {
+    final data = await _client
+        .from('TClientePublicaciones')
+        .select(_selectConSede)
+        .eq('IdClientePublicacion', idClientePublicacion)
+        .maybeSingle();
+    return data == null ? null : PublicacionConSede.fromMap(data);
+  }
+
   Future<void> crearPublicacion({
     required String idClienteSede,
     required String nombreFallecido,
@@ -33,6 +45,8 @@ class PublicacionesRepository {
     String tipo = 'ESQUELA',
     String? idConfiguracionActoTipo,
     String? actoTipoOtro,
+    bool admiteCondolencias = true,
+    bool condolenciasSoloPrivadas = false,
   }) async {
     await _client.from('TClientePublicaciones').insert({
       'IdClienteSede': idClienteSede,
@@ -49,7 +63,26 @@ class PublicacionesRepository {
       'Tipo': tipo,
       'IdConfiguracionActoTipo': idConfiguracionActoTipo,
       'ActoTipoOtro': _oNull(actoTipoOtro),
+      'AdmiteCondolencias': admiteCondolencias,
+      'CondolenciasSoloPrivadas': condolenciasSoloPrivadas,
     });
+  }
+
+  /// Solo lo que decide si se muestran/aceptan condolencias en esta esquela (069) — usado por la
+  /// pantalla de condolencias para informar al seguidor, sin tener que traerse la publicación
+  /// entera.
+  Future<({bool admiteCondolencias, bool soloPrivadas})> fetchConfigCondolencias(
+    String idClientePublicacion,
+  ) async {
+    final data = await _client
+        .from('TClientePublicaciones')
+        .select('AdmiteCondolencias, CondolenciasSoloPrivadas')
+        .eq('IdClientePublicacion', idClientePublicacion)
+        .single();
+    return (
+      admiteCondolencias: data['AdmiteCondolencias'] as bool,
+      soloPrivadas: data['CondolenciasSoloPrivadas'] as bool,
+    );
   }
 
   static String? _oNull(String? valor) {
@@ -150,6 +183,8 @@ class PublicacionesRepository {
     String tipo = 'ESQUELA',
     String? idConfiguracionActoTipo,
     String? actoTipoOtro,
+    bool admiteCondolencias = true,
+    bool condolenciasSoloPrivadas = false,
   }) async {
     await _client
         .from('TClientePublicaciones')
@@ -168,6 +203,8 @@ class PublicacionesRepository {
           'Tipo': tipo,
           'IdConfiguracionActoTipo': idConfiguracionActoTipo,
           'ActoTipoOtro': _oNull(actoTipoOtro),
+          'AdmiteCondolencias': admiteCondolencias,
+          'CondolenciasSoloPrivadas': condolenciasSoloPrivadas,
         })
         .eq('IdClientePublicacion', idClientePublicacion);
   }
@@ -199,6 +236,8 @@ class PublicacionesRepository {
     String tipo = 'ESQUELA',
     String? idConfiguracionActoTipo,
     String? actoTipoOtro,
+    bool admiteCondolencias = true,
+    bool condolenciasSoloPrivadas = false,
   }) async {
     await _client.from('TClientePublicacionesProgramadas').insert({
       'IdClienteSede': idClienteSede,
@@ -216,6 +255,8 @@ class PublicacionesRepository {
       'Tipo': tipo,
       'IdConfiguracionActoTipo': idConfiguracionActoTipo,
       'ActoTipoOtro': _oNull(actoTipoOtro),
+      'AdmiteCondolencias': admiteCondolencias,
+      'CondolenciasSoloPrivadas': condolenciasSoloPrivadas,
     });
   }
 
@@ -236,6 +277,8 @@ class PublicacionesRepository {
     String tipo = 'ESQUELA',
     String? idConfiguracionActoTipo,
     String? actoTipoOtro,
+    bool admiteCondolencias = true,
+    bool condolenciasSoloPrivadas = false,
   }) async {
     await _client
         .from('TClientePublicacionesProgramadas')
@@ -255,6 +298,8 @@ class PublicacionesRepository {
           'Tipo': tipo,
           'IdConfiguracionActoTipo': idConfiguracionActoTipo,
           'ActoTipoOtro': _oNull(actoTipoOtro),
+          'AdmiteCondolencias': admiteCondolencias,
+          'CondolenciasSoloPrivadas': condolenciasSoloPrivadas,
         })
         .eq('IdClientePublicacionProgramada', idClientePublicacionProgramada);
   }

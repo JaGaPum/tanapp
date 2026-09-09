@@ -92,6 +92,18 @@ final misPublicacionesProgramadasProvider =
           );
     });
 
+/// Si una esquela admite condolencias y si son obligatoriamente privadas (069), para informar en
+/// la pantalla de condolencias antes de dejar que el seguidor escriba la suya.
+final configCondolenciasProvider = FutureProvider.autoDispose
+    .family<({bool admiteCondolencias, bool soloPrivadas}), String>((
+      ref,
+      idClientePublicacion,
+    ) {
+      return ref
+          .watch(publicacionesRepositoryProvider)
+          .fetchConfigCondolencias(idClientePublicacion);
+    });
+
 /// Actividad de publicaciones de los últimos meses, para la gráfica del Panel de Datos.
 final publicacionesPorMesProvider =
     FutureProvider.autoDispose<List<PublicacionesPorMes>>((ref) async {

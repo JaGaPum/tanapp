@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app.dart';
 import 'core/config/env.dart';
+import 'core/network/http_cliente_sin_conexion.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +21,10 @@ Future<void> main() async {
   await Supabase.initialize(
     url: Env.supabaseUrl,
     publishableKey: Env.supabaseAnonKey,
+    // Convierte cualquier fallo de conectividad en un mensaje claro ("Sin conexión a
+    // internet...") en vez del error técnico crudo, sin tener que tocar cada pantalla de la
+    // app una por una (ver http_cliente_sin_conexion.dart).
+    httpClient: HttpClienteConDeteccionDeRed(),
   );
   runApp(const ProviderScope(child: TanApp()));
 }

@@ -150,6 +150,55 @@ class ConfiguracionRepository {
       );
     }
   }
+
+  /// Igual que [fetchImportacionWebIaActiva] pero para el botón de login con Google (073): se lee
+  /// también desde la pantalla de login, sin sesión iniciada todavía.
+  Future<bool> fetchGoogleLoginActivo() async {
+    final data = await _client
+        .from('TConfiguracionGlobal')
+        .select('GoogleLoginActivo')
+        .single();
+    return data['GoogleLoginActivo'] as bool;
+  }
+
+  Future<void> actualizarGoogleLoginActivo(bool activo) async {
+    final data = await _client
+        .from('TConfiguracionGlobal')
+        .update({'GoogleLoginActivo': activo})
+        .not('IdConfiguracionGlobal', 'is', null)
+        .select();
+    if ((data as List).isEmpty) {
+      throw Exception(
+        'No se pudo actualizar la configuración global: tu usuario no tiene permiso de administrador '
+        '(revisa que tenga el rol ADMIN) o falta aplicar la migración 073.',
+      );
+    }
+  }
+
+  /// Igual que [fetchGoogleLoginActivo] pero para Facebook (073) — interruptor independiente,
+  /// para poder tener uno activo sin el otro (p. ej. mientras Facebook espera la revisión de
+  /// Meta).
+  Future<bool> fetchFacebookLoginActivo() async {
+    final data = await _client
+        .from('TConfiguracionGlobal')
+        .select('FacebookLoginActivo')
+        .single();
+    return data['FacebookLoginActivo'] as bool;
+  }
+
+  Future<void> actualizarFacebookLoginActivo(bool activo) async {
+    final data = await _client
+        .from('TConfiguracionGlobal')
+        .update({'FacebookLoginActivo': activo})
+        .not('IdConfiguracionGlobal', 'is', null)
+        .select();
+    if ((data as List).isEmpty) {
+      throw Exception(
+        'No se pudo actualizar la configuración global: tu usuario no tiene permiso de administrador '
+        '(revisa que tenga el rol ADMIN) o falta aplicar la migración 073.',
+      );
+    }
+  }
 }
 
 final configuracionRepositoryProvider = Provider<ConfiguracionRepository>((

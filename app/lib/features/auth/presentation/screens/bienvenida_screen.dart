@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../../core/widgets/xaga_labs_logo.dart';
@@ -8,11 +11,58 @@ import '../../../../core/widgets/xaga_labs_logo.dart';
 /// cualquiera que solo quiere seguir esquelas del de una funeraria/tanatorio, para que cada uno
 /// vea solo lo suyo en el login/registro en vez de tener que descartar opciones de negocio (o al
 /// revés) mezcladas en una sola pantalla.
-class BienvenidaScreen extends StatelessWidget {
+class BienvenidaScreen extends StatefulWidget {
   const BienvenidaScreen({super.key});
 
   @override
+  State<BienvenidaScreen> createState() => _BienvenidaScreenState();
+}
+
+class _BienvenidaScreenState extends State<BienvenidaScreen> {
+  // Tras un login con Google/Facebook, Android puede haber matado la app en segundo plano
+  // mientras se estaba un rato en el navegador (frecuente en MIUI/Xiaomi) y recrearla desde cero
+  // al volver por el enlace -ver splash_screen.dart-, cayendo aquí mientras la sesión todavía se
+  // está terminando de procesar. Sin este aviso, esta pantalla estática (elegir particular/
+  // funeraria) parece que se ha quedado colgada sin motivo durante ese rato; el "redirect" del
+  // router se encarga de saltar a donde toque en cuanto la sesión esté lista, esto es solo para
+  // que mientras tanto se note que hay algo en marcha.
+  bool _entrando = Supabase.instance.client.auth.currentSession != null;
+  StreamSubscription<AuthState>? _subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _subscription = Supabase.instance.client.auth.onAuthStateChange.listen((
+      estado,
+    ) {
+      if (estado.session != null && mounted) {
+        setState(() => _entrando = true);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_entrando) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(context.l10n.bienvenidaEntrando),
+            ],
+          ),
+        ),
+      );
+    }
     return Scaffold(
       body: SafeArea(
         child: Center(

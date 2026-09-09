@@ -145,6 +145,9 @@ class _PublicacionProgramadaCardState
         'tipo': publicacion.tipo,
         'idConfiguracionActoTipo': publicacion.idConfiguracionActoTipo,
         'actoTipoOtro': publicacion.actoTipoOtro,
+        'admiteCondolencias': publicacion.admiteCondolencias.toString(),
+        'condolenciasSoloPrivadas': publicacion.condolenciasSoloPrivadas
+            .toString(),
       },
     );
   }
@@ -274,6 +277,9 @@ class _MiPublicacionCardState extends ConsumerState<_MiPublicacionCard> {
         'tipo': publicacion.tipo,
         'idConfiguracionActoTipo': publicacion.idConfiguracionActoTipo,
         'actoTipoOtro': publicacion.actoTipoOtro,
+        'admiteCondolencias': publicacion.admiteCondolencias.toString(),
+        'condolenciasSoloPrivadas': publicacion.condolenciasSoloPrivadas
+            .toString(),
       },
     );
   }

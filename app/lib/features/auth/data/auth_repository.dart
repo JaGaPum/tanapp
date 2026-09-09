@@ -123,6 +123,20 @@ class AuthRepository {
     }
   }
 
+  /// Solo para usuario ordinario (nunca cliente, ver login_screen.dart): mismo circuito exacto
+  /// que Google, incluida la asignación de rol tras el alta (034/036), que no distingue de
+  /// proveedor.
+  Future<void> signInWithFacebook() async {
+    try {
+      await _client.auth.signInWithOAuth(
+        OAuthProvider.facebook,
+        redirectTo: kIsWeb ? null : 'io.supabase.tanapp://login-callback',
+      );
+    } catch (e) {
+      throw mapSupabaseError(e);
+    }
+  }
+
   Future<void> signOut() async {
     await _client.auth.signOut();
   }

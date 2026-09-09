@@ -1,11 +1,11 @@
 import 'conteo_por_periodo.dart';
 
-/// Precio aproximado por token del modelo usado en "escanear-esquela-imagen" (claude-sonnet-5),
-/// en dólares por token: ajustar aquí si cambia el precio publicado por Anthropic o el modelo.
-/// Es solo una estimación nuestra a partir de los tokens que devuelve cada respuesta, no el
-/// saldo real de la cuenta (eso solo lo da la consola de Anthropic).
-const precioPorTokenEntrada = 3 / 1000000;
-const precioPorTokenSalida = 15 / 1000000;
+/// Precio aproximado por token del modelo usado en "escanear-esquela-imagen" (claude-sonnet-5:
+/// 2$/millón entrada, 10$/millón salida), en dólares por token: ajustar aquí si cambia el precio
+/// publicado por Anthropic o el modelo. Es solo una estimación nuestra a partir de los tokens que
+/// devuelve cada respuesta, no el saldo real de la cuenta (eso solo lo da la consola de Anthropic).
+const precioPorTokenEntrada = 2 / 1000000;
+const precioPorTokenSalida = 10 / 1000000;
 
 double costoEstimado({required int tokensEntrada, required int tokensSalida}) =>
     tokensEntrada * precioPorTokenEntrada + tokensSalida * precioPorTokenSalida;
