@@ -46,6 +46,13 @@ final misSeguidosIdsProvider = FutureProvider.autoDispose<Set<String>>((ref) {
   return ref.watch(seguidosRepositoryProvider).listMisSeguidosIds();
 });
 
+/// Base para la búsqueda directa por nombre en "Seguir nuevo" (075): se pide una sola vez y se
+/// filtra en Dart según lo que se va escribiendo, igual que el resto de búsquedas de la app.
+final todosLosClientesActivosProvider =
+    FutureProvider.autoDispose<List<ClienteSeguible>>((ref) {
+      return ref.watch(seguidosRepositoryProvider).listClientesActivos();
+    });
+
 class MisSeguidosClientesNotifier extends PaginatedNotifier<ClienteSeguible> {
   @override
   Future<List<ClienteSeguible>> cargarPagina(int offset, int limit) {

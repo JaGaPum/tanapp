@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../../core/widgets/como_llegar_button.dart';
+import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/etiqueta_chip.dart';
 import '../../../../core/widgets/llamar_button.dart';
@@ -150,18 +151,31 @@ class _MisSeguidosScreenState extends ConsumerState<MisSeguidosScreen> {
                   ),
               const SizedBox(height: 16),
               _provinciaIdSeleccionada == null
-                  ? DropdownButtonFormField<String?>(
-                      initialValue: null,
-                      decoration: InputDecoration(
-                        labelText: context.l10n.fieldConcello,
-                      ),
-                      items: [
-                        DropdownMenuItem(
-                          value: null,
-                          child: Text(context.l10n.filtroTodosConcellos),
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        DropdownButtonFormField<String?>(
+                          initialValue: null,
+                          decoration: InputDecoration(
+                            labelText: context.l10n.fieldConcello,
+                          ),
+                          items: [
+                            DropdownMenuItem(
+                              value: null,
+                              child: Text(context.l10n.filtroTodosConcellos),
+                            ),
+                          ],
+                          onChanged: null,
+                        ),
+                        const SizedBox(height: 4),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 4),
+                          child: Text(
+                            context.l10n.seguidosEligeProvinciaPrimero,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
                         ),
                       ],
-                      onChanged: null,
                     )
                   : ref
                         .watch(
@@ -251,6 +265,18 @@ class _ClienteSeguidoTileState extends ConsumerState<_ClienteSeguidoTile> {
   bool _loadingSilenciar = false;
 
   Future<void> _dejarDeSeguir() async {
+    // Acción sin vuelta atrás con un solo toque (062/075): al ser gente mayor el usuario tipo,
+    // se confirma antes en vez de ejecutarla directamente, igual que ya se hace al eliminar
+    // avisos o recordatorios.
+    final confirmado = await showConfirmDialog(
+      context,
+      title: context.l10n.seguidosDejarDeSeguirTitulo,
+      message: context.l10n.seguidosDejarDeSeguirMensaje(
+        widget.cliente.nombreCliente,
+      ),
+      confirmLabel: context.l10n.seguidosDejarDeSeguir,
+    );
+    if (!confirmado) return;
     setState(() => _loading = true);
     try {
       final perfil = await ref.read(currentUserProfileProvider.future);
@@ -363,7 +389,10 @@ class _ClienteSeguidoTileState extends ConsumerState<_ClienteSeguidoTile> {
                 secondary: true,
               ),
             const SizedBox(height: 12),
-            OutlinedButton.icon(
+            // Acción principal (lo que de verdad se usa a diario: ver si hay publicaciones
+            // nuevas), con más peso visual que el resto para que destaque sobre "Silenciar" y,
+            // sobre todo, sobre "Dejar de seguir" -son fáciles de confundir por el nombre-.
+            FilledButton.icon(
               icon: const Icon(Icons.campaign_outlined),
               label: Text(context.l10n.tabPublicaciones),
               onPressed: () => context.push(
@@ -386,10 +415,17 @@ class _ClienteSeguidoTileState extends ConsumerState<_ClienteSeguidoTile> {
               onPressed: _loadingSilenciar ? null : _alternarSilenciado,
             ),
             const SizedBox(height: 12),
-            OutlinedButton.icon(
-              icon: const Icon(Icons.person_remove_outlined),
-              label: Text(context.l10n.seguidosDejarDeSeguir),
-              onPressed: _loading ? null : _dejarDeSeguir,
+            const Divider(height: 1),
+            const SizedBox(height: 12),
+            Center(
+              child: TextButton.icon(
+                icon: const Icon(Icons.person_remove_outlined, size: 18),
+                label: Text(context.l10n.seguidosDejarDeSeguir),
+                style: TextButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.error,
+                ),
+                onPressed: _loading ? null : _dejarDeSeguir,
+              ),
             ),
           ],
         ),
@@ -497,6 +533,13 @@ class _ZonaSeguidaTileState extends ConsumerState<_ZonaSeguidaTile> {
   bool _loading = false;
 
   Future<void> _dejarDeSeguir() async {
+    final confirmado = await showConfirmDialog(
+      context,
+      title: context.l10n.zonaDejarDeSeguirTitulo,
+      message: context.l10n.zonaDejarDeSeguirMensaje(widget.zona.concello),
+      confirmLabel: context.l10n.zonaDejarDeSeguir,
+    );
+    if (!confirmado) return;
     setState(() => _loading = true);
     try {
       final perfil = await ref.read(currentUserProfileProvider.future);

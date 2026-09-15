@@ -39,6 +39,26 @@ class SeguidosRepository {
         .toList();
   }
 
+  /// Todas las sedes activas, sin filtrar por tipo/provincia/concello (075): sirve para la
+  /// búsqueda directa por nombre en "Seguir nuevo", que evita bajar tipo -> provincia -> concello
+  /// cuando ya se sabe el nombre de la funeraria/tanatorio. Se filtra por nombre en Dart, igual
+  /// que el resto de búsquedas de la app (ver _filtrar en mis_seguidos_screen.dart), en vez de
+  /// con un ilike de PostgREST sobre el recurso embebido.
+  Future<List<ClienteSeguible>> listClientesActivos() async {
+    final data = await _client
+        .from('TClienteSedes')
+        .select('*, TSistemaUsuarios(*)')
+        .order('Nombre');
+    return (data as List)
+        .map((e) => e as Map<String, dynamic>)
+        .where((sede) {
+          final cliente = sede['TSistemaUsuarios'] as Map<String, dynamic>?;
+          return cliente != null && cliente['Activo'] == true;
+        })
+        .map(ClienteSeguible.fromSedeMap)
+        .toList();
+  }
+
   Future<Set<String>> listMisSeguidosIds() async {
     final data = await _client
         .from('TClienteSeguimientos')

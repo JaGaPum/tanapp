@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/utils/app_exception.dart';
 import '../../../core/utils/galician_sort.dart';
+import '../../planes_suscripcion/data/periodo_gratuito.dart';
 import 'concello.dart';
 import 'provincia.dart';
 
@@ -222,6 +224,65 @@ class ConfiguracionRepository {
         '(revisa que tenga el rol ADMIN) o falta aplicar la migración 074.',
       );
     }
+  }
+
+  /// Periodos gratuitos generales (080), antes de empezar a cobrar de verdad: pueden convivir
+  /// varios a la vez (los caducados se quedan como histórico); sin fecha de fin, un periodo
+  /// concreto es indefinido.
+  Future<List<PeriodoGratuito>> listPeriodosGratuitosGlobales() async {
+    final data = await _client
+        .from('TConfiguracionPeriodosGratuitos')
+        .select()
+        .order('Inicio', ascending: false);
+    return (data as List)
+        .map(
+          (e) => PeriodoGratuito.fromMap(
+            e as Map<String, dynamic>,
+            'IdConfiguracionPeriodoGratuito',
+          ),
+        )
+        .toList();
+  }
+
+  Future<void> crearPeriodoGratuitoGlobal({
+    required DateTime inicio,
+    DateTime? fin,
+  }) async {
+    try {
+      await _client.from('TConfiguracionPeriodosGratuitos').insert({
+        'Inicio': inicio.toUtc().toIso8601String(),
+        'Fin': fin?.toUtc().toIso8601String(),
+      });
+    } catch (e) {
+      throw mapSupabaseError(e);
+    }
+  }
+
+  Future<void> actualizarPeriodoGratuitoGlobal({
+    required String idConfiguracionPeriodoGratuito,
+    required DateTime inicio,
+    DateTime? fin,
+  }) async {
+    try {
+      await _client
+          .from('TConfiguracionPeriodosGratuitos')
+          .update({
+            'Inicio': inicio.toUtc().toIso8601String(),
+            'Fin': fin?.toUtc().toIso8601String(),
+          })
+          .eq('IdConfiguracionPeriodoGratuito', idConfiguracionPeriodoGratuito);
+    } catch (e) {
+      throw mapSupabaseError(e);
+    }
+  }
+
+  Future<void> eliminarPeriodoGratuitoGlobal(
+    String idConfiguracionPeriodoGratuito,
+  ) async {
+    await _client
+        .from('TConfiguracionPeriodosGratuitos')
+        .delete()
+        .eq('IdConfiguracionPeriodoGratuito', idConfiguracionPeriodoGratuito);
   }
 }
 

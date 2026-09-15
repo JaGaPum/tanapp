@@ -88,6 +88,7 @@ class UsuariosRepository {
     String? direccion,
     String? idSistemaIdiomaPreferido,
     String? idConfiguracionClienteTipo,
+    String? idConfiguracionPlanSuscripcion,
     required bool activo,
     bool? notificacionesPushActivas,
   }) async {
@@ -106,6 +107,7 @@ class UsuariosRepository {
           'Direccion': normalizado(direccion),
           'IdSistemaIdiomaPreferido': idSistemaIdiomaPreferido,
           'IdConfiguracionClienteTipo': idConfiguracionClienteTipo,
+          'IdConfiguracionPlanSuscripcion': idConfiguracionPlanSuscripcion,
           'Activo': activo,
           // Se manda un idioma explícito desde este formulario: se da por confirmado, igual
           // que si hubiese pasado por "Elige tu idioma" (ver "confirmarIdioma" más abajo).

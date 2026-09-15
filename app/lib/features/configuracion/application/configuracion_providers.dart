@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../planes_suscripcion/data/periodo_gratuito.dart';
 import '../data/concello.dart';
 import '../data/configuracion_repository.dart';
 import '../data/provincia.dart';
@@ -44,3 +45,13 @@ final facebookLoginActivoProvider = FutureProvider.autoDispose<bool>((ref) {
 final appleLoginActivoProvider = FutureProvider.autoDispose<bool>((ref) {
   return ref.watch(configuracionRepositoryProvider).fetchAppleLoginActivo();
 });
+
+/// Periodos gratuitos generales (080): la lista completa (activos e histórico), para gestionarla
+/// en Configuración > Planes. La comprobación real de si un cliente está en periodo gratuito la
+/// hace la base de datos (trigger + RPC), esto es solo para mostrarla/editarla.
+final periodosGratuitosGlobalesProvider =
+    FutureProvider.autoDispose<List<PeriodoGratuito>>((ref) {
+      return ref
+          .watch(configuracionRepositoryProvider)
+          .listPeriodosGratuitosGlobales();
+    });

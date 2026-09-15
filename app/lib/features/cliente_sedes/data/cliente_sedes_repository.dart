@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/utils/app_exception.dart';
 import 'cliente_sede.dart';
 
 class ClienteSedesRepository {
@@ -20,6 +21,9 @@ class ClienteSedesRepository {
         .toList();
   }
 
+  /// Puede fallar por el límite de sedes del plan del cliente (075, trigger
+  /// "FSistemaValidarLimiteSedes"): se envuelve el error para que su mensaje llegue tal cual a
+  /// quien lo llama, en vez del genérico que le tocaría a un PostgrestException sin mapear.
   Future<void> crearSede({
     required String idSistemaUsuario,
     required String codigo,
@@ -28,14 +32,18 @@ class ClienteSedesRepository {
     required String concello,
     required String direccion,
   }) async {
-    await _client.from('TClienteSedes').insert({
-      'IdSistemaUsuario': idSistemaUsuario,
-      'Codigo': codigo.trim(),
-      'Nombre': nombre.trim(),
-      'Provincia': provincia,
-      'Concello': concello,
-      'Direccion': direccion.trim(),
-    });
+    try {
+      await _client.from('TClienteSedes').insert({
+        'IdSistemaUsuario': idSistemaUsuario,
+        'Codigo': codigo.trim(),
+        'Nombre': nombre.trim(),
+        'Provincia': provincia,
+        'Concello': concello,
+        'Direccion': direccion.trim(),
+      });
+    } catch (e) {
+      throw mapSupabaseError(e);
+    }
   }
 
   Future<void> actualizarSede({

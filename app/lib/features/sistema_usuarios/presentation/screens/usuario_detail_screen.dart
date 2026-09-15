@@ -16,6 +16,13 @@ import '../../../cliente_sedes/data/cliente_sede.dart';
 import '../../../cliente_sedes/data/cliente_sedes_repository.dart';
 import '../../../cliente_sedes/presentation/widgets/sede_form_dialog.dart';
 import '../../../cliente_tipos/application/cliente_tipos_providers.dart';
+import '../../../planes_suscripcion/application/planes_suscripcion_providers.dart';
+import '../../../planes_suscripcion/data/periodo_gratuito.dart';
+import '../../../planes_suscripcion/data/planes_suscripcion_repository.dart';
+import '../../../planes_suscripcion/presentation/widgets/pago_suscripcion_tile.dart';
+import '../../../planes_suscripcion/presentation/widgets/periodo_gratuito_form_dialog.dart';
+import '../../../planes_suscripcion/presentation/widgets/periodo_gratuito_tile.dart';
+import '../../../planes_suscripcion/presentation/widgets/registrar_pago_dialog.dart';
 import '../../../importacion_web/application/importacion_web_providers.dart';
 import '../../../importacion_web/data/importacion_web_repository.dart';
 import '../../../auth/application/auth_providers.dart';
@@ -177,6 +184,7 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
   String? _provinciaSeleccionada;
   String? _concelloSeleccionado;
   String? _tipoClienteSeleccionado;
+  String? _planSeleccionado;
   late bool _activo;
   bool _loading = false;
   bool _mostrarSesiones = false;
@@ -204,6 +212,7 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
     _provinciaSeleccionada = widget.perfil.provincia;
     _concelloSeleccionado = widget.perfil.concello;
     _tipoClienteSeleccionado = widget.perfil.idConfiguracionClienteTipo;
+    _planSeleccionado = widget.perfil.idConfiguracionPlanSuscripcion;
     _activo = widget.perfil.activo;
   }
 
@@ -243,6 +252,7 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
             direccion: _direccionController.text,
             idSistemaIdiomaPreferido: _idiomaSeleccionado,
             idConfiguracionClienteTipo: _tipoClienteSeleccionado,
+            idConfiguracionPlanSuscripcion: _planSeleccionado,
             activo: _activo,
           );
       _invalidateUsuario();
@@ -631,6 +641,49 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
                         context.l10n.errorCargarTiposCliente(e.toString()),
                       ),
                     ),
+                const SizedBox(height: 16),
+                // Plan de suscripción (075): por ahora solo lo asigna el ADMIN aquí, mientras no
+                // haya proceso de pago propio para el cliente.
+                ref
+                    .watch(planesSuscripcionListProvider)
+                    .when(
+                      data: (planes) => DropdownButtonFormField<String>(
+                        initialValue: _planSeleccionado,
+                        decoration: InputDecoration(
+                          labelText: context.l10n.usuarioPlanSuscripcion,
+                        ),
+                        items: planes
+                            .map(
+                              (p) => DropdownMenuItem(
+                                value: p.idConfiguracionPlanSuscripcion,
+                                child: Text(
+                                  context.l10n.planesResumen(
+                                    p.nombre,
+                                    p.precioMensual.toStringAsFixed(2),
+                                    p.maxSedes,
+                                  ),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) =>
+                            setState(() => _planSeleccionado = value),
+                      ),
+                      loading: () => const LinearProgressIndicator(),
+                      error: (e, _) =>
+                          Text(context.l10n.errorGenerico(e.toString())),
+                    ),
+                const SizedBox(height: 12),
+                // Historial de pagos (083): sustituye el antiguo interruptor manual "Plan
+                // pagado". Un cliente puede publicar/avisar/añadir sedes mientras hoy caiga
+                // dentro de la cobertura (30 días) de cualquiera de sus pagos.
+                _PagosClienteSection(
+                  idSistemaUsuario: widget.perfil.idSistemaUsuario,
+                ),
+                const SizedBox(height: 12),
+                _PeriodosGratuitosClienteSection(
+                  idSistemaUsuario: widget.perfil.idSistemaUsuario,
+                ),
               ],
               const SizedBox(height: 8),
               SwitchListTile(
@@ -1180,6 +1233,164 @@ class _UsuarioFormState extends ConsumerState<_UsuarioForm> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Historial de pagos de este cliente (083): sustituye el antiguo interruptor "Plan pagado". El
+/// ADMIN es quien registra cada pago (fecha en la que se recibió); la cobertura de 30 días la
+/// calcula siempre la base de datos.
+class _PagosClienteSection extends ConsumerWidget {
+  final String idSistemaUsuario;
+  const _PagosClienteSection({required this.idSistemaUsuario});
+
+  Future<void> _registrar(BuildContext context, WidgetRef ref) async {
+    await showDialog(
+      context: context,
+      builder: (_) => RegistrarPagoDialog(
+        onGuardar: ({required fechaPago}) => ref
+            .read(planesSuscripcionRepositoryProvider)
+            .registrarPago(
+              idSistemaUsuario: idSistemaUsuario,
+              fechaPago: fechaPago,
+            ),
+      ),
+    );
+    ref.invalidate(pagosClienteProvider(idSistemaUsuario));
+  }
+
+  Future<void> _eliminar(WidgetRef ref, String id) async {
+    await ref.read(planesSuscripcionRepositoryProvider).eliminarPago(id);
+    ref.invalidate(pagosClienteProvider(idSistemaUsuario));
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final pagosAsync = ref.watch(pagosClienteProvider(idSistemaUsuario));
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          context.l10n.pagoHistorialTitulo,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).colorScheme.outline,
+          ),
+        ),
+        const SizedBox(height: 6),
+        pagosAsync.when(
+          data: (pagos) => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (final pago in pagos)
+                PagoSuscripcionTile(
+                  pago: pago,
+                  onEliminar: () => _eliminar(ref, pago.id),
+                ),
+            ],
+          ),
+          loading: () => const LinearProgressIndicator(),
+          error: (e, _) => Text(context.l10n.errorGenerico(e.toString())),
+        ),
+        const SizedBox(height: 4),
+        OutlinedButton.icon(
+          icon: const Icon(Icons.add),
+          label: Text(context.l10n.pagoRegistrar),
+          onPressed: () => _registrar(context, ref),
+        ),
+      ],
+    );
+  }
+}
+
+/// Periodos gratuitos propios de este cliente (080): se suman a los generales (Configuración >
+/// Planes), no hace falta que "ganen" -basta con que caiga dentro de cualquiera de los dos-.
+class _PeriodosGratuitosClienteSection extends ConsumerWidget {
+  final String idSistemaUsuario;
+  const _PeriodosGratuitosClienteSection({required this.idSistemaUsuario});
+
+  Future<void> _crear(BuildContext context, WidgetRef ref) async {
+    await showDialog(
+      context: context,
+      builder: (_) => PeriodoGratuitoFormDialog(
+        onGuardar: ({required inicio, fin}) => ref
+            .read(planesSuscripcionRepositoryProvider)
+            .crearPeriodoGratuitoCliente(
+              idSistemaUsuario: idSistemaUsuario,
+              inicio: inicio,
+              fin: fin,
+            ),
+      ),
+    );
+    ref.invalidate(periodosGratuitosClienteProvider(idSistemaUsuario));
+  }
+
+  Future<void> _editar(
+    BuildContext context,
+    WidgetRef ref,
+    PeriodoGratuito periodo,
+  ) async {
+    await showDialog(
+      context: context,
+      builder: (_) => PeriodoGratuitoFormDialog(
+        periodo: periodo,
+        onGuardar: ({required inicio, fin}) => ref
+            .read(planesSuscripcionRepositoryProvider)
+            .actualizarPeriodoGratuitoCliente(
+              idSistemaUsuarioPeriodoGratuito: periodo.id,
+              inicio: inicio,
+              fin: fin,
+            ),
+      ),
+    );
+    ref.invalidate(periodosGratuitosClienteProvider(idSistemaUsuario));
+  }
+
+  Future<void> _eliminar(WidgetRef ref, String id) async {
+    await ref
+        .read(planesSuscripcionRepositoryProvider)
+        .eliminarPeriodoGratuitoCliente(id);
+    ref.invalidate(periodosGratuitosClienteProvider(idSistemaUsuario));
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final periodosAsync = ref.watch(
+      periodosGratuitosClienteProvider(idSistemaUsuario),
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          context.l10n.periodoGratuitoPropioTitulo,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).colorScheme.outline,
+          ),
+        ),
+        const SizedBox(height: 6),
+        periodosAsync.when(
+          data: (periodos) => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (final periodo in periodos)
+                PeriodoGratuitoTile(
+                  periodo: periodo,
+                  onEditar: () => _editar(context, ref, periodo),
+                  onEliminar: () => _eliminar(ref, periodo.id),
+                ),
+            ],
+          ),
+          loading: () => const LinearProgressIndicator(),
+          error: (e, _) => Text(context.l10n.errorGenerico(e.toString())),
+        ),
+        const SizedBox(height: 4),
+        OutlinedButton.icon(
+          icon: const Icon(Icons.add),
+          label: Text(context.l10n.periodoGratuitoNuevo),
+          onPressed: () => _crear(context, ref),
+        ),
+      ],
     );
   }
 }

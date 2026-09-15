@@ -26,6 +26,7 @@ class UsuarioPerfil {
   final String? fotoUrl;
   final String? idSistemaIdiomaPreferido;
   final String? idConfiguracionClienteTipo;
+  final String? idConfiguracionPlanSuscripcion;
   final bool activo;
   final bool emailConfirmado;
   final bool notificacionesPushActivas;
@@ -54,6 +55,7 @@ class UsuarioPerfil {
     this.fotoUrl,
     this.idSistemaIdiomaPreferido,
     this.idConfiguracionClienteTipo,
+    this.idConfiguracionPlanSuscripcion,
     required this.activo,
     required this.emailConfirmado,
     required this.notificacionesPushActivas,
@@ -108,6 +110,8 @@ class UsuarioPerfil {
       fotoUrl: map['FotoUrl'] as String?,
       idSistemaIdiomaPreferido: map['IdSistemaIdiomaPreferido'] as String?,
       idConfiguracionClienteTipo: map['IdConfiguracionClienteTipo'] as String?,
+      idConfiguracionPlanSuscripcion:
+          map['IdConfiguracionPlanSuscripcion'] as String?,
       activo: map['Activo'] as bool? ?? true,
       emailConfirmado: map['EmailConfirmado'] as bool? ?? false,
       notificacionesPushActivas:

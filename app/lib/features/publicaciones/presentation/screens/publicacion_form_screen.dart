@@ -711,7 +711,10 @@ class _PublicacionFormScreenState extends ConsumerState<PublicacionFormScreen> {
                     _EscanearBanner(
                       onTap: _loading
                           ? null
-                          : () => context.pushReplacement('/publicar/escanear'),
+                          : () => context.pushReplacement(
+                              '/publicar/escanear',
+                              extra: _idClienteSedeSeleccionada,
+                            ),
                     ),
                     const SizedBox(height: 16),
                   ],

@@ -1,3 +1,9 @@
+/// Se lanza cuando "escanear-esquela-imagen" rechaza la llamada por haberse alcanzado el máximo
+/// diario de escaneos con IA de este cliente (081, código "LIMITE_DIARIO_IA"): quien llama debe
+/// distinguirlo de cualquier otro fallo para avisar en el formulario que no se ha usado IA, en
+/// vez de caer al OCR local en silencio.
+class LimiteEscaneoIaException implements Exception {}
+
 /// Campos que devuelve la Edge Function "escanear-esquela-imagen" (Claude con visión) al
 /// escanear la foto de una esquela, en el mismo formato que ya usa el formulario manual.
 class EsquelaEscaneada {

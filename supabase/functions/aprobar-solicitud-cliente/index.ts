@@ -173,6 +173,20 @@ async function handle(req: Request): Promise<Response> {
         .eq('IdSistemaUsuario', nuevoPerfil.IdSistemaUsuario);
     }
 
+    // Plan de suscripción (075): sin proceso de pago todavía, todo cliente nuevo arranca en
+    // "Local" (1 sede) hasta que el ADMIN le asigne otro a mano en su ficha.
+    const { data: planLocal } = await adminClient
+      .from('TConfiguracionPlanesSuscripcion')
+      .select('IdConfiguracionPlanSuscripcion')
+      .eq('Nombre', 'Local')
+      .maybeSingle();
+    if (planLocal) {
+      await adminClient
+        .from('TSistemaUsuarios')
+        .update({ IdConfiguracionPlanSuscripcion: planLocal.IdConfiguracionPlanSuscripcion })
+        .eq('IdSistemaUsuario', nuevoPerfil.IdSistemaUsuario);
+    }
+
     // Da de alta la primera sede del cliente (la de la propia solicitud). Buscar/Seguindo/
     // "Cómo llegar" operan sobre sedes, no sobre el cliente directamente, así que sin esto
     // el cliente recién aprobado no aparecería en ningún resultado hasta que él mismo diera

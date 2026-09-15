@@ -146,6 +146,12 @@ class AppDrawer extends ConsumerWidget {
                 ),
               if (isCliente)
                 ListTile(
+                  leading: const Icon(Icons.workspace_premium_outlined),
+                  title: Text(context.l10n.drawerMiSuscripcion),
+                  onTap: () => _navigate(context, '/mi-suscripcion'),
+                ),
+              if (isCliente)
+                ListTile(
                   leading: const Icon(Icons.support_agent_outlined),
                   title: Text(context.l10n.drawerContactarSoporte),
                   onTap: () => _contactarSoporte(context),

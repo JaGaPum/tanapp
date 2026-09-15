@@ -19,8 +19,8 @@
 //   4. Secretos -> añadir "ANTHROPIC_API_KEY" si no está ya (la comparte con
 //      "escanear-webs-clientes"). SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY ya los inyecta
 //      Supabase automáticamente.
-//   5. Aplicar antes las migraciones 041-043 y activar el interruptor global en la app, en
-//      Configuración > IA.
+//   5. Aplicar antes las migraciones 041-043 y 082, y activar el interruptor global en la app,
+//      en Configuración > IA.
 //
 // IMPORTANTE: también se llama desde un navegador (Flutter Web, pantalla de escanear), así que
 // hace falta responder a la petición de verificación previa CORS (OPTIONS) e incluir las
@@ -87,11 +87,15 @@ async function handle(req: Request): Promise<Response> {
   const imagenBase64 = body?.imagenBase64;
   const mimeType = typeof body?.mimeType === 'string' ? body.mimeType : 'image/jpeg';
   const idioma = body?.idioma === 'gl' ? 'gl' : 'es';
+  const idClienteSede = typeof body?.idClienteSede === 'string' ? body.idClienteSede : null;
   if (typeof imagenBase64 !== 'string' || imagenBase64.length === 0) {
     return jsonResponse({ error: 'Falta la imagen' }, 400);
   }
   if (imagenBase64.length > MAX_BYTES_IMAGEN_BASE64) {
     return jsonResponse({ error: 'La imagen es demasiado grande' }, 400);
+  }
+  if (!idClienteSede) {
+    return jsonResponse({ error: 'Falta la sede' }, 400);
   }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -121,7 +125,7 @@ async function handle(req: Request): Promise<Response> {
   }
   const { data: usuario, error: usuarioError } = await adminClient
     .from('TSistemaUsuarios')
-    .select('IdSistemaUsuario, EscaneoEsquelaIaActiva')
+    .select('IdSistemaUsuario, EscaneoEsquelaIaActiva, IdConfiguracionPlanSuscripcion')
     .eq('IdAuthSupabase', authUserId)
     .maybeSingle();
   if (usuarioError || !usuario) {
@@ -134,17 +138,57 @@ async function handle(req: Request): Promise<Response> {
     return jsonResponse({ error: 'El escaneo de esquelas con IA está desactivado para este usuario' }, 403);
   }
 
+  // La sede tiene que ser una de las del propio cliente que llama: como aquí se salta la RLS
+  // (service_role), hay que comprobarlo a mano para que nadie pueda gastar cupo de IA contando
+  // contra una sede ajena.
+  const { data: sede, error: sedeError } = await adminClient
+    .from('TClienteSedes')
+    .select('IdClienteSede')
+    .eq('IdClienteSede', idClienteSede)
+    .eq('IdSistemaUsuario', usuario.IdSistemaUsuario)
+    .maybeSingle();
+  if (sedeError || !sede) {
+    return jsonResponse({ error: 'La sede indicada no es válida' }, 403);
+  }
+
+  // Límite diario por sede (082): lo fija el plan de suscripción del cliente, no una cifra
+  // global. Null = sin límite (plan sin tope, o cliente sin plan asignado). "code" es lo que usa
+  // la app para distinguir este caso de cualquier otro fallo y avisar en el formulario en vez de
+  // caer al OCR local en silencio.
+  if (usuario.IdConfiguracionPlanSuscripcion) {
+    const { data: plan } = await adminClient
+      .from('TConfiguracionPlanesSuscripcion')
+      .select('MaxEscaneosIaPorDia')
+      .eq('IdConfiguracionPlanSuscripcion', usuario.IdConfiguracionPlanSuscripcion)
+      .maybeSingle();
+    const maxPorDia = plan?.MaxEscaneosIaPorDia as number | null | undefined;
+    if (typeof maxPorDia === 'number') {
+      const { data: yaHechos, error: contarError } = await adminClient.rpc(
+        'FSistemaContarEscaneosIaHoy',
+        { p_id_cliente_sede: idClienteSede },
+      );
+      if (contarError) {
+        console.error('escanear-esquela-imagen: error contando escaneos de hoy', contarError);
+      } else if (typeof yaHechos === 'number' && yaHechos >= maxPorDia) {
+        return jsonResponse(
+          { error: 'Esta sede ha alcanzado el máximo de escaneos con IA de hoy', code: 'LIMITE_DIARIO_IA' },
+          429,
+        );
+      }
+    }
+  }
+
   const anthropic = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY') });
   try {
     const { esquela, usage } = await extraerEsquela(anthropic, imagenBase64, mimeType, idioma);
-    await registrarUso(adminClient, usuario.IdSistemaUsuario, true, usage);
+    await registrarUso(adminClient, usuario.IdSistemaUsuario, idClienteSede, true, usage);
     if (!esquela) {
       return jsonResponse({ error: 'No se ha reconocido ninguna esquela en la foto' }, 422);
     }
     return jsonResponse({ campos: esquela });
   } catch (e) {
     console.error('escanear-esquela-imagen: fallo extrayendo la esquela', e);
-    await registrarUso(adminClient, usuario.IdSistemaUsuario, false, null);
+    await registrarUso(adminClient, usuario.IdSistemaUsuario, idClienteSede, false, null);
     return jsonResponse({ error: e instanceof Error ? e.message : String(e) }, 500);
   }
 }
@@ -152,11 +196,13 @@ async function handle(req: Request): Promise<Response> {
 async function registrarUso(
   adminClient: ReturnType<typeof createClient>,
   idSistemaUsuario: string,
+  idClienteSede: string,
   exito: boolean,
   usage: { inputTokens: number; outputTokens: number } | null,
 ): Promise<void> {
   const { error } = await adminClient.from('TSistemaUsuarioEscaneoIaLog').insert({
     IdSistemaUsuario: idSistemaUsuario,
+    IdClienteSede: idClienteSede,
     Exito: exito,
     TokensEntrada: usage?.inputTokens ?? null,
     TokensSalida: usage?.outputTokens ?? null,

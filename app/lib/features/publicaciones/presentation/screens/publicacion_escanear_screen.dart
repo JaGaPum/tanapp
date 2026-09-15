@@ -10,6 +10,7 @@ import '../../../../core/utils/text_format.dart';
 import '../../../auth/application/auth_providers.dart';
 import '../../../cliente_tipos/application/cliente_tipos_providers.dart';
 import '../../../configuracion/application/configuracion_providers.dart';
+import '../../data/esquela_escaneada.dart';
 import '../../data/publicaciones_repository.dart';
 
 /// Quita acentos y pasa a minúsculas, para que la detección de palabras clave no dependa de que
@@ -493,7 +494,11 @@ _CamposExtraidos _extraerCampos(String texto) {
 /// (fecha, edad, funeral, lugar, capilla ardiente), para que el cliente los revise antes de
 /// publicar. No se guarda la foto, solo lo que el cliente confirme.
 class PublicacionEscanearScreen extends ConsumerStatefulWidget {
-  const PublicacionEscanearScreen({super.key});
+  /// Sede ya elegida en el formulario del que viene (081/082): el límite diario de escaneos con
+  /// IA se cuenta por sede, así que hace falta saber cuál es antes de escanear.
+  final String idClienteSede;
+
+  const PublicacionEscanearScreen({super.key, required this.idClienteSede});
 
   @override
   ConsumerState<PublicacionEscanearScreen> createState() =>
@@ -527,7 +532,9 @@ class _PublicacionEscanearScreenState
     // la foto entera va a la Edge Function "escanear-esquela-imagen" (Claude con visión), mucho
     // más fiable que el OCR local con cualquier plantilla de esquela. Si falla por lo que sea
     // (desactivado, sin conexión, error puntual de la IA...) se sigue sin más con el OCR de
-    // siempre, que nunca deja de funcionar.
+    // siempre, que nunca deja de funcionar. El límite diario (081) es la única excepción que se
+    // distingue aparte, para poder avisar en el formulario que no se ha usado IA.
+    var limiteIaAlcanzado = false;
     try {
       final iaActiva = await ref.read(escaneoEsquelaIaActivaProvider.future);
       if (iaActiva) {
@@ -535,12 +542,17 @@ class _PublicacionEscanearScreenState
         final bytes = await picked.readAsBytes();
         final esquela = await ref
             .read(publicacionesRepositoryProvider)
-            .escanearConIa(bytesImagen: bytes, idioma: idioma);
+            .escanearConIa(
+              bytesImagen: bytes,
+              idioma: idioma,
+              idClienteSede: widget.idClienteSede,
+            );
         if (esquela != null) {
           if (!mounted) return;
           context.pushReplacement(
             '/publicar/manual',
             extra: {
+              'idClienteSede': widget.idClienteSede,
               'nombre': esquela.nombreFallecido,
               'fechaFallecimiento': esquela.fechaFallecimiento,
               'edad': esquela.edad?.toString(),
@@ -556,6 +568,8 @@ class _PublicacionEscanearScreenState
           return;
         }
       }
+    } on LimiteEscaneoIaException {
+      limiteIaAlcanzado = true;
     } catch (_) {
       // Sigue con el OCR local más abajo.
     }
@@ -649,9 +663,21 @@ class _PublicacionEscanearScreenState
     }
 
     if (!mounted) return;
+
+    // El límite diario y un fallo del OCR son avisos independientes (pueden darse los dos a la
+    // vez o por separado): se combinan en un único mensaje para el formulario.
+    final avisos = [
+      if (limiteIaAlcanzado) context.l10n.publicarLimiteIaAlcanzado,
+      if (ocrFallo)
+        detalleError != null
+            ? context.l10n.publicarOcrError(detalleError)
+            : context.l10n.publicarOcrSinTexto,
+    ];
+
     context.pushReplacement(
       '/publicar/manual',
       extra: {
+        'idClienteSede': widget.idClienteSede,
         'nombre': nombreGuess,
         'fechaFallecimiento': campos.fechaFallecimiento?.toIso8601String(),
         'edad': campos.edad?.toString(),
@@ -661,10 +687,7 @@ class _PublicacionEscanearScreenState
         'lugar': campos.lugar,
         'capillaArdiente': campos.capillaArdiente,
         'sala': campos.sala,
-        if (ocrFallo)
-          'avisoOcr': detalleError != null
-              ? context.l10n.publicarOcrError(detalleError)
-              : context.l10n.publicarOcrSinTexto,
+        if (avisos.isNotEmpty) 'avisoOcr': avisos.join('\n'),
       },
     );
   }

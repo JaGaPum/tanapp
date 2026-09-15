@@ -1058,6 +1058,18 @@ abstract class AppLocalizations {
   /// **'No se pudieron cargar los tipos de cliente: {error}'**
   String errorCargarTiposCliente(String error);
 
+  /// No description provided for @usuarioPlanSuscripcion.
+  ///
+  /// In es, this message translates to:
+  /// **'Plan de suscripción'**
+  String get usuarioPlanSuscripcion;
+
+  /// No description provided for @periodoGratuitoPropioTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Periodo gratuito propio de este cliente (opcional)'**
+  String get periodoGratuitoPropioTitulo;
+
   /// No description provided for @usuarioActivo.
   ///
   /// In es, this message translates to:
@@ -1670,6 +1682,12 @@ abstract class AppLocalizations {
   /// **'Si está activado, al escanear una esquela la foto se analiza con IA en vez del reconocimiento de texto local. Si la desactivas (o falla), se sigue usando el escaneo local de siempre.'**
   String get configuracionIaEscaneoEsquelaDescripcion;
 
+  /// No description provided for @configuracionIaLimitePorPlanAviso.
+  ///
+  /// In es, this message translates to:
+  /// **'El máximo de escaneos con IA al día se fija por plan de suscripción, no aquí: edítalo en Planes de suscripción (se cuenta por sede).'**
+  String get configuracionIaLimitePorPlanAviso;
+
   /// No description provided for @configuracionLoginTitulo.
   ///
   /// In es, this message translates to:
@@ -1711,6 +1729,258 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Si lo desactivas, el botón \"Continuar con Apple\" desaparece de las pantallas de acceso y registro de usuario ordinario.'**
   String get configuracionLoginAppleDescripcion;
+
+  /// No description provided for @planesTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Planes de suscripción'**
+  String get planesTitulo;
+
+  /// No description provided for @planesExplicacion.
+  ///
+  /// In es, this message translates to:
+  /// **'Los tres planes son fijos y solo se diferencian por el número máximo de sedes; aquí puedes editar el precio y el límite de cada uno. El plan de cada cliente se asigna en su ficha, en \"Sistema > Usuarios\".'**
+  String get planesExplicacion;
+
+  /// No description provided for @periodoGratuitoTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Periodo gratuito general'**
+  String get periodoGratuitoTitulo;
+
+  /// No description provided for @periodoGratuitoExplicacion.
+  ///
+  /// In es, this message translates to:
+  /// **'Mientras esté activo, ningún cliente se bloquea por no tener el plan pagado. Sin fecha de fin es indefinido. Cada cliente puede tener además uno propio en su ficha, que prevalece si es más largo que este.'**
+  String get periodoGratuitoExplicacion;
+
+  /// No description provided for @periodoGratuitoInicio.
+  ///
+  /// In es, this message translates to:
+  /// **'Inicio'**
+  String get periodoGratuitoInicio;
+
+  /// No description provided for @periodoGratuitoFin.
+  ///
+  /// In es, this message translates to:
+  /// **'Fin'**
+  String get periodoGratuitoFin;
+
+  /// No description provided for @periodoGratuitoIndefinido.
+  ///
+  /// In es, this message translates to:
+  /// **'Indefinido'**
+  String get periodoGratuitoIndefinido;
+
+  /// No description provided for @periodoGratuitoInicioObligatorio.
+  ///
+  /// In es, this message translates to:
+  /// **'La fecha de inicio es obligatoria'**
+  String get periodoGratuitoInicioObligatorio;
+
+  /// No description provided for @periodoGratuitoNuevo.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir periodo'**
+  String get periodoGratuitoNuevo;
+
+  /// No description provided for @periodoGratuitoEditar.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar periodo'**
+  String get periodoGratuitoEditar;
+
+  /// No description provided for @periodoGratuitoEliminarTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Eliminar este periodo?'**
+  String get periodoGratuitoEliminarTitulo;
+
+  /// No description provided for @periodoGratuitoEliminarMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'Se eliminará este periodo gratuito. Esta acción no se puede deshacer.'**
+  String get periodoGratuitoEliminarMensaje;
+
+  /// No description provided for @periodoGratuitoActivo.
+  ///
+  /// In es, this message translates to:
+  /// **'Activo ahora mismo'**
+  String get periodoGratuitoActivo;
+
+  /// No description provided for @periodoGratuitoNinguno.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no hay ningún periodo gratuito general.'**
+  String get periodoGratuitoNinguno;
+
+  /// No description provided for @suscripcionTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Mi suscripción'**
+  String get suscripcionTitulo;
+
+  /// No description provided for @suscripcionPlanActual.
+  ///
+  /// In es, this message translates to:
+  /// **'Plan actual'**
+  String get suscripcionPlanActual;
+
+  /// No description provided for @suscripcionSinPlan.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no tienes un plan asignado. Contacta con soporte.'**
+  String get suscripcionSinPlan;
+
+  /// No description provided for @suscripcionAlDia.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu plan está al día'**
+  String get suscripcionAlDia;
+
+  /// No description provided for @suscripcionEnPrueba.
+  ///
+  /// In es, this message translates to:
+  /// **'Estás en periodo de prueba gratuito'**
+  String get suscripcionEnPrueba;
+
+  /// No description provided for @suscripcionEnPruebaHasta.
+  ///
+  /// In es, this message translates to:
+  /// **'Hasta el {fecha}'**
+  String suscripcionEnPruebaHasta(String fecha);
+
+  /// No description provided for @suscripcionPagoPendienteTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu periodo de prueba ha terminado'**
+  String get suscripcionPagoPendienteTitulo;
+
+  /// No description provided for @suscripcionPagoPendienteExplicacion.
+  ///
+  /// In es, this message translates to:
+  /// **'Para seguir publicando, enviando avisos y añadiendo sedes, activa el pago de tu plan.'**
+  String get suscripcionPagoPendienteExplicacion;
+
+  /// No description provided for @suscripcionIniciarPago.
+  ///
+  /// In es, this message translates to:
+  /// **'Iniciar pago'**
+  String get suscripcionIniciarPago;
+
+  /// No description provided for @suscripcionIniciarPagoAsunto.
+  ///
+  /// In es, this message translates to:
+  /// **'Quiero activar el pago de mi plan en TanApp'**
+  String get suscripcionIniciarPagoAsunto;
+
+  /// No description provided for @planesPrecioMensual.
+  ///
+  /// In es, this message translates to:
+  /// **'Precio mensual (€)'**
+  String get planesPrecioMensual;
+
+  /// No description provided for @planesPrecioInvalido.
+  ///
+  /// In es, this message translates to:
+  /// **'Introduce un precio válido'**
+  String get planesPrecioInvalido;
+
+  /// No description provided for @planesMaxSedes.
+  ///
+  /// In es, this message translates to:
+  /// **'Máximo de sedes'**
+  String get planesMaxSedes;
+
+  /// No description provided for @pagoHistorialTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'Historial de pagos'**
+  String get pagoHistorialTitulo;
+
+  /// No description provided for @pagoSinHistorial.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no hay ningún pago registrado.'**
+  String get pagoSinHistorial;
+
+  /// No description provided for @pagoRegistrar.
+  ///
+  /// In es, this message translates to:
+  /// **'Registrar pago'**
+  String get pagoRegistrar;
+
+  /// No description provided for @pagoFecha.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha del pago'**
+  String get pagoFecha;
+
+  /// No description provided for @pagoCubre30Dias.
+  ///
+  /// In es, this message translates to:
+  /// **'Cada pago cubre 30 días desde la fecha en la que se recibe.'**
+  String get pagoCubre30Dias;
+
+  /// No description provided for @pagoFechaYCobertura.
+  ///
+  /// In es, this message translates to:
+  /// **'Pagado el {fechaPago} · cubre hasta el {fechaFinCobertura}'**
+  String pagoFechaYCobertura(String fechaPago, String fechaFinCobertura);
+
+  /// No description provided for @pagoVigente.
+  ///
+  /// In es, this message translates to:
+  /// **'Vigente'**
+  String get pagoVigente;
+
+  /// No description provided for @planesMaxSedesInvalido.
+  ///
+  /// In es, this message translates to:
+  /// **'Introduce un número de sedes válido'**
+  String get planesMaxSedesInvalido;
+
+  /// No description provided for @planesMaxEscaneosIa.
+  ///
+  /// In es, this message translates to:
+  /// **'Máximo de escaneos con IA al día (por sede)'**
+  String get planesMaxEscaneosIa;
+
+  /// No description provided for @planesMaxEscaneosIaSinLimite.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin límite'**
+  String get planesMaxEscaneosIaSinLimite;
+
+  /// No description provided for @planesMaxEscaneosIaInvalido.
+  ///
+  /// In es, this message translates to:
+  /// **'Introduce un número mayor que 0, o déjalo en blanco para no limitarlo'**
+  String get planesMaxEscaneosIaInvalido;
+
+  /// No description provided for @planesEscaneosIaPorSede.
+  ///
+  /// In es, this message translates to:
+  /// **'{maximo, plural, one{1 escaneo con IA al día por sede} other{{maximo} escaneos con IA al día por sede}}'**
+  String planesEscaneosIaPorSede(int maximo);
+
+  /// No description provided for @planesEscaneosIaSinLimite.
+  ///
+  /// In es, this message translates to:
+  /// **'Escaneos con IA sin límite diario'**
+  String get planesEscaneosIaSinLimite;
+
+  /// No description provided for @planesPrecioYSedes.
+  ///
+  /// In es, this message translates to:
+  /// **'{precio} €/mes · {maxSedes, plural, one{hasta 1 sede} other{hasta {maxSedes} sedes}}'**
+  String planesPrecioYSedes(String precio, int maxSedes);
+
+  /// No description provided for @planesResumen.
+  ///
+  /// In es, this message translates to:
+  /// **'{nombre} — {precio} €/mes · {maxSedes, plural, one{1 sede} other{{maxSedes} sedes}}'**
+  String planesResumen(String nombre, String precio, int maxSedes);
 
   /// No description provided for @noHayTiposClienteDadosDeAlta.
   ///
@@ -2456,6 +2726,30 @@ abstract class AppLocalizations {
   /// **'Seguir un cliente nuevo'**
   String get misSeguidosSeguirNuevo;
 
+  /// No description provided for @seguidosBusquedaVacia.
+  ///
+  /// In es, this message translates to:
+  /// **'No se encontró ningún cliente con ese nombre.'**
+  String get seguidosBusquedaVacia;
+
+  /// No description provided for @seguidosEligeProvinciaPrimero.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige primero una provincia.'**
+  String get seguidosEligeProvinciaPrimero;
+
+  /// No description provided for @seguidosDejarDeSeguirTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Dejar de seguir?'**
+  String get seguidosDejarDeSeguirTitulo;
+
+  /// No description provided for @seguidosDejarDeSeguirMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'Dejarás de ver las publicaciones de {nombreCliente} y de recibir sus avisos. Podrás volver a seguirlo cuando quieras.'**
+  String seguidosDejarDeSeguirMensaje(String nombreCliente);
+
   /// No description provided for @zonaTitulo.
   ///
   /// In es, this message translates to:
@@ -2492,11 +2786,29 @@ abstract class AppLocalizations {
   /// **'Todavía no sigues ninguna zona. Usa \"Seguir una zona nueva\" para recibir avisos de todo un concello.'**
   String get misZonasVacio;
 
+  /// No description provided for @zonaDejarDeSeguirTitulo.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Dejar de seguir esta zona?'**
+  String get zonaDejarDeSeguirTitulo;
+
+  /// No description provided for @zonaDejarDeSeguirMensaje.
+  ///
+  /// In es, this message translates to:
+  /// **'Dejarás de recibir avisos de publicaciones en {concello}. Podrás volver a seguirla cuando quieras.'**
+  String zonaDejarDeSeguirMensaje(String concello);
+
   /// No description provided for @drawerMisSedes.
   ///
   /// In es, this message translates to:
   /// **'Mis sedes/tanatorios'**
   String get drawerMisSedes;
+
+  /// No description provided for @drawerMiSuscripcion.
+  ///
+  /// In es, this message translates to:
+  /// **'Mi suscripción'**
+  String get drawerMiSuscripcion;
 
   /// No description provided for @drawerContactarSoporte.
   ///
@@ -3187,6 +3499,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Leyendo esquela…'**
   String get publicarLeyendoEsquela;
+
+  /// No description provided for @publicarLimiteIaAlcanzado.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta sede ha alcanzado el máximo de escaneos con IA de hoy: no se ha usado IA en esta foto. Revisa el formulario con atención.'**
+  String get publicarLimiteIaAlcanzado;
 
   /// No description provided for @publicarOcrSinTexto.
   ///

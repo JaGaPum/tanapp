@@ -546,6 +546,13 @@ class AppLocalizationsGl extends AppLocalizations {
   }
 
   @override
+  String get usuarioPlanSuscripcion => 'Plan de subscrición';
+
+  @override
+  String get periodoGratuitoPropioTitulo =>
+      'Periodo gratuíto propio deste cliente (opcional)';
+
+  @override
   String get usuarioActivo => 'Usuario activo';
 
   @override
@@ -880,6 +887,10 @@ class AppLocalizationsGl extends AppLocalizations {
       'Se está activado, ao escanear unha esquela a foto analízase con IA en vez do recoñecemento de texto local. Se a desactivas (ou falla), séguese usando o escaneo local de sempre.';
 
   @override
+  String get configuracionIaLimitePorPlanAviso =>
+      'O máximo de escaneos con IA ao día fíxase por plan de subscrición, non aquí: edítao en Plans de subscrición (cóntase por sede).';
+
+  @override
   String get configuracionLoginTitulo => 'Login';
 
   @override
@@ -902,6 +913,171 @@ class AppLocalizationsGl extends AppLocalizations {
   @override
   String get configuracionLoginAppleDescripcion =>
       'Se o desactivas, o botón \"Continuar con Apple\" desaparece das pantallas de acceso e rexistro de usuario ordinario.';
+
+  @override
+  String get planesTitulo => 'Plans de subscrición';
+
+  @override
+  String get planesExplicacion =>
+      'Os tres plans son fixos e só se diferencian polo número máximo de sedes; aquí podes editar o prezo e o límite de cada un. O plan de cada cliente asígnase na súa ficha, en \"Sistema > Usuarios\".';
+
+  @override
+  String get periodoGratuitoTitulo => 'Periodo gratuíto xeral';
+
+  @override
+  String get periodoGratuitoExplicacion =>
+      'Mentres estea activo, ningún cliente se bloquea por non ter o plan pagado. Sen data de fin é indefinido. Cada cliente pode ter ademais un propio na súa ficha, que prevalece se é máis longo ca este.';
+
+  @override
+  String get periodoGratuitoInicio => 'Inicio';
+
+  @override
+  String get periodoGratuitoFin => 'Fin';
+
+  @override
+  String get periodoGratuitoIndefinido => 'Indefinido';
+
+  @override
+  String get periodoGratuitoInicioObligatorio =>
+      'A data de inicio é obrigatoria';
+
+  @override
+  String get periodoGratuitoNuevo => 'Engadir periodo';
+
+  @override
+  String get periodoGratuitoEditar => 'Editar periodo';
+
+  @override
+  String get periodoGratuitoEliminarTitulo => 'Eliminar este periodo?';
+
+  @override
+  String get periodoGratuitoEliminarMensaje =>
+      'Eliminarase este periodo gratuíto. Esta acción non se pode desfacer.';
+
+  @override
+  String get periodoGratuitoActivo => 'Activo agora mesmo';
+
+  @override
+  String get periodoGratuitoNinguno =>
+      'Aínda non hai ningún periodo gratuíto xeral.';
+
+  @override
+  String get suscripcionTitulo => 'A miña subscrición';
+
+  @override
+  String get suscripcionPlanActual => 'Plan actual';
+
+  @override
+  String get suscripcionSinPlan =>
+      'Aínda non tes un plan asignado. Contacta con soporte.';
+
+  @override
+  String get suscripcionAlDia => 'O teu plan está ao día';
+
+  @override
+  String get suscripcionEnPrueba => 'Estás nun periodo de proba gratuíto';
+
+  @override
+  String suscripcionEnPruebaHasta(String fecha) {
+    return 'Ata o $fecha';
+  }
+
+  @override
+  String get suscripcionPagoPendienteTitulo => 'O teu periodo de proba rematou';
+
+  @override
+  String get suscripcionPagoPendienteExplicacion =>
+      'Para seguir publicando, enviando avisos e engadindo sedes, activa o pago do teu plan.';
+
+  @override
+  String get suscripcionIniciarPago => 'Iniciar pago';
+
+  @override
+  String get suscripcionIniciarPagoAsunto =>
+      'Quero activar o pago do meu plan en TanApp';
+
+  @override
+  String get planesPrecioMensual => 'Prezo mensual (€)';
+
+  @override
+  String get planesPrecioInvalido => 'Introduce un prezo válido';
+
+  @override
+  String get planesMaxSedes => 'Máximo de sedes';
+
+  @override
+  String get pagoHistorialTitulo => 'Historial de pagamentos';
+
+  @override
+  String get pagoSinHistorial => 'Aínda non hai ningún pagamento rexistrado.';
+
+  @override
+  String get pagoRegistrar => 'Rexistrar pagamento';
+
+  @override
+  String get pagoFecha => 'Data do pagamento';
+
+  @override
+  String get pagoCubre30Dias =>
+      'Cada pagamento cobre 30 días desde a data na que se recibe.';
+
+  @override
+  String pagoFechaYCobertura(String fechaPago, String fechaFinCobertura) {
+    return 'Pagado o $fechaPago · cobre ata o $fechaFinCobertura';
+  }
+
+  @override
+  String get pagoVigente => 'Vixente';
+
+  @override
+  String get planesMaxSedesInvalido => 'Introduce un número de sedes válido';
+
+  @override
+  String get planesMaxEscaneosIa =>
+      'Máximo de escaneos con IA ao día (por sede)';
+
+  @override
+  String get planesMaxEscaneosIaSinLimite => 'Sen límite';
+
+  @override
+  String get planesMaxEscaneosIaInvalido =>
+      'Introduce un número maior que 0, ou déixao en branco para non limitalo';
+
+  @override
+  String planesEscaneosIaPorSede(int maximo) {
+    String _temp0 = intl.Intl.pluralLogic(
+      maximo,
+      locale: localeName,
+      other: '$maximo escaneos con IA ao día por sede',
+      one: '1 escaneo con IA ao día por sede',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get planesEscaneosIaSinLimite => 'Escaneos con IA sen límite diario';
+
+  @override
+  String planesPrecioYSedes(String precio, int maxSedes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      maxSedes,
+      locale: localeName,
+      other: 'ata $maxSedes sedes',
+      one: 'ata 1 sede',
+    );
+    return '$precio €/mes · $_temp0';
+  }
+
+  @override
+  String planesResumen(String nombre, String precio, int maxSedes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      maxSedes,
+      locale: localeName,
+      other: '$maxSedes sedes',
+      one: '1 sede',
+    );
+    return '$nombre — $precio €/mes · $_temp0';
+  }
 
   @override
   String get noHayTiposClienteDadosDeAlta =>
@@ -1340,6 +1516,21 @@ class AppLocalizationsGl extends AppLocalizations {
   String get misSeguidosSeguirNuevo => 'Seguir un cliente novo';
 
   @override
+  String get seguidosBusquedaVacia =>
+      'Non se atopou ningún cliente con ese nome.';
+
+  @override
+  String get seguidosEligeProvinciaPrimero => 'Elixe primeiro unha provincia.';
+
+  @override
+  String get seguidosDejarDeSeguirTitulo => 'Deixar de seguir?';
+
+  @override
+  String seguidosDejarDeSeguirMensaje(String nombreCliente) {
+    return 'Deixarás de ver as publicacións de $nombreCliente e de recibir os seus avisos. Poderás volver a segui-lo cando queiras.';
+  }
+
+  @override
   String get zonaTitulo => 'Zona';
 
   @override
@@ -1360,7 +1551,18 @@ class AppLocalizationsGl extends AppLocalizations {
       'Aínda non segues ningunha zona. Usa \"Seguir unha zona nova\" para recibir avisos de todo un concello.';
 
   @override
+  String get zonaDejarDeSeguirTitulo => 'Deixar de seguir esta zona?';
+
+  @override
+  String zonaDejarDeSeguirMensaje(String concello) {
+    return 'Deixarás de recibir avisos de publicacións en $concello. Poderás volver a segui-la cando queiras.';
+  }
+
+  @override
   String get drawerMisSedes => 'As miñas sedes/tanatorios';
+
+  @override
+  String get drawerMiSuscripcion => 'A miña subscrición';
 
   @override
   String get drawerContactarSoporte => 'Contactar con soporte';
@@ -1773,6 +1975,10 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get publicarLeyendoEsquela => 'Lendo esquela…';
+
+  @override
+  String get publicarLimiteIaAlcanzado =>
+      'Esta sede chegou ao máximo de escaneos con IA de hoxe: non se usou IA nesta foto. Revisa o formulario con atención.';
 
   @override
   String get publicarOcrSinTexto =>

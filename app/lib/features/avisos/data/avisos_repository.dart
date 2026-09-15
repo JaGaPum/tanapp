@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/utils/app_exception.dart';
 import 'aviso_estadistica.dart';
 import 'aviso_programado.dart';
 import 'aviso_recibido.dart';
@@ -19,11 +20,15 @@ class AvisosRepository {
     required String titulo,
     required String texto,
   }) async {
-    await _client.from('TClienteAvisos').insert({
-      'IdClienteSede': idClienteSede,
-      'Titulo': titulo.trim(),
-      'Texto': texto.trim(),
-    });
+    try {
+      await _client.from('TClienteAvisos').insert({
+        'IdClienteSede': idClienteSede,
+        'Titulo': titulo.trim(),
+        'Texto': texto.trim(),
+      });
+    } catch (e) {
+      throw mapSupabaseError(e);
+    }
   }
 
   static const _selectProgramadoConSede = '*, TClienteSedes(Codigo, Nombre)';
@@ -37,12 +42,16 @@ class AvisosRepository {
     required String texto,
     required DateTime fechaProgramada,
   }) async {
-    await _client.from('TClienteAvisosProgramados').insert({
-      'IdClienteSede': idClienteSede,
-      'Titulo': titulo.trim(),
-      'Texto': texto.trim(),
-      'FechaProgramada': fechaProgramada.toUtc().toIso8601String(),
-    });
+    try {
+      await _client.from('TClienteAvisosProgramados').insert({
+        'IdClienteSede': idClienteSede,
+        'Titulo': titulo.trim(),
+        'Texto': texto.trim(),
+        'FechaProgramada': fechaProgramada.toUtc().toIso8601String(),
+      });
+    } catch (e) {
+      throw mapSupabaseError(e);
+    }
   }
 
   Future<void> actualizarAvisoProgramado({

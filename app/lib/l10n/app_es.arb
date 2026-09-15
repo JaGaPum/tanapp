@@ -231,6 +231,8 @@
   "@errorCargarTiposCliente": {
     "placeholders": { "error": { "type": "String" } }
   },
+  "usuarioPlanSuscripcion": "Plan de suscripción",
+  "periodoGratuitoPropioTitulo": "Periodo gratuito propio de este cliente (opcional)",
   "usuarioActivo": "Usuario activo",
   "usuarioImportacionWebSinConfigurar": "Este cliente no ha configurado ninguna URL de importación automática.",
   "usuarioImportacionWebActiva": "Importación automática activa",
@@ -361,6 +363,7 @@
   "configuracionIaImportacionWebDescripcion": "Si la desactivas, ningún cliente podrá activar la importación automática de su web ni ver propuestas, aunque ya la tuviera configurada.",
   "configuracionIaEscaneoEsquelaLabel": "Escaneo de esquelas con IA",
   "configuracionIaEscaneoEsquelaDescripcion": "Si está activado, al escanear una esquela la foto se analiza con IA en vez del reconocimiento de texto local. Si la desactivas (o falla), se sigue usando el escaneo local de siempre.",
+  "configuracionIaLimitePorPlanAviso": "El máximo de escaneos con IA al día se fija por plan de suscripción, no aquí: edítalo en Planes de suscripción (se cuenta por sede).",
   "configuracionLoginTitulo": "Login",
   "configuracionLoginGoogleLabel": "Iniciar sesión con Google",
   "configuracionLoginGoogleDescripcion": "Si lo desactivas, el botón \"Continuar con Google\" desaparece de las pantallas de acceso y registro de usuario ordinario.",
@@ -368,6 +371,76 @@
   "configuracionLoginFacebookDescripcion": "Si lo desactivas, el botón \"Continuar con Facebook\" desaparece de las pantallas de acceso y registro de usuario ordinario.",
   "configuracionLoginAppleLabel": "Iniciar sesión con Apple",
   "configuracionLoginAppleDescripcion": "Si lo desactivas, el botón \"Continuar con Apple\" desaparece de las pantallas de acceso y registro de usuario ordinario.",
+
+  "planesTitulo": "Planes de suscripción",
+  "planesExplicacion": "Los tres planes son fijos y solo se diferencian por el número máximo de sedes; aquí puedes editar el precio y el límite de cada uno. El plan de cada cliente se asigna en su ficha, en \"Sistema > Usuarios\".",
+  "periodoGratuitoTitulo": "Periodo gratuito general",
+  "periodoGratuitoExplicacion": "Mientras esté activo, ningún cliente se bloquea por no tener el plan pagado. Sin fecha de fin es indefinido. Cada cliente puede tener además uno propio en su ficha, que prevalece si es más largo que este.",
+  "periodoGratuitoInicio": "Inicio",
+  "periodoGratuitoFin": "Fin",
+  "periodoGratuitoIndefinido": "Indefinido",
+  "periodoGratuitoInicioObligatorio": "La fecha de inicio es obligatoria",
+  "periodoGratuitoNuevo": "Añadir periodo",
+  "periodoGratuitoEditar": "Editar periodo",
+  "periodoGratuitoEliminarTitulo": "¿Eliminar este periodo?",
+  "periodoGratuitoEliminarMensaje": "Se eliminará este periodo gratuito. Esta acción no se puede deshacer.",
+  "periodoGratuitoActivo": "Activo ahora mismo",
+  "periodoGratuitoNinguno": "Todavía no hay ningún periodo gratuito general.",
+
+  "suscripcionTitulo": "Mi suscripción",
+  "suscripcionPlanActual": "Plan actual",
+  "suscripcionSinPlan": "Todavía no tienes un plan asignado. Contacta con soporte.",
+  "suscripcionAlDia": "Tu plan está al día",
+  "suscripcionEnPrueba": "Estás en periodo de prueba gratuito",
+  "suscripcionEnPruebaHasta": "Hasta el {fecha}",
+  "@suscripcionEnPruebaHasta": {
+    "placeholders": { "fecha": { "type": "String" } }
+  },
+  "suscripcionPagoPendienteTitulo": "Tu periodo de prueba ha terminado",
+  "suscripcionPagoPendienteExplicacion": "Para seguir publicando, enviando avisos y añadiendo sedes, activa el pago de tu plan.",
+  "suscripcionIniciarPago": "Iniciar pago",
+  "suscripcionIniciarPagoAsunto": "Quiero activar el pago de mi plan en TanApp",
+  "planesPrecioMensual": "Precio mensual (€)",
+  "planesPrecioInvalido": "Introduce un precio válido",
+  "planesMaxSedes": "Máximo de sedes",
+  "pagoHistorialTitulo": "Historial de pagos",
+  "pagoSinHistorial": "Todavía no hay ningún pago registrado.",
+  "pagoRegistrar": "Registrar pago",
+  "pagoFecha": "Fecha del pago",
+  "pagoCubre30Dias": "Cada pago cubre 30 días desde la fecha en la que se recibe.",
+  "pagoFechaYCobertura": "Pagado el {fechaPago} · cubre hasta el {fechaFinCobertura}",
+  "@pagoFechaYCobertura": {
+    "placeholders": {
+      "fechaPago": { "type": "String" },
+      "fechaFinCobertura": { "type": "String" }
+    }
+  },
+  "pagoVigente": "Vigente",
+  "planesMaxSedesInvalido": "Introduce un número de sedes válido",
+  "planesMaxEscaneosIa": "Máximo de escaneos con IA al día (por sede)",
+  "planesMaxEscaneosIaSinLimite": "Sin límite",
+  "planesMaxEscaneosIaInvalido": "Introduce un número mayor que 0, o déjalo en blanco para no limitarlo",
+  "planesEscaneosIaPorSede": "{maximo, plural, one{1 escaneo con IA al día por sede} other{{maximo} escaneos con IA al día por sede}}",
+  "@planesEscaneosIaPorSede": {
+    "placeholders": { "maximo": { "type": "int" } }
+  },
+  "planesEscaneosIaSinLimite": "Escaneos con IA sin límite diario",
+  "planesPrecioYSedes": "{precio} €/mes · {maxSedes, plural, one{hasta 1 sede} other{hasta {maxSedes} sedes}}",
+  "@planesPrecioYSedes": {
+    "placeholders": {
+      "precio": { "type": "String" },
+      "maxSedes": { "type": "int" }
+    }
+  },
+  "planesResumen": "{nombre} — {precio} €/mes · {maxSedes, plural, one{1 sede} other{{maxSedes} sedes}}",
+  "@planesResumen": {
+    "placeholders": {
+      "nombre": { "type": "String" },
+      "precio": { "type": "String" },
+      "maxSedes": { "type": "int" }
+    }
+  },
+
   "noHayTiposClienteDadosDeAlta": "No hay tipos de cliente dados de alta",
   "clienteTipoNuevo": "Nuevo tipo de cliente",
   "clienteTipoEditar": "Editar tipo de cliente",
@@ -551,6 +624,13 @@
   "misSeguidosTabClientes": "Clientes",
   "misSeguidosTabZonas": "Zonas",
   "misSeguidosSeguirNuevo": "Seguir un cliente nuevo",
+  "seguidosBusquedaVacia": "No se encontró ningún cliente con ese nombre.",
+  "seguidosEligeProvinciaPrimero": "Elige primero una provincia.",
+  "seguidosDejarDeSeguirTitulo": "¿Dejar de seguir?",
+  "seguidosDejarDeSeguirMensaje": "Dejarás de ver las publicaciones de {nombreCliente} y de recibir sus avisos. Podrás volver a seguirlo cuando quieras.",
+  "@seguidosDejarDeSeguirMensaje": {
+    "placeholders": { "nombreCliente": { "type": "String" } }
+  },
 
   "zonaTitulo": "Zona",
   "zonaExplicacion": "Sigue un concello sin tener que buscar y seguir a cada cliente por separado: recibirás los avisos de cualquier cliente con sede ahí.",
@@ -558,8 +638,14 @@
   "zonaDejarDeSeguir": "Dejar de seguir",
   "zonaSeguirNueva": "Seguir una zona nueva",
   "misZonasVacio": "Todavía no sigues ninguna zona. Usa \"Seguir una zona nueva\" para recibir avisos de todo un concello.",
+  "zonaDejarDeSeguirTitulo": "¿Dejar de seguir esta zona?",
+  "zonaDejarDeSeguirMensaje": "Dejarás de recibir avisos de publicaciones en {concello}. Podrás volver a seguirla cuando quieras.",
+  "@zonaDejarDeSeguirMensaje": {
+    "placeholders": { "concello": { "type": "String" } }
+  },
 
   "drawerMisSedes": "Mis sedes/tanatorios",
+  "drawerMiSuscripcion": "Mi suscripción",
   "drawerContactarSoporte": "Contactar con soporte",
   "soporteAsuntoPorDefecto": "Soporte TanApp",
   "misSedesTitulo": "Mis sedes/tanatorios",
@@ -717,6 +803,7 @@
   "publicarPublicar": "Publicar",
   "publicarPublicadoOk": "Publicación creada",
   "publicarLeyendoEsquela": "Leyendo esquela…",
+  "publicarLimiteIaAlcanzado": "Esta sede ha alcanzado el máximo de escaneos con IA de hoy: no se ha usado IA en esta foto. Revisa el formulario con atención.",
   "publicarOcrSinTexto": "No se ha podido leer texto en la foto. Rellena el formulario a mano.",
   "publicarOcrError": "No se ha podido leer la foto (detalle técnico: {detalle}). Rellena el formulario a mano; si puedes, haz una captura de este mensaje para reportarlo.",
   "@publicarOcrError": {

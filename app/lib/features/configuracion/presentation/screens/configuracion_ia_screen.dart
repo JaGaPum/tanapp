@@ -107,6 +107,13 @@ class ConfiguracionIaScreen extends ConsumerWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 16),
+            Text(
+              context.l10n.configuracionIaLimitePorPlanAviso,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.outline,
+              ),
+            ),
           ],
         ),
       ),

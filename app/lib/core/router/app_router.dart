@@ -28,6 +28,8 @@ import '../../features/configuracion/presentation/screens/configuracion_comunica
 import '../../features/configuracion/presentation/screens/configuracion_concellos_screen.dart';
 import '../../features/configuracion/presentation/screens/configuracion_ia_screen.dart';
 import '../../features/configuracion/presentation/screens/configuracion_login_screen.dart';
+import '../../features/planes_suscripcion/presentation/screens/configuracion_planes_screen.dart';
+import '../../features/planes_suscripcion/presentation/screens/mi_suscripcion_screen.dart';
 import '../../features/configuracion/presentation/screens/configuracion_provincias_screen.dart';
 import '../../features/configuracion/presentation/screens/configuracion_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
@@ -378,6 +380,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const MisSedesScreen(),
       ),
       GoRoute(
+        path: '/mi-suscripcion',
+        builder: (context, state) => const MiSuscripcionScreen(),
+      ),
+      GoRoute(
         path: '/publicar/manual',
         builder: (context, state) {
           final datos = state.extra as Map<String, String?>?;
@@ -421,7 +427,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/publicar/escanear',
-        builder: (context, state) => const PublicacionEscanearScreen(),
+        builder: (context, state) =>
+            PublicacionEscanearScreen(idClienteSede: state.extra as String),
       ),
       GoRoute(
         path: '/publicar/importar-web',
@@ -547,6 +554,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'login',
             builder: (context, state) => const ConfiguracionLoginScreen(),
+          ),
+          GoRoute(
+            path: 'planes',
+            builder: (context, state) => const ConfiguracionPlanesScreen(),
           ),
           GoRoute(
             path: 'terminos',

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/utils/app_exception.dart';
 import 'esquela_escaneada.dart';
 import 'publicacion_con_sede.dart';
 import 'publicacion_programada.dart';
@@ -48,32 +49,35 @@ class PublicacionesRepository {
     bool admiteCondolencias = true,
     bool condolenciasSoloPrivadas = false,
   }) async {
-    await _client.from('TClientePublicaciones').insert({
-      'IdClienteSede': idClienteSede,
-      'NombreFallecido': nombreFallecido.trim(),
-      'FechaFallecimiento': fechaFallecimiento?.toIso8601String(),
-      'Edad': edad,
-      'FechaFuneral': fechaFuneral?.toIso8601String(),
-      'HoraFuneral': _oNull(horaFuneral),
-      'Iglesia': _oNull(iglesia),
-      'Lugar': _oNull(lugar),
-      'CapillaArdiente': _oNull(capillaArdiente),
-      'Sala': _oNull(sala),
-      'Observaciones': _oNull(observaciones),
-      'Tipo': tipo,
-      'IdConfiguracionActoTipo': idConfiguracionActoTipo,
-      'ActoTipoOtro': _oNull(actoTipoOtro),
-      'AdmiteCondolencias': admiteCondolencias,
-      'CondolenciasSoloPrivadas': condolenciasSoloPrivadas,
-    });
+    try {
+      await _client.from('TClientePublicaciones').insert({
+        'IdClienteSede': idClienteSede,
+        'NombreFallecido': nombreFallecido.trim(),
+        'FechaFallecimiento': fechaFallecimiento?.toIso8601String(),
+        'Edad': edad,
+        'FechaFuneral': fechaFuneral?.toIso8601String(),
+        'HoraFuneral': _oNull(horaFuneral),
+        'Iglesia': _oNull(iglesia),
+        'Lugar': _oNull(lugar),
+        'CapillaArdiente': _oNull(capillaArdiente),
+        'Sala': _oNull(sala),
+        'Observaciones': _oNull(observaciones),
+        'Tipo': tipo,
+        'IdConfiguracionActoTipo': idConfiguracionActoTipo,
+        'ActoTipoOtro': _oNull(actoTipoOtro),
+        'AdmiteCondolencias': admiteCondolencias,
+        'CondolenciasSoloPrivadas': condolenciasSoloPrivadas,
+      });
+    } catch (e) {
+      throw mapSupabaseError(e);
+    }
   }
 
   /// Solo lo que decide si se muestran/aceptan condolencias en esta esquela (069) — usado por la
   /// pantalla de condolencias para informar al seguidor, sin tener que traerse la publicación
   /// entera.
-  Future<({bool admiteCondolencias, bool soloPrivadas})> fetchConfigCondolencias(
-    String idClientePublicacion,
-  ) async {
+  Future<({bool admiteCondolencias, bool soloPrivadas})>
+  fetchConfigCondolencias(String idClientePublicacion) async {
     final data = await _client
         .from('TClientePublicaciones')
         .select('AdmiteCondolencias, CondolenciasSoloPrivadas')
@@ -125,26 +129,42 @@ class PublicacionesRepository {
 
   /// Manda la foto de una esquela a la Edge Function "escanear-esquela-imagen" (Claude con
   /// visión) para que extraiga sus datos; lanza si la función responde con error (p. ej. si el
-  /// escaneo con IA no está activado), para que quien llame pueda recurrir al OCR local.
+  /// escaneo con IA no está activado), para que quien llame pueda recurrir al OCR local. Un
+  /// código de respuesta distinto de 2xx (interruptor desactivado, límite diario alcanzado,
+  /// fallo de la IA...) llega como [FunctionException], no como datos normales.
   Future<EsquelaEscaneada?> escanearConIa({
     required List<int> bytesImagen,
     required String idioma,
+    required String idClienteSede,
   }) async {
-    final respuesta = await _client.functions.invoke(
-      'escanear-esquela-imagen',
-      body: {
-        'imagenBase64': base64Encode(bytesImagen),
-        'mimeType': 'image/jpeg',
-        'idioma': idioma,
-      },
-    );
-    final data = respuesta.data;
-    if (data is! Map || data['campos'] is! Map) {
-      throw Exception(
-        data is Map
-            ? (data['error'] ?? 'Respuesta inesperada')
-            : 'Respuesta inesperada',
+    final Map data;
+    try {
+      final respuesta = await _client.functions.invoke(
+        'escanear-esquela-imagen',
+        body: {
+          'imagenBase64': base64Encode(bytesImagen),
+          'mimeType': 'image/jpeg',
+          'idioma': idioma,
+          'idClienteSede': idClienteSede,
+        },
       );
+      if (respuesta.data is! Map) {
+        throw Exception('Respuesta inesperada');
+      }
+      data = respuesta.data as Map;
+    } on FunctionException catch (e) {
+      final details = e.details;
+      if (details is Map && details['code'] == 'LIMITE_DIARIO_IA') {
+        throw LimiteEscaneoIaException();
+      }
+      throw Exception(
+        details is Map && details['error'] != null
+            ? details['error'].toString()
+            : (e.reasonPhrase ?? 'Error ${e.status}'),
+      );
+    }
+    if (data['campos'] is! Map) {
+      throw Exception(data['error'] ?? 'Respuesta inesperada');
     }
     return EsquelaEscaneada.fromMap(
       (data['campos'] as Map).cast<String, dynamic>(),
@@ -239,25 +259,29 @@ class PublicacionesRepository {
     bool admiteCondolencias = true,
     bool condolenciasSoloPrivadas = false,
   }) async {
-    await _client.from('TClientePublicacionesProgramadas').insert({
-      'IdClienteSede': idClienteSede,
-      'NombreFallecido': nombreFallecido.trim(),
-      'FechaFallecimiento': fechaFallecimiento?.toIso8601String(),
-      'Edad': edad,
-      'FechaFuneral': fechaFuneral?.toIso8601String(),
-      'HoraFuneral': _oNull(horaFuneral),
-      'Iglesia': _oNull(iglesia),
-      'Lugar': _oNull(lugar),
-      'CapillaArdiente': _oNull(capillaArdiente),
-      'Sala': _oNull(sala),
-      'Observaciones': _oNull(observaciones),
-      'FechaProgramada': fechaProgramada.toUtc().toIso8601String(),
-      'Tipo': tipo,
-      'IdConfiguracionActoTipo': idConfiguracionActoTipo,
-      'ActoTipoOtro': _oNull(actoTipoOtro),
-      'AdmiteCondolencias': admiteCondolencias,
-      'CondolenciasSoloPrivadas': condolenciasSoloPrivadas,
-    });
+    try {
+      await _client.from('TClientePublicacionesProgramadas').insert({
+        'IdClienteSede': idClienteSede,
+        'NombreFallecido': nombreFallecido.trim(),
+        'FechaFallecimiento': fechaFallecimiento?.toIso8601String(),
+        'Edad': edad,
+        'FechaFuneral': fechaFuneral?.toIso8601String(),
+        'HoraFuneral': _oNull(horaFuneral),
+        'Iglesia': _oNull(iglesia),
+        'Lugar': _oNull(lugar),
+        'CapillaArdiente': _oNull(capillaArdiente),
+        'Sala': _oNull(sala),
+        'Observaciones': _oNull(observaciones),
+        'FechaProgramada': fechaProgramada.toUtc().toIso8601String(),
+        'Tipo': tipo,
+        'IdConfiguracionActoTipo': idConfiguracionActoTipo,
+        'ActoTipoOtro': _oNull(actoTipoOtro),
+        'AdmiteCondolencias': admiteCondolencias,
+        'CondolenciasSoloPrivadas': condolenciasSoloPrivadas,
+      });
+    } catch (e) {
+      throw mapSupabaseError(e);
+    }
   }
 
   Future<void> actualizarPublicacionProgramada({
